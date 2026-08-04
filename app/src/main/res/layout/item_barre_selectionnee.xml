@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/item_background">
+
+    <TextView
+        android:id="@+id/tvTypeBarre"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="N6"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="3">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etNombreBarres"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quantité"
+            android:inputType="number"
+            android:maxLength="3"
+            android:text="0" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageButton
+        android:id="@+id/btnSupprimer"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Supprimer" />
+
+</LinearLayout>

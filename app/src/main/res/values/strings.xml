@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GKM Bar Fer Calculator</string>
+    <string name="infos_poteaux">Informations des Poteaux</string>
+    <string name="nombre_poteaux">Nombre de poteaux</string>
+    <string name="longueur_poteaux">Longueur des poteaux</string>
+    <string name="barres_fer_poteau">Barres de Fer par Poteau</string>
+    <string name="nombre">Nombre</string>
+    <string name="calculer">Calculer</string>
+    <string name="selection_types_barres">Sélection des Types de Barres</string>
+    <string name="choisir_type_barre">Choisir un type de barre</string>
+    <string name="aucune_barre_selectionnee">Aucune barre sélectionnée. Choisissez un type ci-dessus.</string>
+    <string name="resultats">Résultats</string>
+
+    <!-- Ajoutez aussi ces chaînes pour les types de barres -->
+    <string name="n6">N6</string>
+    <string name="n8">N8</string>
+    <string name="n10">N10</string>
+    <string name="n12">N12</string>
+    <string name="n14">N14</string>
+    <string name="n16">N16</string>
+
+    <!-- Valeurs par défaut -->
+    <string name="valeur_un"></string>
+    <string name="valeur_six"></string>
+    <string name="valeur_zero"></string>
+</resources>
