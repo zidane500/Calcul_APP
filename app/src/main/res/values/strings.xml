@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GKM Bar Fer Calculator</string>
+    <string name="app_name">Bar Fer Calculator</string>
     <string name="infos_poteaux">Informations des Poteaux</string>
     <string name="nombre_poteaux">Nombre de poteaux</string>
     <string name="longueur_poteaux">Longueur des poteaux</string>

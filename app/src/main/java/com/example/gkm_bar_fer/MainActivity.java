@@ -227,10 +227,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Si la coupe est plus longue qu'une barre standard
         if (longueurPoteau > LONGUEUR_BARRE_STANDARD) {
-            int barresNecessaires = totalCoupesNecessaires;
+            // Combien de barres de 12 m faut-il assembler pour obtenir une coupe ?
+            int barresParCoupe = (int) Math.ceil(longueurPoteau / LONGUEUR_BARRE_STANDARD);
+            int barresNecessaires = barresParCoupe * totalCoupesNecessaires;
+
+            // Chute générée à chaque coupe (toujours positive maintenant)
+            double dechetParCoupe = (barresParCoupe * LONGUEUR_BARRE_STANDARD) - longueurPoteau;
+
             List<Double> dechets = new ArrayList<>();
             for (int i = 0; i < totalCoupesNecessaires; i++) {
-                dechets.add(LONGUEUR_BARRE_STANDARD - longueurPoteau);
+                dechets.add(dechetParCoupe);
             }
             return new ResultatCalcul(barresNecessaires, dechets, false);
         }
