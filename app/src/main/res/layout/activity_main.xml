@@ -22,69 +22,29 @@
             android:gravity="center"
             android:layout_marginBottom="24dp" />
 
-        <!-- Card pour les poteaux -->
-        <androidx.cardview.widget.CardView
+        <!-- Conteneur des groupes de poteaux : rempli dynamiquement en code.
+             Contient au minimum 1 groupe (Infos + Sélection des barres). -->
+        <LinearLayout
+            android:id="@+id/layoutGroupesPoteaux"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="16dp">
+            android:orientation="vertical" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+        <!-- Bouton pour ajouter un autre type de poteau -->
+        <Button
+            android:id="@+id/btnAjouterPoteau"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ajouter_poteau"
+            android:textSize="15sp"
+            android:textAllCaps="false"
+            android:textColor="@color/primary"
+            app:strokeColor="@color/primary"
+            app:cornerRadius="8dp"
+            android:layout_marginBottom="16dp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/infos_poteaux"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- Nombre de poteaux -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etNombrePoteaux"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/nombre_poteaux"
-                        android:inputType="number"
-                        android:text="@string/valeur_un"
-                        android:autofillHints="number" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Longueur des poteaux -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:suffixText="m">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etLongueurPoteaux"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/longueur_poteaux"
-                        android:inputType="numberDecimal"
-                        android:text="@string/valeur_six"
-                        android:autofillHints="number" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Bouton Calculer -->
+        <!-- Bouton Calculer : sous tous les groupes de poteaux -->
         <Button
             android:id="@+id/btnCalculer"
             android:layout_width="match_parent"
@@ -94,72 +54,6 @@
             android:background="@color/primary"
             android:textColor="@color/white"
             android:layout_marginBottom="24dp" />
-
-        <!-- Card pour la sélection des types de barres -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Sélection des Barres par Poteau"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- Dropdown pour choisir le type de barre -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    app:endIconMode="dropdown_menu">
-
-                    <AutoCompleteTextView
-                        android:id="@+id/autoCompleteBarreType"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Choisir un type de barre (N6, N8, N10...)"
-                        android:inputType="none" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Layout pour afficher les barres sélectionnées -->
-                <LinearLayout
-                    android:id="@+id/layoutBarresSelectionnees"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <!-- Les barres sélectionnées apparaîtront ici dynamiquement -->
-
-                </LinearLayout>
-
-                <!-- Message si aucune barre sélectionnée -->
-                <TextView
-                    android:id="@+id/tvAucuneBarre"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Aucune barre sélectionnée. Choisissez un type ci-dessus."
-                    android:textSize="14sp"
-                    android:textColor="@color/primary_dark"
-                    android:gravity="center"
-                    android:padding="16dp" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
         <!-- Card pour les résultats -->
         <androidx.cardview.widget.CardView

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bar Fer Calculator</string>
+    <string name="app_name">Bienvenue</string>
     <string name="infos_poteaux">Informations des Poteaux</string>
     <string name="nombre_poteaux">Nombre de poteaux</string>
     <string name="longueur_poteaux">Longueur des poteaux</string>
@@ -11,6 +11,8 @@
     <string name="choisir_type_barre">Choisir un type de barre</string>
     <string name="aucune_barre_selectionnee">Aucune barre sélectionnée. Choisissez un type ci-dessus.</string>
     <string name="resultats">Résultats</string>
+    <string name="ajouter_poteau">+ Ajouter un autre poteau</string>
+    <string name="supprimer_poteau">Supprimer ce poteau</string>
 
     <!-- Ajoutez aussi ces chaînes pour les types de barres -->
     <string name="n6">N6</string>

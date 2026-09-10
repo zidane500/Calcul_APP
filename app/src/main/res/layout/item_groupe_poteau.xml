@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:layout_marginBottom="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- En-tête : titre + bouton supprimer (masqué pour le tout premier groupe) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/infos_poteaux"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary" />
+
+            <ImageButton
+                android:id="@+id/btnSupprimerGroupe"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@android:drawable/ic_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/supprimer_poteau"
+                app:tint="@color/error"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Nombre de poteaux -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNombrePoteaux"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/nombre_poteaux"
+                android:inputType="number"
+                android:autofillHints="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Longueur des poteaux -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:suffixText="m">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etLongueurPoteaux"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/longueur_poteaux"
+                android:inputType="numberDecimal"
+                android:autofillHints="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Séparateur visuel -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E9ECEF"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/selection_types_barres"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Dropdown pour choisir le type de barre -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            app:endIconMode="dropdown_menu">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteBarreType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/choisir_type_barre"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Layout pour afficher les barres sélectionnées -->
+        <LinearLayout
+            android:id="@+id/layoutBarresSelectionnees"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Message si aucune barre sélectionnée -->
+        <TextView
+            android:id="@+id/tvAucuneBarre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/aucune_barre_selectionnee"
+            android:textSize="14sp"
+            android:textColor="@color/primary_dark"
+            android:gravity="center"
+            android:padding="16dp" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
