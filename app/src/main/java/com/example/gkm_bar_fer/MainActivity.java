@@ -1,5 +1,12 @@
 package com.example.gkm_bar_fer;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -8,7 +15,12 @@ import android.view.ViewGroup;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.FileProvider;
 import com.google.android.material.textfield.TextInputEditText;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
     private List<String> typesBarresDisponibles;
     private List<GroupePoteau> listeGroupesPoteaux;
 
+    private LinearLayout layoutResultatsBarres;
+
+    private Button btnExporterPdf;
+
+    // Mémorise les derniers résultats calculés, pour pouvoir les exporter sans recalculer
+    private String dernierResumePoteaux = "";
+    private LinkedHashMap<String, ResultatCalcul> derniersResultatsBarres = new LinkedHashMap<>();
+
     // Représente un "type de poteau" : ses infos (nombre/longueur) + les barres qui lui sont associées.
     private static class GroupePoteau {
         View rootView;
@@ -35,15 +55,95 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Classe pour stocker les résultats de calcul
+    // Représente une coupe à réaliser, avec son origine (quel groupe de poteau l'a demandée)
+    private static class CoupeRequise {
+        double longueur;
+        double longueurPoteau;
+        int nombrePoteaux;
+        String segmentInfo;
+
+        CoupeRequise(double longueur, double longueurPoteau, int nombrePoteaux, String segmentInfo) {
+            this.longueur = longueur;
+            this.longueurPoteau = longueurPoteau;
+            this.nombrePoteaux = nombrePoteaux;
+            this.segmentInfo = segmentInfo;
+        }
+    }
+
+    // Représente une barre de 12 m utilisée, avec le détail des coupes qui y sont faites
+    private static class BarreUtilisee {
+        List<CoupeRequise> coupes = new ArrayList<>();
+        double resteDisponible;
+
+        BarreUtilisee(double resteDisponible) {
+            this.resteDisponible = resteDisponible;
+        }
+    }
+
+    // Classe pour stocker les résultats de calcul
+
+    // Petit gestionnaire de curseur d'écriture pour générer un PDF multi-pages :
+// avance une position Y et ouvre automatiquement une nouvelle page si besoin.
+    private static class CurseurPdf {
+        PdfDocument document;
+        PdfDocument.Page page;
+        Canvas canvas;
+        float y;
+        int numeroPage;
+        final int largeur;
+        final int hauteur;
+        final int marge;
+
+        CurseurPdf(PdfDocument document, int largeur, int hauteur, int marge) {
+            this.document = document;
+            this.largeur = largeur;
+            this.hauteur = hauteur;
+            this.marge = marge;
+            this.numeroPage = 0;
+            nouvellePage();
+        }
+
+        void nouvellePage() {
+            if (page != null) {
+                document.finishPage(page);
+            }
+            numeroPage++;
+            PdfDocument.PageInfo pageInfo =
+                    new PdfDocument.PageInfo.Builder(largeur, hauteur, numeroPage).create();
+            page = document.startPage(pageInfo);
+            canvas = page.getCanvas();
+            y = marge;
+        }
+
+        void assurerEspace(float hauteurNecessaire) {
+            if (y + hauteurNecessaire > hauteur - marge) {
+                nouvellePage();
+            }
+        }
+
+        void ligne(String texte, Paint paint, float interligne) {
+            assurerEspace(interligne);
+            canvas.drawText(texte, marge, y, paint);
+            y += interligne;
+        }
+
+        void terminer() {
+            document.finishPage(page);
+        }
+    }
+
     private static class ResultatCalcul {
         int barresNecessaires;
         List<Double> listeDechets;  // Liste des déchets individuels
         boolean utilisationOptimisee;
+        List<BarreUtilisee> detailBarres; // Quelle(s) coupe(s), de quel poteau, sur quelle barre
 
-        ResultatCalcul(int barresNecessaires, List<Double> listeDechets, boolean utilisationOptimisee) {
+        ResultatCalcul(int barresNecessaires, List<Double> listeDechets, boolean utilisationOptimisee,
+                       List<BarreUtilisee> detailBarres) {
             this.barresNecessaires = barresNecessaires;
             this.listeDechets = listeDechets;
             this.utilisationOptimisee = utilisationOptimisee;
+            this.detailBarres = detailBarres;
         }
     }
 
@@ -80,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
         btnCalculer = findViewById(R.id.btnCalculer);
         cardResultats = findViewById(R.id.cardResultats);
         tvResultats = findViewById(R.id.tvResultats);
+        layoutResultatsBarres = findViewById(R.id.layoutResultatsBarres);
+        btnExporterPdf = findViewById(R.id.btnExporterPdf);
     }
 
     private void setupListeners() {
@@ -94,6 +196,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 calculerBarres();
+            }
+        });
+        btnExporterPdf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exporterResultatsEnPdf();
             }
         });
     }
@@ -206,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
         //    a) afficher le détail des besoins par poteau
         //    b) regrouper TOUTES les coupes nécessaires par type de barre (tous poteaux confondus)
         StringBuilder detailPoteaux = new StringBuilder();
-        Map<String, List<Double>> coupesParTypeBarre = new HashMap<>();
+        Map<String, List<CoupeRequise>> coupesParTypeBarre = new HashMap<>();
 
         for (GroupePoteau groupe : listeGroupesPoteaux) {
             int nombrePoteaux = Integer.parseInt(groupe.etNombrePoteaux.getText().toString());
@@ -241,19 +349,22 @@ public class MainActivity extends AppCompatActivity {
                         .append(totalCoupesNecessaires).append(" coupes au total\n");
 
                 // Ajouter ces coupes à la liste globale du type de barre (partagée entre TOUS les poteaux)
-                List<Double> coupes = coupesParTypeBarre.get(typeBarre);
+                List<CoupeRequise> coupes = coupesParTypeBarre.get(typeBarre);
                 if (coupes == null) {
                     coupes = new ArrayList<>();
                     coupesParTypeBarre.put(typeBarre, coupes);
                 }
                 for (int i = 0; i < totalCoupesNecessaires; i++) {
-                    coupes.add(longueurPoteaux);
+                    coupes.add(new CoupeRequise(longueurPoteaux, longueurPoteaux, nombrePoteaux, null));
                 }
             }
             detailPoteaux.append("\n");
         }
 
         if (coupesParTypeBarre.isEmpty()) {
+            layoutResultatsBarres.removeAllViews();
+            derniersResultatsBarres.clear();
+            dernierResumePoteaux = "";
             tvResultats.setText(detailPoteaux.toString().trim());
             cardResultats.setVisibility(View.VISIBLE);
             return;
@@ -261,42 +372,206 @@ public class MainActivity extends AppCompatActivity {
 
         // 3) Un seul calcul d'optimisation par type de barre, sur l'ensemble des coupes
         //    demandées par TOUS les poteaux de ce type (réutilisation des chutes entre poteaux différents).
-        StringBuilder achats = new StringBuilder();
-        achats.append("=== Barres à acheter (optimisé sur l'ensemble du chantier) ===\n\n");
+        // 3) Un seul calcul d'optimisation par type de barre, sur l'ensemble des coupes
+        //    demandées par TOUS les poteaux de ce type (réutilisation des chutes entre poteaux différents).
+        tvResultats.setText(detailPoteaux.toString()
+                + "=== Barres à acheter (optimisé sur l'ensemble du chantier) ===");
 
-        for (Map.Entry<String, List<Double>> entry : coupesParTypeBarre.entrySet()) {
+        dernierResumePoteaux = detailPoteaux.toString().trim();
+        derniersResultatsBarres.clear();
+
+        layoutResultatsBarres.removeAllViews();
+        for (Map.Entry<String, List<CoupeRequise>> entry : coupesParTypeBarre.entrySet()) {
             String typeBarre = entry.getKey();
             ResultatCalcul resultat = calculerBarresNecessaires(entry.getValue());
+            derniersResultatsBarres.put(typeBarre, resultat);
+            ajouterResultatBarre(typeBarre, resultat);
+        }
 
-            achats.append("• ").append(typeBarre).append(":\n");
-            achats.append("  - Barres à acheter: ").append(resultat.barresNecessaires).append("\n");
+        cardResultats.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Construit et ajoute au conteneur layoutResultatsBarres le bloc de résultat d'un type de barre :
+     * le résumé (barres à acheter / déchets / optimisé) toujours visible, et le détail barre par barre
+     * masqué derrière un bouton "Afficher détail".
+     */
+    private void ajouterResultatBarre(String typeBarre, ResultatCalcul resultat) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View itemView = inflater.inflate(R.layout.item_resultat_barre, layoutResultatsBarres, false);
+
+        TextView tvResumeBarre = itemView.findViewById(R.id.tvResumeBarre);
+        Button btnAfficherDetail = itemView.findViewById(R.id.btnAfficherDetail);
+        TextView tvDetailBarres = itemView.findViewById(R.id.tvDetailBarres);
+
+        StringBuilder resume = new StringBuilder();
+        resume.append("• ").append(typeBarre).append(":\n");
+        resume.append("  - Barres à acheter: ").append(resultat.barresNecessaires).append("\n");
+
+        if (resultat.listeDechets.isEmpty()) {
+            resume.append("  - Déchets: Aucun");
+        } else {
+            resume.append("  - Déchets: ").append(resultat.listeDechets.size()).append(" chutes\n");
+
+            Map<Double, Integer> dechetsParLongueur = new HashMap<>();
+            for (Double dechet : resultat.listeDechets) {
+                dechetsParLongueur.put(dechet, dechetsParLongueur.getOrDefault(dechet, 0) + 1);
+            }
+
+            List<String> lignesDechets = new ArrayList<>();
+            for (Map.Entry<Double, Integer> entryDechet : dechetsParLongueur.entrySet()) {
+                if (entryDechet.getValue() == 1) {
+                    lignesDechets.add("    * Chute: "
+                            + String.format(Locale.FRANCE, "%.2f", entryDechet.getKey()) + " m");
+                } else {
+                    lignesDechets.add("    * " + entryDechet.getValue() + " chutes: "
+                            + String.format(Locale.FRANCE, "%.2f", entryDechet.getKey()) + " m");
+                }
+            }
+            resume.append(TextUtils.join("\n", lignesDechets));
+            resume.append("\n");
+        }
+        resume.append("\n  - Optimisé: ").append(resultat.utilisationOptimisee ? "Oui" : "Non");
+        tvResumeBarre.setText(resume.toString());
+
+        StringBuilder detail = new StringBuilder();
+        int numeroBarre = 1;
+        for (BarreUtilisee barre : resultat.detailBarres) {
+            if (numeroBarre > 1) {
+                detail.append("\n");
+            }
+            detail.append("Barre ").append(numeroBarre).append(" : ")
+                    .append(formatterDetailBarre(barre));
+            numeroBarre++;
+        }
+        tvDetailBarres.setText(detail.toString());
+
+        btnAfficherDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean estVisible = tvDetailBarres.getVisibility() == View.VISIBLE;
+                tvDetailBarres.setVisibility(estVisible ? View.GONE : View.VISIBLE);
+                btnAfficherDetail.setText(estVisible ? "Afficher détail" : "Masquer détail");
+            }
+        });
+
+        layoutResultatsBarres.addView(itemView);
+    }
+
+    /**
+     * Génère un PDF récapitulatif (poteaux + barres à acheter + détail barre par barre)
+     * à partir des derniers résultats calculés, puis propose de l'ouvrir/partager.
+     */
+    private void exporterResultatsEnPdf() {
+        if (derniersResultatsBarres.isEmpty()) {
+            Toast.makeText(this, "Veuillez d'abord calculer les résultats.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Paint paintTitre = new Paint();
+        paintTitre.setTextSize(18);
+        paintTitre.setFakeBoldText(true);
+        paintTitre.setColor(Color.parseColor("#2196F3"));
+
+        Paint paintDate = new Paint();
+        paintDate.setTextSize(10);
+        paintDate.setColor(Color.GRAY);
+
+        Paint paintSection = new Paint();
+        paintSection.setTextSize(14);
+        paintSection.setFakeBoldText(true);
+        paintSection.setColor(Color.BLACK);
+
+        Paint paintTexte = new Paint();
+        paintTexte.setTextSize(11);
+        paintTexte.setColor(Color.DKGRAY);
+
+        PdfDocument pdfDocument = new PdfDocument();
+        CurseurPdf curseur = new CurseurPdf(pdfDocument, 595, 842, 40);
+
+        curseur.ligne("GKM Bar Fer - Résultats de calcul", paintTitre, 24);
+        String date = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRANCE).format(new Date());
+        curseur.ligne("Généré le " + date, paintDate, 22);
+
+        for (String ligne : dernierResumePoteaux.split("\n")) {
+            curseur.ligne(ligne, paintTexte, 14);
+        }
+        curseur.y += 10;
+
+        curseur.ligne("Barres à acheter (optimisé sur l'ensemble du chantier)", paintSection, 22);
+
+        for (Map.Entry<String, ResultatCalcul> entry : derniersResultatsBarres.entrySet()) {
+            String typeBarre = entry.getKey();
+            ResultatCalcul resultat = entry.getValue();
+
+            curseur.assurerEspace(50);
+            curseur.y += 6;
+            curseur.ligne("Type de barre : " + typeBarre, paintSection, 18);
+            curseur.ligne("Barres à acheter : " + resultat.barresNecessaires, paintTexte, 14);
+            curseur.ligne("Optimisé : " + (resultat.utilisationOptimisee ? "Oui" : "Non"), paintTexte, 14);
 
             if (resultat.listeDechets.isEmpty()) {
-                achats.append("  - Déchets: Aucun\n");
+                curseur.ligne("Déchets : Aucun", paintTexte, 14);
             } else {
-                achats.append("  - Déchets: ").append(resultat.listeDechets.size()).append(" chutes\n");
-
                 Map<Double, Integer> dechetsParLongueur = new HashMap<>();
                 for (Double dechet : resultat.listeDechets) {
                     dechetsParLongueur.put(dechet, dechetsParLongueur.getOrDefault(dechet, 0) + 1);
                 }
-
-                for (Map.Entry<Double, Integer> entryDechet : dechetsParLongueur.entrySet()) {
-                    if (entryDechet.getValue() == 1) {
-                        achats.append("    * Chute: ")
-                                .append(String.format(Locale.FRANCE, "%.2f", entryDechet.getKey())).append(" m\n");
-                    } else {
-                        achats.append("    * ").append(entryDechet.getValue()).append(" chutes: ")
-                                .append(String.format(Locale.FRANCE, "%.2f", entryDechet.getKey())).append(" m\n");
-                    }
+                StringBuilder dechetsTxt = new StringBuilder("Déchets : ");
+                for (Map.Entry<Double, Integer> d : dechetsParLongueur.entrySet()) {
+                    dechetsTxt.append(d.getValue()).append("x ")
+                            .append(String.format(Locale.FRANCE, "%.2f", d.getKey())).append("m   ");
                 }
+                curseur.ligne(dechetsTxt.toString(), paintTexte, 14);
             }
 
-            achats.append("  - Optimisé: ").append(resultat.utilisationOptimisee ? "Oui" : "Non").append("\n\n");
+            curseur.ligne("Détail des barres :", paintTexte, 14);
+            int numeroBarre = 1;
+            for (BarreUtilisee barre : resultat.detailBarres) {
+                curseur.ligne("  Barre " + numeroBarre + " : " + formatterDetailBarre(barre), paintTexte, 13);
+                numeroBarre++;
+            }
         }
 
-        tvResultats.setText(detailPoteaux.toString() + achats.toString());
-        cardResultats.setVisibility(View.VISIBLE);
+        curseur.terminer();
+
+        try {
+            File dossierBase = getExternalFilesDir(null);
+            if (dossierBase == null) {
+                dossierBase = getFilesDir();
+            }
+            File dossierExports = new File(dossierBase, "exports");
+            if (!dossierExports.exists()) {
+                dossierExports.mkdirs();
+            }
+
+            String nomFichier = "GKM_Resultats_" + System.currentTimeMillis() + ".pdf";
+            File fichierPdf = new File(dossierExports, nomFichier);
+
+            FileOutputStream fos = new FileOutputStream(fichierPdf);
+            pdfDocument.writeTo(fos);
+            fos.close();
+            pdfDocument.close();
+
+            Uri uriPdf = FileProvider.getUriForFile(this,
+                    getPackageName() + ".fileprovider", fichierPdf);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uriPdf, "application/pdf");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            try {
+                startActivity(Intent.createChooser(intent, "Ouvrir le PDF avec"));
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this,
+                        "Aucune application pour ouvrir le PDF. Fichier enregistré : " + fichierPdf.getName(),
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (IOException e) {
+            Toast.makeText(this, "Erreur lors de la génération du PDF : " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -307,32 +582,102 @@ public class MainActivity extends AppCompatActivity {
      * sinon on ouvre une nouvelle barre. Cela permet de réutiliser les chutes même entre deux
      * poteaux différents qui partagent le même type de barre.
      */
-    private ResultatCalcul calculerBarresNecessaires(List<Double> coupesRequises) {
+
+    /**
+     * Regroupe et met en forme les coupes d'une barre donnée, ex :
+     * "2× Poteaux de 2,00 m (2,00 m) + Poteaux de 10,00 m (10,00 m)"
+     */
+    private String formatterDetailBarre(BarreUtilisee barre) {
+        LinkedHashMap<String, Integer> comptage = new LinkedHashMap<>();
+        LinkedHashMap<String, CoupeRequise> exemples = new LinkedHashMap<>();
+        for (CoupeRequise c : barre.coupes) {
+            String cle = c.longueur + "|" + c.longueurPoteau + "|" + c.nombrePoteaux + "|" + c.segmentInfo;
+            comptage.put(cle, comptage.getOrDefault(cle, 0) + 1);
+            exemples.putIfAbsent(cle, c);
+        }
+
+        List<String> parts = new ArrayList<>();
+        for (Map.Entry<String, Integer> e : comptage.entrySet()) {
+            CoupeRequise c = exemples.get(e.getKey());
+            int n = e.getValue();
+            String longueurCoupeTxt = String.format(Locale.FRANCE, "%.2f", c.longueur);
+            String longueurPoteauTxt = String.format(Locale.FRANCE, "%.2f", c.longueurPoteau);
+            String segmentTxt = c.segmentInfo != null ? " (" + c.segmentInfo + ")" : "";
+            String finPhrasePoteau = c.nombrePoteaux > 1
+                    ? "les " + c.nombrePoteaux + " poteaux de " + longueurPoteauTxt + " m"
+                    : "le poteau de " + longueurPoteauTxt + " m";
+
+            parts.add(n + " coupe" + (n > 1 ? "s" : "") + " de " + longueurCoupeTxt + " m" + segmentTxt
+                    + " pour " + finPhrasePoteau);
+        }
+
+        String description = TextUtils.join(" + ", parts);
+        List<Double> chutes = barre.resteDisponible > 1e-9
+                ? Collections.singletonList(barre.resteDisponible)
+                : Collections.<Double>emptyList();
+
+        return description + " avec " + formatterChute(chutes);
+    }
+
+    private String formatterChute(List<Double> chutes) {
+        if (chutes.isEmpty()) {
+            return "0 chutes";
+        }
+        Map<Double, Integer> comptageChutes = new LinkedHashMap<>();
+        for (Double d : chutes) {
+            comptageChutes.put(d, comptageChutes.getOrDefault(d, 0) + 1);
+        }
+        List<String> parts = new ArrayList<>();
+        for (Map.Entry<Double, Integer> e : comptageChutes.entrySet()) {
+            String longueurTxt = String.format(Locale.FRANCE, "%.2f", e.getKey());
+            if (e.getValue() == 1) {
+                parts.add("chute " + longueurTxt + " m");
+            } else {
+                parts.add(e.getValue() + " chutes de " + longueurTxt + " m");
+            }
+        }
+        return TextUtils.join(" et ", parts);
+    }
+    private ResultatCalcul calculerBarresNecessaires(List<CoupeRequise> coupesRequises) {
         int barresNecessaires = 0;
-        List<Double> barresOuvertes = new ArrayList<>(); // longueur restante sur chaque barre déjà entamée
+        List<BarreUtilisee> barresOuvertes = new ArrayList<>(); // barres réutilisables (coupes ≤ 12 m)
+        List<BarreUtilisee> barresFermees = new ArrayList<>();  // barres "figées" pour les coupes > 12 m
         List<Double> listeDechets = new ArrayList<>();
 
-        List<Double> coupesTriees = new ArrayList<>(coupesRequises);
-        Collections.sort(coupesTriees, Collections.reverseOrder());
+        List<CoupeRequise> coupesTriees = new ArrayList<>(coupesRequises);
+        Collections.sort(coupesTriees, new Comparator<CoupeRequise>() {
+            @Override
+            public int compare(CoupeRequise a, CoupeRequise b) {
+                return Double.compare(b.longueur, a.longueur);
+            }
+        });
 
-        for (double longueurCoupe : coupesTriees) {
+        for (CoupeRequise coupe : coupesTriees) {
+            double longueurCoupe = coupe.longueur;
             if (longueurCoupe <= 0) {
                 continue;
             }
 
-            // Coupe plus longue qu'une barre standard : il faut assembler plusieurs barres
             if (longueurCoupe > LONGUEUR_BARRE_STANDARD) {
                 int barresParCoupe = (int) Math.ceil(longueurCoupe / LONGUEUR_BARRE_STANDARD);
                 barresNecessaires += barresParCoupe;
                 listeDechets.add((barresParCoupe * LONGUEUR_BARRE_STANDARD) - longueurCoupe);
+
+                for (int seg = 1; seg <= barresParCoupe; seg++) {
+                    double longueurSegment = Math.min(LONGUEUR_BARRE_STANDARD,
+                            longueurCoupe - (seg - 1) * LONGUEUR_BARRE_STANDARD);
+                    BarreUtilisee barre = new BarreUtilisee(LONGUEUR_BARRE_STANDARD - longueurSegment);
+                    barre.coupes.add(new CoupeRequise(longueurSegment, coupe.longueurPoteau,
+                            coupe.nombrePoteaux, "segment " + seg + "/" + barresParCoupe));
+                    barresFermees.add(barre);
+                }
                 continue;
             }
 
-            // Chercher, parmi les barres déjà entamées, celle qui laissera le moins de perte (best-fit)
             int indexTrouve = -1;
             double meilleurReste = -1;
             for (int i = 0; i < barresOuvertes.size(); i++) {
-                double reste = barresOuvertes.get(i);
+                double reste = barresOuvertes.get(i).resteDisponible;
                 if (reste >= longueurCoupe && (meilleurReste == -1 || reste < meilleurReste)) {
                     indexTrouve = i;
                     meilleurReste = reste;
@@ -340,17 +685,20 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (indexTrouve != -1) {
-                barresOuvertes.set(indexTrouve, barresOuvertes.get(indexTrouve) - longueurCoupe);
+                BarreUtilisee barre = barresOuvertes.get(indexTrouve);
+                barre.resteDisponible -= longueurCoupe;
+                barre.coupes.add(coupe);
             } else {
                 barresNecessaires++;
-                barresOuvertes.add(LONGUEUR_BARRE_STANDARD - longueurCoupe);
+                BarreUtilisee barre = new BarreUtilisee(LONGUEUR_BARRE_STANDARD - longueurCoupe);
+                barre.coupes.add(coupe);
+                barresOuvertes.add(barre);
             }
         }
 
-        // Les longueurs restant sur les barres entamées (>0) sont les déchets finaux
-        for (double reste : barresOuvertes) {
-            if (reste > 1e-9) {
-                listeDechets.add(reste);
+        for (BarreUtilisee barre : barresOuvertes) {
+            if (barre.resteDisponible > 1e-9) {
+                listeDechets.add(barre.resteDisponible);
             }
         }
 
@@ -361,7 +709,11 @@ public class MainActivity extends AppCompatActivity {
         boolean utilisationOptimisee = barresNecessaires == 0
                 || (totalDechets / (barresNecessaires * LONGUEUR_BARRE_STANDARD)) < 0.2;
 
-        return new ResultatCalcul(barresNecessaires, listeDechets, utilisationOptimisee);
+        List<BarreUtilisee> detailBarres = new ArrayList<>();
+        detailBarres.addAll(barresFermees);
+        detailBarres.addAll(barresOuvertes);
+
+        return new ResultatCalcul(barresNecessaires, listeDechets, utilisationOptimisee, detailBarres);
     }
 
     /**
