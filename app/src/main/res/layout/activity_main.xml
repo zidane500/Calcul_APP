@@ -1,126 +1,273 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:fillViewport="true"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header -->
+
+        <!-- ===================================================== -->
+        <!-- HEADER                                                -->
+        <!-- ===================================================== -->
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary"
+            android:layout_marginBottom="24dp"
             android:gravity="center"
-            android:layout_marginBottom="24dp" />
+            android:text="Bienvenue"
+            android:textColor="@color/primary"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
-        <!-- Conteneur des groupes de poteaux : rempli dynamiquement en code.
-             Contient au minimum 1 groupe (Infos + Sélection des barres). -->
+
+        <!-- ===================================================== -->
+        <!-- GROUPES DE POTEAUX                                    -->
+        <!-- Rempli dynamiquement en Java/Kotlin                  -->
+        <!-- ===================================================== -->
+
         <LinearLayout
             android:id="@+id/layoutGroupesPoteaux"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />
 
-        <!-- Bouton pour ajouter un autre type de poteau -->
-        <Button
-            android:id="@+id/btnAjouterPoteau"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/ajouter_poteau"
-            android:textSize="15sp"
-            android:textAllCaps="false"
-            android:textColor="@color/primary"
-            app:strokeColor="@color/primary"
-            app:cornerRadius="8dp"
-            android:layout_marginBottom="16dp" />
 
-        <!-- Bouton Calculer : sous tous les groupes de poteaux -->
-        <Button
+        <!-- ===================================================== -->
+        <!-- AJOUTER UN POTEAU                                     -->
+        <!-- ===================================================== -->
+
+
+        <!-- ===================================================== -->
+        <!-- CALCULER                                              -->
+        <!-- ===================================================== -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAjouterPoteau"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+
+            android:text="@string/ajouter_poteau"
+            android:textAllCaps="false"
+            android:textColor="@color/add_poteau_text"
+            android:textSize="14sp"
+            android:textStyle="bold"
+
+            app:backgroundTint="@color/add_poteau_background"
+            app:cornerRadius="12dp"
+            app:elevation="0dp"
+
+            app:icon="@drawable/ic_add_poteau"
+            app:iconGravity="textStart"
+            app:iconPadding="7dp"
+            app:iconSize="19dp"
+            app:iconTint="@color/add_poteau_text"
+
+            app:strokeColor="@color/add_poteau_stroke"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCalculer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginBottom="24dp"
             android:text="@string/calculer"
-            android:textSize="16sp"
-            android:background="@color/primary"
+            android:textAllCaps="false"
             android:textColor="@color/white"
-            android:layout_marginBottom="24dp" />
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="14dp"
+            app:elevation="3dp"
+            app:icon="@drawable/ic_calculate"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconSize="20dp"
+            app:iconTint="@color/white" />
 
-        <!-- Card pour les résultats -->
+
+        <!-- ===================================================== -->
+        <!-- CARD DES RÉSULTATS                                   -->
+        <!-- ===================================================== -->
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardResultats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone">
+            android:layout_marginBottom="20dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:paddingStart="16dp"
+                android:paddingTop="18dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="18dp">
+
+
+                <!-- ================================================= -->
+                <!-- TITRE DES RÉSULTATS                               -->
+                <!-- ================================================= -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:includeFontPadding="false"
                         android:text="@string/resultats"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/primary" />
-
-                    <Button
-                        android:id="@+id/btnExporterPdf"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:text="Exporter PDF"
-                        android:textAllCaps="false"
-                        android:textSize="12sp"
                         android:textColor="@color/primary"
-                        app:strokeColor="@color/primary"
-                        app:cornerRadius="8dp" />
+                        android:textSize="21sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:includeFontPadding="false"
+                        android:text="Résumé et détails de votre calcul"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="13sp" />
 
                 </LinearLayout>
+
+
+                <!-- ================================================= -->
+                <!-- BOUTONS D'EXPORTATION                             -->
+                <!-- ================================================= -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+
+                    <!-- ============================= -->
+                    <!-- EXPORT PDF                    -->
+                    <!-- ============================= -->
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExporterPdf"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="Exporter PDF"
+                        android:textAllCaps="false"
+                        android:textColor="@color/on_surface"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/pdf_color"
+                        app:cornerRadius="10dp"
+                        app:elevation="0dp"
+                        app:icon="@drawable/ic_pdf_export"
+                        app:iconGravity="textStart"
+                        app:iconPadding="6dp"
+                        app:iconSize="17dp"
+                        app:iconTint="@color/on_surface"
+                        app:strokeWidth="0dp" />
+
+
+                    <!-- ============================= -->
+                    <!-- EXPORT EXCEL                  -->
+                    <!-- ============================= -->
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExporterExcel"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="5dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="Exporter Excel"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/excel_color"
+                        app:cornerRadius="10dp"
+                        app:elevation="0dp"
+                        app:icon="@drawable/ic_excel_export"
+                        app:iconGravity="textStart"
+                        app:iconPadding="6dp"
+                        app:iconSize="17dp"
+                        app:iconTint="@color/white"
+                        app:strokeWidth="0dp" />
+
+                </LinearLayout>
+
+
+                <!-- ================================================= -->
+                <!-- SÉPARATEUR                                        -->
+                <!-- ================================================= -->
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="#E8E8E8" />
+
+
+                <!-- ================================================= -->
+                <!-- RÉSULTAT PRINCIPAL                                -->
+                <!-- ================================================= -->
 
                 <TextView
                     android:id="@+id/tvResultats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="4dp" />
-                <!-- Rempli dynamiquement en code : un bloc par type de barre (N6, N8, N12...),
-                     chacun avec son bouton "Afficher détail". -->
+                    android:includeFontPadding="false"
+                    android:lineSpacingExtra="5dp"
+                    android:textColor="#343A40"
+                    android:textSize="14sp" />
+
+
+                <!-- ================================================= -->
+                <!-- DÉTAILS DES BARRES                                -->
+                <!-- Rempli dynamiquement en Java/Kotlin              -->
+                <!-- ================================================= -->
+
                 <LinearLayout
                     android:id="@+id/layoutResultatsBarres"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:orientation="vertical" />
+
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>
+
 </ScrollView>

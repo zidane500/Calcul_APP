@@ -18,4 +18,36 @@
     <color name="success">#4CAF50</color>
     <color name="warning">#FF9800</color>
     <color name="error">#F44336</color>
+    <!-- Teinte claire pour bouton tonal (ex: Ajouter un poteau) -->
+    <color name="light_primary_tint">#E3F2FD</color>
+    <!-- Couleurs des boutons d'export -->
+    <color name="pdf_color">#F9A825</color>
+    <color name="excel_color">#217346</color>
+
+    <color name="detail_button_text">#1976D2</color>
+    <color name="detail_button_background">#EEF6FF</color>
+    <color name="detail_button_stroke">#B9D8F7</color>
+
+    <color name="add_poteau_text">#1976D2</color>
+    <color name="add_poteau_background">#F3F8FE</color>
+    <color name="add_poteau_stroke">#B9D8F7</color>
+
+
+    <!-- Interface poteau / barres -->
+
+
+    <color name="secondary_text">#6B7280</color>
+    <color name="section_title">#374151</color>
+    <color name="divider">#E5E7EB</color>
+
+    <!-- Élément barre -->
+    <color name="barre_item_background">#F8FAFC</color>
+    <color name="barre_type_text">#1F2937</color>
+    <color name="barre_secondary_text">#6B7280</color>
+    <color name="barre_input_stroke">#CBD5E1</color>
+    <color name="barre_input_text">#111827</color>
+    <color name="barre_delete">#DC3545</color>
+
+    <!-- État vide -->
+    <color name="empty_barres_icon">#1976D2</color>
 </resources>

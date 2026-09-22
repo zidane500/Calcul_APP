@@ -9,9 +9,9 @@
     <string name="calculer">Calculer</string>
     <string name="selection_types_barres">Sélection des Types de Barres</string>
     <string name="choisir_type_barre">Choisir un type de barre</string>
-    <string name="aucune_barre_selectionnee">Aucune barre sélectionnée. Choisissez un type ci-dessus.</string>
+    <string name="aucune_barre_selectionnee">Aucune barre sélectionnée !</string>
     <string name="resultats">Résultats</string>
-    <string name="ajouter_poteau">+ Ajouter un autre poteau</string>
+    <string name="ajouter_poteau">Ajouter un autre poteau</string>
     <string name="supprimer_poteau">Supprimer ce poteau</string>
 
     <!-- Ajoutez aussi ces chaînes pour les types de barres -->

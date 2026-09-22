@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,11 +40,11 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout layoutResultatsBarres;
 
     private Button btnExporterPdf;
+    private Button btnExporterExcel;
 
-    // Mémorise les derniers résultats calculés, pour pouvoir les exporter sans recalculer
     private String dernierResumePoteaux = "";
     private LinkedHashMap<String, ResultatCalcul> derniersResultatsBarres = new LinkedHashMap<>();
-
+    private List<String[]> derniersGroupesPoteaux = new ArrayList<>();
     // Représente un "type de poteau" : ses infos (nombre/longueur) + les barres qui lui sont associées.
     private static class GroupePoteau {
         View rootView;
@@ -132,6 +134,178 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    // Génère un fichier .xlsx minimal (format OOXML) en écrivant le XML à la main dans un ZIP,
+// sans dépendance externe (ni Apache POI, ni autre librairie).
+    private static class GenerateurXlsx {
+        private static class Cellule {
+            String texte;
+            Double nombre;
+            boolean gras;
+
+            static Cellule texte(String t, boolean gras) {
+                Cellule c = new Cellule();
+                c.texte = t;
+                c.gras = gras;
+                return c;
+            }
+
+            static Cellule nombre(double n, boolean gras) {
+                Cellule c = new Cellule();
+                c.nombre = n;
+                c.gras = gras;
+                return c;
+            }
+        }
+
+        private final List<String> nomsFeuilles = new ArrayList<>();
+        private final List<List<List<Cellule>>> feuilles = new ArrayList<>();
+
+        int ajouterFeuille(String nom) {
+            nomsFeuilles.add(nom);
+            feuilles.add(new ArrayList<List<Cellule>>());
+            return feuilles.size() - 1;
+        }
+
+        void ajouterLigne(int feuille, List<Cellule> cellules) {
+            feuilles.get(feuille).add(cellules);
+        }
+
+        void ecrire(File fichier) throws IOException {
+            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(fichier));
+            try {
+                ecrireEntree(zip, "[Content_Types].xml", genererContentTypes());
+                ecrireEntree(zip, "_rels/.rels", genererRelsRacine());
+                ecrireEntree(zip, "xl/workbook.xml", genererWorkbook());
+                ecrireEntree(zip, "xl/_rels/workbook.xml.rels", genererWorkbookRels());
+                ecrireEntree(zip, "xl/styles.xml", genererStyles());
+                for (int i = 0; i < feuilles.size(); i++) {
+                    ecrireEntree(zip, "xl/worksheets/sheet" + (i + 1) + ".xml",
+                            genererFeuille(feuilles.get(i)));
+                }
+            } finally {
+                zip.close();
+            }
+        }
+
+        private void ecrireEntree(ZipOutputStream zip, String nom, String contenu) throws IOException {
+            ZipEntry entree = new ZipEntry(nom);
+            zip.putNextEntry(entree);
+            zip.write(contenu.getBytes("UTF-8"));
+            zip.closeEntry();
+        }
+
+        private String genererContentTypes() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+            sb.append("<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">");
+            sb.append("<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/>");
+            sb.append("<Default Extension=\"xml\" ContentType=\"application/xml\"/>");
+            sb.append("<Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/>");
+            sb.append("<Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/>");
+            for (int i = 0; i < feuilles.size(); i++) {
+                sb.append("<Override PartName=\"/xl/worksheets/sheet").append(i + 1)
+                        .append(".xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/>");
+            }
+            sb.append("</Types>");
+            return sb.toString();
+        }
+
+        private String genererRelsRacine() {
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                    + "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">"
+                    + "<Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"xl/workbook.xml\"/>"
+                    + "</Relationships>";
+        }
+
+        private String genererWorkbook() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+            sb.append("<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" ")
+                    .append("xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">");
+            sb.append("<sheets>");
+            for (int i = 0; i < nomsFeuilles.size(); i++) {
+                sb.append("<sheet name=\"").append(echapperXml(nomsFeuilles.get(i)))
+                        .append("\" sheetId=\"").append(i + 1)
+                        .append("\" r:id=\"rIdSheet").append(i + 1).append("\"/>");
+            }
+            sb.append("</sheets></workbook>");
+            return sb.toString();
+        }
+
+        private String genererWorkbookRels() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+            sb.append("<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">");
+            for (int i = 0; i < feuilles.size(); i++) {
+                sb.append("<Relationship Id=\"rIdSheet").append(i + 1)
+                        .append("\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" ")
+                        .append("Target=\"worksheets/sheet").append(i + 1).append(".xml\"/>");
+            }
+            sb.append("<Relationship Id=\"rIdStyles\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/>");
+            sb.append("</Relationships>");
+            return sb.toString();
+        }
+
+        private String genererStyles() {
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                    + "<styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">"
+                    + "<fonts count=\"2\">"
+                    + "<font><sz val=\"11\"/><name val=\"Calibri\"/></font>"
+                    + "<font><b/><sz val=\"11\"/><name val=\"Calibri\"/></font>"
+                    + "</fonts>"
+                    + "<fills count=\"1\"><fill><patternFill patternType=\"none\"/></fill></fills>"
+                    + "<borders count=\"1\"><border/></borders>"
+                    + "<cellStyleXfs count=\"1\"><xf/></cellStyleXfs>"
+                    + "<cellXfs count=\"2\"><xf fontId=\"0\"/><xf fontId=\"1\"/></cellXfs>"
+                    + "<cellStyles count=\"1\"><cellStyle name=\"Normal\" xfId=\"0\" builtinId=\"0\"/></cellStyles>"
+                    + "</styleSheet>";
+        }
+
+        private String genererFeuille(List<List<Cellule>> lignes) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+            sb.append("<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">");
+            sb.append("<sheetData>");
+            for (int r = 0; r < lignes.size(); r++) {
+                sb.append("<row r=\"").append(r + 1).append("\">");
+                List<Cellule> ligne = lignes.get(r);
+                for (int c = 0; c < ligne.size(); c++) {
+                    Cellule cellule = ligne.get(c);
+                    String ref = colonneLettre(c) + (r + 1);
+                    int style = cellule.gras ? 1 : 0;
+                    if (cellule.nombre != null) {
+                        sb.append("<c r=\"").append(ref).append("\" s=\"").append(style).append("\">")
+                                .append("<v>").append(cellule.nombre).append("</v></c>");
+                    } else {
+                        sb.append("<c r=\"").append(ref).append("\" t=\"inlineStr\" s=\"").append(style).append("\">")
+                                .append("<is><t xml:space=\"preserve\">")
+                                .append(echapperXml(cellule.texte == null ? "" : cellule.texte))
+                                .append("</t></is></c>");
+                    }
+                }
+                sb.append("</row>");
+            }
+            sb.append("</sheetData></worksheet>");
+            return sb.toString();
+        }
+
+        private String colonneLettre(int index) {
+            StringBuilder sb = new StringBuilder();
+            int n = index;
+            do {
+                sb.insert(0, (char) ('A' + (n % 26)));
+                n = n / 26 - 1;
+            } while (n >= 0);
+            return sb.toString();
+        }
+
+        private String echapperXml(String s) {
+            return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                    .replace("\"", "&quot;").replace("'", "&apos;");
+        }
+    }
+
     private static class ResultatCalcul {
         int barresNecessaires;
         List<Double> listeDechets;  // Liste des déchets individuels
@@ -182,6 +356,7 @@ public class MainActivity extends AppCompatActivity {
         tvResultats = findViewById(R.id.tvResultats);
         layoutResultatsBarres = findViewById(R.id.layoutResultatsBarres);
         btnExporterPdf = findViewById(R.id.btnExporterPdf);
+        btnExporterExcel = findViewById(R.id.btnExporterExcel);
     }
 
     private void setupListeners() {
@@ -202,6 +377,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 exporterResultatsEnPdf();
+            }
+        });
+        btnExporterExcel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exporterResultatsEnExcel();
             }
         });
     }
@@ -289,7 +470,8 @@ public class MainActivity extends AppCompatActivity {
         groupe.layoutBarresSelectionnees.addView(barreView);
 
         // Masquer le message "Aucune barre"
-        groupe.tvAucuneBarre.setVisibility(View.GONE);
+        groupe.tvAucuneBarre.setText("•••");
+        groupe.tvAucuneBarre.setVisibility(View.VISIBLE);
     }
 
     private void supprimerBarreSelectionnee(GroupePoteau groupe, String typeBarre, View barreView) {
@@ -315,6 +497,7 @@ public class MainActivity extends AppCompatActivity {
         //    b) regrouper TOUTES les coupes nécessaires par type de barre (tous poteaux confondus)
         StringBuilder detailPoteaux = new StringBuilder();
         Map<String, List<CoupeRequise>> coupesParTypeBarre = new HashMap<>();
+        List<String[]> nouveauxGroupesPoteaux = new ArrayList<>();
 
         for (GroupePoteau groupe : listeGroupesPoteaux) {
             int nombrePoteaux = Integer.parseInt(groupe.etNombrePoteaux.getText().toString());
@@ -357,6 +540,13 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < totalCoupesNecessaires; i++) {
                     coupes.add(new CoupeRequise(longueurPoteaux, longueurPoteaux, nombrePoteaux, null));
                 }
+                nouveauxGroupesPoteaux.add(new String[]{
+                        String.format(Locale.FRANCE, "%.2f", longueurPoteaux),
+                        String.valueOf(nombrePoteaux),
+                        typeBarre,
+                        String.valueOf(nombreParPoteau),
+                        String.valueOf(totalCoupesNecessaires)
+                });
             }
             detailPoteaux.append("\n");
         }
@@ -364,6 +554,7 @@ public class MainActivity extends AppCompatActivity {
         if (coupesParTypeBarre.isEmpty()) {
             layoutResultatsBarres.removeAllViews();
             derniersResultatsBarres.clear();
+            derniersGroupesPoteaux.clear();
             dernierResumePoteaux = "";
             tvResultats.setText(detailPoteaux.toString().trim());
             cardResultats.setVisibility(View.VISIBLE);
@@ -375,10 +566,11 @@ public class MainActivity extends AppCompatActivity {
         // 3) Un seul calcul d'optimisation par type de barre, sur l'ensemble des coupes
         //    demandées par TOUS les poteaux de ce type (réutilisation des chutes entre poteaux différents).
         tvResultats.setText(detailPoteaux.toString()
-                + "=== Barres à acheter (optimisé sur l'ensemble du chantier) ===");
+                + "=== Optimisé sur l'ensemble du chantier ===");
 
         dernierResumePoteaux = detailPoteaux.toString().trim();
         derniersResultatsBarres.clear();
+        derniersGroupesPoteaux = nouveauxGroupesPoteaux;
 
         layoutResultatsBarres.removeAllViews();
         for (Map.Entry<String, List<CoupeRequise>> entry : coupesParTypeBarre.entrySet()) {
@@ -574,6 +766,107 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void exporterResultatsEnExcel() {
+        if (derniersResultatsBarres.isEmpty()) {
+            Toast.makeText(this, "Veuillez d'abord calculer les résultats.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        GenerateurXlsx classeur = new GenerateurXlsx();
+
+        int feuillePoteaux = classeur.ajouterFeuille("Poteaux");
+        classeur.ajouterLigne(feuillePoteaux, Arrays.asList(
+                GenerateurXlsx.Cellule.texte("Longueur poteau (m)", true),
+                GenerateurXlsx.Cellule.texte("Nombre de poteaux", true),
+                GenerateurXlsx.Cellule.texte("Type de barre", true),
+                GenerateurXlsx.Cellule.texte("Coupes / poteau", true),
+                GenerateurXlsx.Cellule.texte("Total coupes", true)));
+
+        for (String[] ligne : derniersGroupesPoteaux) {
+            classeur.ajouterLigne(feuillePoteaux, Arrays.asList(
+                    GenerateurXlsx.Cellule.nombre(Double.parseDouble(ligne[0].replace(",", ".")), false),
+                    GenerateurXlsx.Cellule.nombre(Double.parseDouble(ligne[1]), false),
+                    GenerateurXlsx.Cellule.texte(ligne[2], false),
+                    GenerateurXlsx.Cellule.nombre(Double.parseDouble(ligne[3]), false),
+                    GenerateurXlsx.Cellule.nombre(Double.parseDouble(ligne[4]), false)));
+        }
+
+        for (Map.Entry<String, ResultatCalcul> entry : derniersResultatsBarres.entrySet()) {
+            String typeBarre = entry.getKey();
+            ResultatCalcul resultat = entry.getValue();
+
+            int feuille = classeur.ajouterFeuille(typeBarre);
+
+            classeur.ajouterLigne(feuille, Arrays.asList(
+                    GenerateurXlsx.Cellule.texte("Barres à acheter", true),
+                    GenerateurXlsx.Cellule.nombre(resultat.barresNecessaires, false)));
+            classeur.ajouterLigne(feuille, Arrays.asList(
+                    GenerateurXlsx.Cellule.texte("Optimisé", true),
+                    GenerateurXlsx.Cellule.texte(resultat.utilisationOptimisee ? "Oui" : "Non", false)));
+
+            double totalDechets = 0;
+            for (double d : resultat.listeDechets) {
+                totalDechets += d;
+            }
+            classeur.ajouterLigne(feuille, Arrays.asList(
+                    GenerateurXlsx.Cellule.texte("Total déchets (m)", true),
+                    GenerateurXlsx.Cellule.nombre(totalDechets, false)));
+
+            classeur.ajouterLigne(feuille, Collections.<GenerateurXlsx.Cellule>emptyList());
+
+            classeur.ajouterLigne(feuille, Arrays.asList(
+                    GenerateurXlsx.Cellule.texte("Barre N°", true),
+                    GenerateurXlsx.Cellule.texte("Coupes", true),
+                    GenerateurXlsx.Cellule.texte("Chute (m)", true)));
+
+            int numeroBarre = 1;
+            for (BarreUtilisee barre : resultat.detailBarres) {
+                classeur.ajouterLigne(feuille, Arrays.asList(
+                        GenerateurXlsx.Cellule.nombre(numeroBarre, false),
+                        GenerateurXlsx.Cellule.texte(formatterDescriptionCoupes(barre), false),
+                        GenerateurXlsx.Cellule.nombre(
+                                barre.resteDisponible > 1e-9 ? barre.resteDisponible : 0.0, false)));
+                numeroBarre++;
+            }
+        }
+
+        try {
+            File dossierBase = getExternalFilesDir(null);
+            if (dossierBase == null) {
+                dossierBase = getFilesDir();
+            }
+            File dossierExports = new File(dossierBase, "exports");
+            if (!dossierExports.exists()) {
+                dossierExports.mkdirs();
+            }
+
+            String nomFichier = "GKM_Resultats_" + System.currentTimeMillis() + ".xlsx";
+            File fichierXlsx = new File(dossierExports, nomFichier);
+            classeur.ecrire(fichierXlsx);
+
+            Uri uriXlsx = FileProvider.getUriForFile(this,
+                    getPackageName() + ".fileprovider", fichierXlsx);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uriXlsx,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            try {
+                startActivity(Intent.createChooser(intent, "Ouvrir le fichier Excel avec"));
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this,
+                        "Aucune application pour ouvrir le fichier Excel. Fichier enregistré : "
+                                + fichierXlsx.getName(),
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (IOException e) {
+            Toast.makeText(this, "Erreur lors de la génération du fichier Excel : " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
     /**
      * Calcule le nombre de barres de 12 m nécessaires pour satisfaire TOUTES les coupes demandées
      * (potentiellement de longueurs différentes) pour un même type de barre.
@@ -587,7 +880,7 @@ public class MainActivity extends AppCompatActivity {
      * Regroupe et met en forme les coupes d'une barre donnée, ex :
      * "2× Poteaux de 2,00 m (2,00 m) + Poteaux de 10,00 m (10,00 m)"
      */
-    private String formatterDetailBarre(BarreUtilisee barre) {
+    private String formatterDescriptionCoupes(BarreUtilisee barre) {
         LinkedHashMap<String, Integer> comptage = new LinkedHashMap<>();
         LinkedHashMap<String, CoupeRequise> exemples = new LinkedHashMap<>();
         for (CoupeRequise c : barre.coupes) {
@@ -610,13 +903,14 @@ public class MainActivity extends AppCompatActivity {
             parts.add(n + " coupe" + (n > 1 ? "s" : "") + " de " + longueurCoupeTxt + " m" + segmentTxt
                     + " pour " + finPhrasePoteau);
         }
+        return TextUtils.join(" + ", parts);
+    }
 
-        String description = TextUtils.join(" + ", parts);
+    private String formatterDetailBarre(BarreUtilisee barre) {
         List<Double> chutes = barre.resteDisponible > 1e-9
                 ? Collections.singletonList(barre.resteDisponible)
                 : Collections.<Double>emptyList();
-
-        return description + " avec " + formatterChute(chutes);
+        return formatterDescriptionCoupes(barre) + " avec " + formatterChute(chutes);
     }
 
     private String formatterChute(List<Double> chutes) {
