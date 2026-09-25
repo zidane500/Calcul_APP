@@ -23,11 +23,11 @@ public class SplashActivity extends AppCompatActivity {
         ImageView ivLogo = findViewById(R.id.ivLogoSplash);
         TextView tvNom = findViewById(R.id.tvNomAppSplash);
 
-        // Petite animation d'apparition professionnelle : fondu + léger zoom, logo puis nom
+        // Petite animation d'apparition professionnelle : léger zoom sur le logo (déjà visible),
+        // puis fondu du nom de l'appli
         ivLogo.setScaleX(0.8f);
         ivLogo.setScaleY(0.8f);
         ivLogo.animate()
-                .alpha(1f)
                 .scaleX(1f)
                 .scaleY(1f)
                 .setDuration(DUREE_ANIMATION_MS)
@@ -50,7 +50,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void demarrerActivitePrincipale() {
-        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+        startActivity(new Intent(SplashActivity.this, MenuActivity.class));
         finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }

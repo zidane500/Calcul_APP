@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    android:padding="20dp"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textColor="@color/primary"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:text="Choisissez un type de calcul"
+        android:textColor="@color/on_surface"
+        android:textSize="14sp" />
+
+    <!-- Ligne 1 : Poteau / Semelle (actifs) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnMenuPoteau"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="130dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Poteau"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="16dp"
+            app:elevation="3dp"
+            app:icon="@drawable/ic_poteau"
+            app:iconGravity="top"
+            app:iconPadding="8dp"
+            app:iconSize="36dp"
+            app:iconTint="@color/white" />
+
+        <Button
+            android:id="@+id/btnMenuSemelle"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="130dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Semelle"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/excel_color"
+            app:cornerRadius="16dp"
+            app:elevation="3dp"
+            app:icon="@drawable/ic_semelle"
+            app:iconGravity="top"
+            app:iconPadding="8dp"
+            app:iconSize="36dp"
+            app:iconTint="@color/white" />
+
+    </LinearLayout>
+
+    <!-- Ligne 2 : Escalier / Dalle (pas encore actifs) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnMenuEscalier"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="130dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Escalier"
+            android:textAllCaps="false"
+            android:textColor="@color/on_surface"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/light_primary_tint"
+            app:cornerRadius="16dp"
+            app:elevation="0dp"
+            app:icon="@drawable/ic_escalier"
+            app:iconGravity="top"
+            app:iconPadding="8dp"
+            app:iconSize="36dp"
+            app:iconTint="@color/on_surface" />
+
+        <Button
+            android:id="@+id/btnMenuDalle"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="130dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Dalle"
+            android:textAllCaps="false"
+            android:textColor="@color/on_surface"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/light_primary_tint"
+            app:cornerRadius="16dp"
+            app:elevation="0dp"
+            app:icon="@drawable/ic_dalle"
+            app:iconGravity="top"
+            app:iconPadding="8dp"
+            app:iconSize="36dp"
+            app:iconTint="@color/on_surface" />
+
+    </LinearLayout>
+
+</LinearLayout>
