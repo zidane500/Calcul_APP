@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="Ajouter du fer au stock"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="Type de fer"
+        android:textColor="@color/on_surface"
+        android:textSize="13sp" />
+
+    <Button
+        android:id="@+id/btnChoisirType"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="Sélectionner un type"
+        android:textAllCaps="false"
+        android:textColor="@color/primary"
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/primary" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="Unité"
+        android:textColor="@color/on_surface"
+        android:textSize="13sp" />
+
+    <Button
+        android:id="@+id/btnChoisirUnite"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sélectionner une unité"
+        android:textAllCaps="false"
+        android:textColor="@color/primary"
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/primary" />
+
+</LinearLayout>

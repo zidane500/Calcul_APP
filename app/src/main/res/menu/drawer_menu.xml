@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navAccueil"
+        android:icon="@drawable/ic_home"
+        android:title="Accueil" />
+    <item
+        android:id="@+id/navHistorique"
+        android:icon="@drawable/ic_historique"
+        android:title="Historique" />
+    <item
+        android:id="@+id/navStockDechets"
+        android:icon="@drawable/ic_stock_dechets"
+        android:title="Stock Déchets" />
+</menu>

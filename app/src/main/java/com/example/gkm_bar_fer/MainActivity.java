@@ -10,20 +10,27 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import java.util.*;
+import android.content.res.ColorStateList;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private CardView cardResultats;
     private TextView tvResultats;
 
-    private static final double LONGUEUR_BARRE_STANDARD = 12.0;
+    private static final double LONGUEUR_BARRE_STANDARD = ConfigurationBarres.LONGUEUR_BARRE_STANDARD;
     private List<String> typesBarresDisponibles;
     private List<GroupePoteau> listeGroupesPoteaux;
 
@@ -41,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
 
     private Button btnExporterPdf;
     private Button btnExporterExcel;
+
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private ActionBarDrawerToggle drawerToggle;
 
     private String dernierResumePoteaux = "";
     private LinkedHashMap<String, ResultatCalcul> derniersResultatsBarres = new LinkedHashMap<>();
@@ -329,21 +340,14 @@ public class MainActivity extends AppCompatActivity {
         initTypesBarres();
         initViews();
         setupListeners();
+        configurerTiroirNavigation();
 
-        // Premier groupe de poteau affiché par défaut, sans bouton "Supprimer"
+// Premier groupe de poteau affiché par défaut, sans bouton "Supprimer"
         ajouterGroupePoteau(false);
     }
 
     private void initTypesBarres() {
-        typesBarresDisponibles = new ArrayList<>();
-        // Ajoutez tous les types de barres de N6 à N30
-        for (int i = 6; i <= 30; i += 2) {
-            typesBarresDisponibles.add("N" + i);
-        }
-        // Ajoutez aussi les types supplémentaires si nécessaire
-        typesBarresDisponibles.add("N32");
-        typesBarresDisponibles.add("N35");
-        typesBarresDisponibles.add("N40");
+        typesBarresDisponibles = new ArrayList<>(ConfigurationBarres.listerTypes());
 
         listeGroupesPoteaux = new ArrayList<>();
     }
@@ -357,6 +361,9 @@ public class MainActivity extends AppCompatActivity {
         layoutResultatsBarres = findViewById(R.id.layoutResultatsBarres);
         btnExporterPdf = findViewById(R.id.btnExporterPdf);
         btnExporterExcel = findViewById(R.id.btnExporterExcel);
+
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.navigationView);
     }
 
     private void setupListeners() {
@@ -385,6 +392,45 @@ public class MainActivity extends AppCompatActivity {
                 exporterResultatsEnExcel();
             }
         });
+    }
+    private void configurerTiroirNavigation() {
+        drawerToggle = new ActionBarDrawerToggle(
+                this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.addDrawerListener(drawerToggle);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+
+        drawerToggle.syncState();
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+
+                int id = item.getItemId();
+                if (id == R.id.navAccueil) {
+                    startActivity(new Intent(MainActivity.this, MenuActivity.class));
+                    finish();
+                } else if (id == R.id.navStockDechets) {
+                    startActivity(new Intent(MainActivity.this, StockActivity.class));
+                }
+// Historique : pas encore fonctionnel, aucune action pour l'instant
+// (en attente de vos instructions pour la suite)
+
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle != null && drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -594,6 +640,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tvResumeBarre = itemView.findViewById(R.id.tvResumeBarre);
         Button btnAfficherDetail = itemView.findViewById(R.id.btnAfficherDetail);
+        Button btnDechetsAuStock = itemView.findViewById(R.id.btnDechetsAuStock);
         TextView tvDetailBarres = itemView.findViewById(R.id.tvDetailBarres);
 
         StringBuilder resume = new StringBuilder();
@@ -644,6 +691,33 @@ public class MainActivity extends AppCompatActivity {
                 boolean estVisible = tvDetailBarres.getVisibility() == View.VISIBLE;
                 tvDetailBarres.setVisibility(estVisible ? View.GONE : View.VISIBLE);
                 btnAfficherDetail.setText(estVisible ? "Afficher détail" : "Masquer détail");
+            }
+        });
+
+        final boolean[] dechetsEnvoyes = {false};
+
+
+
+        btnDechetsAuStock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!dechetsEnvoyes[0]) {
+                    StockManager.getInstance(MainActivity.this).ajouterDechets(typeBarre, resultat.listeDechets);
+                    btnDechetsAuStock.setText("Retirer chutes envoyées");
+                    btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
+                            ContextCompat.getColor(MainActivity.this, R.color.error)));
+                    dechetsEnvoyes[0] = true;
+                    Toast.makeText(MainActivity.this,
+                            "Déchets de " + typeBarre + " ajoutés au stock.", Toast.LENGTH_SHORT).show();
+                } else {
+                    StockManager.getInstance(MainActivity.this).retirerDechets(typeBarre, resultat.listeDechets);
+                    btnDechetsAuStock.setText("Déchets au stock");
+                    btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
+                            ContextCompat.getColor(MainActivity.this, R.color.success)));
+                    dechetsEnvoyes[0] = false;
+                    Toast.makeText(MainActivity.this,
+                            "Déchets de " + typeBarre + " retirés du stock.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

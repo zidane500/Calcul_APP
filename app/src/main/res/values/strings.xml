@@ -14,6 +14,10 @@
     <string name="ajouter_poteau">Ajouter un autre poteau</string>
     <string name="supprimer_poteau">Supprimer ce poteau</string>
 
+    <!-- Tiroir de navigation -->
+    <string name="drawer_open">Ouvrir le menu</string>
+    <string name="drawer_close">Fermer le menu</string>
+
     <!-- Ajoutez aussi ces chaînes pour les types de barres -->
     <string name="n6">N6</string>
     <string name="n8">N8</string>

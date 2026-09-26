@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -8,11 +7,7 @@
     android:paddingTop="8dp"
     android:paddingBottom="10dp">
 
-
-    <!-- ===================================================== -->
-    <!-- RÉSUMÉ DE LA BARRE                                   -->
-    <!-- ===================================================== -->
-
+    <!-- Résumé de la barre -->
     <TextView
         android:id="@+id/tvResumeBarre"
         android:layout_width="match_parent"
@@ -22,41 +17,63 @@
         android:textColor="#343A40"
         android:textSize="14sp" />
 
-
-    <!-- ===================================================== -->
-    <!-- BOUTON AFFICHER / MASQUER LE DÉTAIL                  -->
-    <!-- ===================================================== -->
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnAfficherDetail"
-        android:layout_width="wrap_content"
-        android:layout_height="42dp"
+    <!-- Actions -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
-        android:paddingStart="13dp"
-        android:paddingEnd="11dp"
-        android:text="Afficher le détail"
-        android:textAllCaps="false"
-        android:textColor="@color/detail_button_text"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        app:backgroundTint="@color/detail_button_background"
-        app:cornerRadius="10dp"
-        app:elevation="0dp"
-        app:icon="@drawable/ic_chevron_down"
-        app:iconGravity="textEnd"
-        app:iconPadding="6dp"
-        app:iconSize="16dp"
-        app:iconTint="@color/detail_button_text"
-        app:strokeColor="@color/detail_button_stroke"
-        app:strokeWidth="1dp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
+        <!-- Afficher le détail -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAfficherDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="13dp"
+            android:paddingEnd="11dp"
+            android:text="Afficher le détail"
+            android:textAllCaps="false"
+            android:textColor="@color/detail_button_text"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/detail_button_background"
+            app:cornerRadius="10dp"
+            app:elevation="0dp"
+            app:icon="@drawable/ic_chevron_down"
+            app:iconGravity="textEnd"
+            app:iconPadding="6dp"
+            app:iconSize="16dp"
+            app:iconTint="@color/detail_button_text"
+            app:strokeColor="@color/detail_button_stroke"
+            app:strokeWidth="1dp" />
 
-    <!-- ===================================================== -->
-    <!-- DÉTAIL DES BARRES                                    -->
-    <!-- ===================================================== -->
+        <!-- Déchets au stock -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDechetsAuStock"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_marginStart="7dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Déchets au stock"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/success"
+            app:cornerRadius="10dp"
+            app:elevation="0dp"
+            app:iconGravity="textStart"
+            app:iconPadding="5dp" />
 
+    </LinearLayout>
+
+    <!-- Détail caché au départ -->
     <TextView
         android:id="@+id/tvDetailBarres"
         android:layout_width="match_parent"
