@@ -31,6 +31,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import android.content.res.ColorStateList;
 import androidx.core.content.ContextCompat;
+import com.google.android.material.appbar.MaterialToolbar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -336,6 +337,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         initTypesBarres();
         initViews();
@@ -394,14 +397,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     private void configurerTiroirNavigation() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+
         drawerToggle = new ActionBarDrawerToggle(
-                this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close
+        );
+
         drawerLayout.addDrawerListener(drawerToggle);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-        }
+        drawerToggle.getDrawerArrowDrawable().setColor(
+                ContextCompat.getColor(this, R.color.white)
+        );
 
         drawerToggle.syncState();
 

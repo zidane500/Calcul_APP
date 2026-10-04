@@ -7,9 +7,18 @@
     android:layout_height="match_parent">
 
     <!-- CONTENU PRINCIPAL -->
-    <ScrollView
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <include layout="@layout/layout_header" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:background="@color/background"
         android:fillViewport="true"
         android:paddingStart="16dp"
@@ -221,7 +230,10 @@
 
         </LinearLayout>
 
+
+
     </ScrollView>
+    </LinearLayout>
 
     <!-- MENU LATÉRAL -->
     <com.google.android.material.navigation.NavigationView

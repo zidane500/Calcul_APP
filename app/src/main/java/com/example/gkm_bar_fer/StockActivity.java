@@ -1,6 +1,7 @@
 package com.example.gkm_bar_fer;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +10,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -30,6 +37,8 @@ public class StockActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock);
+
+        configurerMenuNavigation();
 
         layoutStock = findViewById(R.id.layoutStock);
         tvStockVide = findViewById(R.id.tvStockVide);
@@ -53,6 +62,72 @@ public class StockActivity extends AppCompatActivity {
         rafraichirAffichageStock();
     }
 
+    // ------------------------------------------------------------------
+    // Header et menu latéral
+    // ------------------------------------------------------------------
+
+    private void configurerMenuNavigation() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Stock Déchets");
+        }
+
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close
+        );
+
+        drawerLayout.addDrawerListener(drawerToggle);
+
+        drawerToggle.getDrawerArrowDrawable().setColor(
+                ContextCompat.getColor(this, R.color.white)
+        );
+
+        drawerToggle.syncState();
+        navigationView.setCheckedItem(R.id.navStockDechets);
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.navAccueil) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+
+                Intent intent = new Intent(
+                        StockActivity.this,
+                        MenuActivity.class
+                );
+
+                intent.addFlags(
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                );
+
+                startActivity(intent);
+                finish();
+                return true;
+            }
+
+            if (id == R.id.navStockDechets) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    // ------------------------------------------------------------------
+    // Affichage du stock
+    // ------------------------------------------------------------------
+
     /**
      * Reconstruit entièrement l'affichage du stock à partir des données actuelles.
      */
@@ -71,7 +146,12 @@ public class StockActivity extends AppCompatActivity {
             String typeFer = entry.getKey();
             List<MorceauFer> morceaux = entry.getValue();
 
-            View itemView = inflater.inflate(R.layout.item_stock_type, layoutStock, false);
+            View itemView = inflater.inflate(
+                    R.layout.item_stock_type,
+                    layoutStock,
+                    false
+            );
+
             TextView tvType = itemView.findViewById(R.id.tvTypeFerStock);
             TextView tvDetail = itemView.findViewById(R.id.tvDetailStock);
 
@@ -83,7 +163,7 @@ public class StockActivity extends AppCompatActivity {
     }
 
     /**
-     * Met en forme la liste des morceaux d'un type de fer, avec un total récapitulatif.
+     * Met en forme les morceaux d'un type de fer avec un total récapitulatif.
      */
     private String formatterDetailStock(List<MorceauFer> morceaux) {
         StringBuilder texte = new StringBuilder();
@@ -91,16 +171,21 @@ public class StockActivity extends AppCompatActivity {
         double totalMetres = 0;
 
         for (MorceauFer m : morceaux) {
-            texte.append(m.quantite).append(m.quantite > 1 ? " morceaux de " : " morceau de ")
-                    .append(String.format(Locale.FRANCE, "%.2f", m.longueur)).append(" m\n");
+            texte.append(m.quantite)
+                    .append(m.quantite > 1 ? " morceaux de " : " morceau de ")
+                    .append(String.format(Locale.FRANCE, "%.2f", m.longueur))
+                    .append(" m\n");
+
             totalPieces += m.quantite;
             totalMetres += m.quantite * m.longueur;
         }
 
-        texte.append("\nTotal : ").append(totalPieces)
+        texte.append("\nTotal : ")
+                .append(totalPieces)
                 .append(totalPieces > 1 ? " pièces" : " pièce")
                 .append(" — ")
-                .append(String.format(Locale.FRANCE, "%.2f", totalMetres)).append(" m");
+                .append(String.format(Locale.FRANCE, "%.2f", totalMetres))
+                .append(" m");
 
         return texte.toString();
     }
@@ -113,10 +198,15 @@ public class StockActivity extends AppCompatActivity {
         typeFerSelectionne = null;
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        View vueDialogue = inflater.inflate(R.layout.dialog_choix_type_unite, null);
+        View vueDialogue = inflater.inflate(
+                R.layout.dialog_choix_type_unite,
+                null
+        );
 
-        final Button btnChoisirType = vueDialogue.findViewById(R.id.btnChoisirType);
-        Button btnChoisirUnite = vueDialogue.findViewById(R.id.btnChoisirUnite);
+        final Button btnChoisirType =
+                vueDialogue.findViewById(R.id.btnChoisirType);
+        Button btnChoisirUnite =
+                vueDialogue.findViewById(R.id.btnChoisirUnite);
 
         final AlertDialog dialogue = new AlertDialog.Builder(this)
                 .setView(vueDialogue)
@@ -134,10 +224,14 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (typeFerSelectionne == null) {
-                    Toast.makeText(StockActivity.this,
-                            "Choisissez d'abord un type de fer.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(
+                            StockActivity.this,
+                            "Choisissez d'abord un type de fer.",
+                            Toast.LENGTH_SHORT
+                    ).show();
                     return;
                 }
+
                 dialogue.dismiss();
                 afficherListeChoixUnite();
             }
@@ -147,7 +241,8 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void afficherListeChoixType(final Button btnChoisirType) {
-        final String[] types = ConfigurationBarres.listerTypes().toArray(new String[0]);
+        final String[] types =
+                ConfigurationBarres.listerTypes().toArray(new String[0]);
 
         new AlertDialog.Builder(this)
                 .setTitle("Type de fer")
@@ -180,22 +275,37 @@ public class StockActivity extends AppCompatActivity {
     }
 
     // ------------------------------------------------------------------
-    // Boîte de dialogue 2 : saisie (Bar ou Coupes selon le choix précédent)
+    // Boîte de dialogue 2 : saisie de barres entières
     // ------------------------------------------------------------------
 
     private void afficherDialogueSaisieBar(final String typeFer) {
         LayoutInflater inflater = LayoutInflater.from(this);
-        View vueDialogue = inflater.inflate(R.layout.dialog_saisie_stock, null);
+        View vueDialogue = inflater.inflate(
+                R.layout.dialog_saisie_stock,
+                null
+        );
 
         TextView tvType = vueDialogue.findViewById(R.id.tvTypeFerDialog);
         TextView tvUnite = vueDialogue.findViewById(R.id.tvUniteDialog);
-        final TextInputLayout layoutQuantite = vueDialogue.findViewById(R.id.layoutQuantite);
-        final TextInputEditText etQuantite = vueDialogue.findViewById(R.id.etQuantite);
-        TextInputLayout layoutLongueur = vueDialogue.findViewById(R.id.layoutLongueur);
+
+        final TextInputLayout layoutQuantite =
+                vueDialogue.findViewById(R.id.layoutQuantite);
+        final TextInputEditText etQuantite =
+                vueDialogue.findViewById(R.id.etQuantite);
+        TextInputLayout layoutLongueur =
+                vueDialogue.findViewById(R.id.layoutLongueur);
 
         tvType.setText("Type : " + typeFer);
-        tvUnite.setText("Unité : Bar (barres entières de "
-                + String.format(Locale.FRANCE, "%.2f", ConfigurationBarres.LONGUEUR_BARRE_STANDARD) + " m)");
+        tvUnite.setText(
+                "Unité : Bar (barres entières de "
+                        + String.format(
+                        Locale.FRANCE,
+                        "%.2f",
+                        ConfigurationBarres.LONGUEUR_BARRE_STANDARD
+                )
+                        + " m)"
+        );
+
         layoutQuantite.setHint("Nombre de barres");
         layoutLongueur.setVisibility(View.GONE);
 
@@ -208,41 +318,69 @@ public class StockActivity extends AppCompatActivity {
         dialogue.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                dialogue.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String texteQuantite = etQuantite.getText() == null
-                                ? "" : etQuantite.getText().toString().trim();
-                        Integer quantite = parseEntierPositif(texteQuantite);
+                dialogue.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String texteQuantite = etQuantite.getText() == null
+                                        ? ""
+                                        : etQuantite.getText().toString().trim();
 
-                        if (quantite == null) {
-                            layoutQuantite.setError("Entrez un nombre entier positif");
-                            return;
-                        }
-                        layoutQuantite.setError(null);
+                                Integer quantite = parseEntierPositif(texteQuantite);
 
-                        stockManager.ajouter(typeFer, ConfigurationBarres.LONGUEUR_BARRE_STANDARD, quantite);
-                        rafraichirAffichageStock();
-                        dialogue.dismiss();
-                        Toast.makeText(StockActivity.this, "Stock mis à jour.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                                if (quantite == null) {
+                                    layoutQuantite.setError(
+                                            "Entrez un nombre entier positif"
+                                    );
+                                    return;
+                                }
+
+                                layoutQuantite.setError(null);
+
+                                stockManager.ajouter(
+                                        typeFer,
+                                        ConfigurationBarres.LONGUEUR_BARRE_STANDARD,
+                                        quantite
+                                );
+
+                                rafraichirAffichageStock();
+                                dialogue.dismiss();
+
+                                Toast.makeText(
+                                        StockActivity.this,
+                                        "Stock mis à jour.",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        });
             }
         });
 
         dialogue.show();
     }
 
+    // ------------------------------------------------------------------
+    // Boîte de dialogue 2 : saisie de coupes
+    // ------------------------------------------------------------------
+
     private void afficherDialogueSaisieCoupes(final String typeFer) {
         LayoutInflater inflater = LayoutInflater.from(this);
-        View vueDialogue = inflater.inflate(R.layout.dialog_saisie_stock, null);
+        View vueDialogue = inflater.inflate(
+                R.layout.dialog_saisie_stock,
+                null
+        );
 
         TextView tvType = vueDialogue.findViewById(R.id.tvTypeFerDialog);
         TextView tvUnite = vueDialogue.findViewById(R.id.tvUniteDialog);
-        final TextInputLayout layoutQuantite = vueDialogue.findViewById(R.id.layoutQuantite);
-        final TextInputEditText etQuantite = vueDialogue.findViewById(R.id.etQuantite);
-        final TextInputLayout layoutLongueur = vueDialogue.findViewById(R.id.layoutLongueur);
-        final TextInputEditText etLongueur = vueDialogue.findViewById(R.id.etLongueur);
+
+        final TextInputLayout layoutQuantite =
+                vueDialogue.findViewById(R.id.layoutQuantite);
+        final TextInputEditText etQuantite =
+                vueDialogue.findViewById(R.id.etQuantite);
+        final TextInputLayout layoutLongueur =
+                vueDialogue.findViewById(R.id.layoutLongueur);
+        final TextInputEditText etLongueur =
+                vueDialogue.findViewById(R.id.etLongueur);
 
         tvType.setText("Type : " + typeFer);
         tvUnite.setText("Unité : Coupes (longueur libre)");
@@ -258,40 +396,56 @@ public class StockActivity extends AppCompatActivity {
         dialogue.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                dialogue.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String texteQuantite = etQuantite.getText() == null
-                                ? "" : etQuantite.getText().toString().trim();
-                        String texteLongueur = etLongueur.getText() == null
-                                ? "" : etLongueur.getText().toString().trim();
+                dialogue.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String texteQuantite = etQuantite.getText() == null
+                                        ? ""
+                                        : etQuantite.getText().toString().trim();
 
-                        Integer quantite = parseEntierPositif(texteQuantite);
-                        Double longueur = parseReelPositif(texteLongueur);
+                                String texteLongueur = etLongueur.getText() == null
+                                        ? ""
+                                        : etLongueur.getText().toString().trim();
 
-                        boolean valide = true;
-                        if (quantite == null) {
-                            layoutQuantite.setError("Entrez un nombre entier positif");
-                            valide = false;
-                        } else {
-                            layoutQuantite.setError(null);
-                        }
-                        if (longueur == null) {
-                            layoutLongueur.setError("Entrez une longueur valide");
-                            valide = false;
-                        } else {
-                            layoutLongueur.setError(null);
-                        }
-                        if (!valide) {
-                            return;
-                        }
+                                Integer quantite = parseEntierPositif(texteQuantite);
+                                Double longueur = parseReelPositif(texteLongueur);
 
-                        stockManager.ajouter(typeFer, longueur, quantite);
-                        rafraichirAffichageStock();
-                        dialogue.dismiss();
-                        Toast.makeText(StockActivity.this, "Stock mis à jour.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                                boolean valide = true;
+
+                                if (quantite == null) {
+                                    layoutQuantite.setError(
+                                            "Entrez un nombre entier positif"
+                                    );
+                                    valide = false;
+                                } else {
+                                    layoutQuantite.setError(null);
+                                }
+
+                                if (longueur == null) {
+                                    layoutLongueur.setError(
+                                            "Entrez une longueur valide"
+                                    );
+                                    valide = false;
+                                } else {
+                                    layoutLongueur.setError(null);
+                                }
+
+                                if (!valide) {
+                                    return;
+                                }
+
+                                stockManager.ajouter(typeFer, longueur, quantite);
+                                rafraichirAffichageStock();
+                                dialogue.dismiss();
+
+                                Toast.makeText(
+                                        StockActivity.this,
+                                        "Stock mis à jour.",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        });
             }
         });
 
