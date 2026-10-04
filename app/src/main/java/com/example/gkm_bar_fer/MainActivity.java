@@ -641,6 +641,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvResumeBarre = itemView.findViewById(R.id.tvResumeBarre);
         Button btnAfficherDetail = itemView.findViewById(R.id.btnAfficherDetail);
         Button btnDechetsAuStock = itemView.findViewById(R.id.btnDechetsAuStock);
+        Button btnResumer = itemView.findViewById(R.id.btnResumer);
+        TextView tvResumeBarresDetail = itemView.findViewById(R.id.tvResumeBarresDetail);
         TextView tvDetailBarres = itemView.findViewById(R.id.tvDetailBarres);
 
         StringBuilder resume = new StringBuilder();
@@ -684,13 +686,30 @@ public class MainActivity extends AppCompatActivity {
             numeroBarre++;
         }
         tvDetailBarres.setText(detail.toString());
+        tvResumeBarresDetail.setText(formatterResumeBarres(resultat.detailBarres));
 
         btnAfficherDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean estVisible = tvDetailBarres.getVisibility() == View.VISIBLE;
                 tvDetailBarres.setVisibility(estVisible ? View.GONE : View.VISIBLE);
+                btnResumer.setVisibility(estVisible ? View.GONE : View.VISIBLE);
                 btnAfficherDetail.setText(estVisible ? "Afficher détail" : "Masquer détail");
+
+                if (estVisible) {
+                    // On replie aussi le résumé s'il était ouvert
+                    tvResumeBarresDetail.setVisibility(View.GONE);
+                    btnResumer.setText("Résumer");
+                }
+            }
+        });
+
+        btnResumer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean estVisible = tvResumeBarresDetail.getVisibility() == View.VISIBLE;
+                tvResumeBarresDetail.setVisibility(estVisible ? View.GONE : View.VISIBLE);
+                btnResumer.setText(estVisible ? "Résumer" : "Masquer résumé");
             }
         });
 
@@ -985,6 +1004,31 @@ public class MainActivity extends AppCompatActivity {
                 ? Collections.singletonList(barre.resteDisponible)
                 : Collections.<Double>emptyList();
         return formatterDescriptionCoupes(barre) + " avec " + formatterChute(chutes);
+    }
+
+    /**
+     * Regroupe les barres identiques (même composition + même chute) en une seule ligne
+     * récapitulative, ex : "3 Barres : pour chaque Barre, 1 coupe de 9,00 m pour les 5
+     * poteaux de 9,00 m avec chute 3,00 m".
+     */
+    private String formatterResumeBarres(List<BarreUtilisee> detailBarres) {
+        LinkedHashMap<String, Integer> comptage = new LinkedHashMap<>();
+        for (BarreUtilisee barre : detailBarres) {
+            String description = formatterDetailBarre(barre);
+            comptage.put(description, comptage.getOrDefault(description, 0) + 1);
+        }
+
+        List<String> lignes = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : comptage.entrySet()) {
+            int nombre = entry.getValue();
+            String description = entry.getKey();
+            if (nombre == 1) {
+                lignes.add("1 Barre : " + description);
+            } else {
+                lignes.add(nombre + " Barres : pour chaque Barre, " + description);
+            }
+        }
+        return TextUtils.join("\n", lignes);
     }
 
     private String formatterChute(List<Double> chutes) {
