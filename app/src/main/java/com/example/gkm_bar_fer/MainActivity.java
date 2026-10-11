@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     // --- Espace Client ---
     public static final String EXTRA_CLIENT_ID = "client_id";
     public static final String EXTRA_CALCUL_ID = "calcul_id";
+
+    public static final String EXTRA_TYPE_ELEMENT = "type_element";
+    private TypeElement typeElement = TypeElement.POTEAU;
     private String clientId = null;
     private String calculId = null;
     private String nomCalculCharge = null;
@@ -412,6 +415,7 @@ public class MainActivity extends AppCompatActivity {
 
         initTypesBarres();
         initViews();
+        appliquerTypeElement();
         setupListeners();
         configurerTiroirNavigation();
         configurerModeClient();
@@ -540,6 +544,21 @@ public class MainActivity extends AppCompatActivity {
         groupe.tvAucuneBarre = groupeView.findViewById(R.id.tvAucuneBarre);
         ImageButton btnSupprimerGroupe = groupeView.findViewById(R.id.btnSupprimerGroupe);
 
+        // Libellés adaptés au type d'élément (poteau, dalle, semelle...)
+        TextView tvTitreGroupe = groupeView.findViewById(R.id.tvTitreGroupe);
+        tvTitreGroupe.setText("Informations des " + typeElement.getPlurielMajuscule());
+
+        TextInputLayout layoutNombre = trouverTextInputLayout(groupe.etNombrePoteaux);
+        if (layoutNombre != null) {
+            layoutNombre.setHint("Nombre de " + typeElement.getPluriel());
+        }
+        TextInputLayout layoutLongueur = trouverTextInputLayout(groupe.etLongueurPoteaux);
+        if (layoutLongueur != null) {
+            layoutLongueur.setHint("Longueur de " + typeElement.getSingulier());
+        }
+        btnSupprimerGroupe.setContentDescription(
+                "Supprimer " + typeElement.getCe() + " " + typeElement.getSingulier());
+
         // Adapteur pour le dropdown de sélection des types de barres
         ArrayAdapter<String> adapterTypesBarres = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, typesBarresDisponibles);
@@ -619,6 +638,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void calculerBarres() {
         // 1) Valider tous les groupes avant de calculer quoi que ce soit
         for (int i = 0; i < listeGroupesPoteaux.size(); i++) {
@@ -646,8 +666,9 @@ public class MainActivity extends AppCompatActivity {
             int nombrePoteaux = Integer.parseInt(groupe.etNombrePoteaux.getText().toString());
             double longueurPoteaux = Double.parseDouble(groupe.etLongueurPoteaux.getText().toString());
 
-            String libellePoteaux = String.format(Locale.FRANCE, "Poteaux de %.2f m (%d poteau%s)",
-                    longueurPoteaux, nombrePoteaux, nombrePoteaux > 1 ? "x" : "");
+            String libellePoteaux = String.format(Locale.FRANCE, "%s de %.2f m (%d %s)",
+                    typeElement.getPlurielMajuscule(), longueurPoteaux, nombrePoteaux,
+                    nombrePoteaux > 1 ? typeElement.getPluriel() : typeElement.getSingulier());
 
             detailPoteaux.append("=== ").append(libellePoteaux).append(" ===\n");
 
@@ -671,7 +692,7 @@ public class MainActivity extends AppCompatActivity {
                 int totalCoupesNecessaires = nombreParPoteau * nombrePoteaux;
 
                 detailPoteaux.append("  • ").append(typeBarre).append(": ")
-                        .append(nombreParPoteau).append(" coupes/poteau → ")
+                        .append(nombreParPoteau).append(" coupes/").append(typeElement.getSingulier()).append(" → ")
                         .append(totalCoupesNecessaires).append(" coupes au total\n");
 
                 // Ajouter ces coupes à la liste globale du type de barre (partagée entre TOUS les poteaux)
@@ -1027,7 +1048,7 @@ public class MainActivity extends AppCompatActivity {
         PdfDocument pdfDocument = new PdfDocument();
         CurseurPdf curseur = new CurseurPdf(pdfDocument, 595, 842, 40);
 
-        curseur.ligne("GKM Bar Fer - Résultats de calcul", paintTitre, 24);
+        curseur.ligne("GKM Bar Fer - Résultats de calcul (" + typeElement.getPlurielMajuscule() + ")", paintTitre, 24);
         String date = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRANCE).format(new Date());
         curseur.ligne("Généré le " + date, paintDate, 22);
 
@@ -1083,7 +1104,7 @@ public class MainActivity extends AppCompatActivity {
                 dossierExports.mkdirs();
             }
 
-            String nomFichier = "GKM_Resultats_" + System.currentTimeMillis() + ".pdf";
+            String nomFichier = "GKM_" + typeElement.getPlurielMajuscule() + "_" + System.currentTimeMillis() + ".pdf";
             File fichierPdf = new File(dossierExports, nomFichier);
 
             FileOutputStream fos = new FileOutputStream(fichierPdf);
@@ -1120,12 +1141,12 @@ public class MainActivity extends AppCompatActivity {
 
         GenerateurXlsx classeur = new GenerateurXlsx();
 
-        int feuillePoteaux = classeur.ajouterFeuille("Poteaux");
+        int feuillePoteaux = classeur.ajouterFeuille(typeElement.getPlurielMajuscule());
         classeur.ajouterLigne(feuillePoteaux, Arrays.asList(
-                GenerateurXlsx.Cellule.texte("Longueur poteau (m)", true),
-                GenerateurXlsx.Cellule.texte("Nombre de poteaux", true),
+                GenerateurXlsx.Cellule.texte("Longueur " + typeElement.getSingulier() + " (m)", true),
+                GenerateurXlsx.Cellule.texte("Nombre de " + typeElement.getPluriel(), true),
                 GenerateurXlsx.Cellule.texte("Type de barre", true),
-                GenerateurXlsx.Cellule.texte("Coupes / poteau", true),
+                GenerateurXlsx.Cellule.texte("Coupes / " + typeElement.getSingulier(), true),
                 GenerateurXlsx.Cellule.texte("Total coupes", true)));
 
         for (String[] ligne : derniersGroupesPoteaux) {
@@ -1189,7 +1210,7 @@ public class MainActivity extends AppCompatActivity {
                 dossierExports.mkdirs();
             }
 
-            String nomFichier = "GKM_Resultats_" + System.currentTimeMillis() + ".xlsx";
+            String nomFichier = "GKM_" + typeElement.getPlurielMajuscule() + "_" + System.currentTimeMillis() + ".xlsx";
             File fichierXlsx = new File(dossierExports, nomFichier);
             classeur.ecrire(fichierXlsx);
 
@@ -1246,8 +1267,8 @@ public class MainActivity extends AppCompatActivity {
             String longueurPoteauTxt = String.format(Locale.FRANCE, "%.2f", c.longueurPoteau);
             String segmentTxt = c.segmentInfo != null ? " (" + c.segmentInfo + ")" : "";
             String finPhrasePoteau = c.nombrePoteaux > 1
-                    ? "les " + c.nombrePoteaux + " poteaux de " + longueurPoteauTxt + " m"
-                    : "le poteau de " + longueurPoteauTxt + " m";
+                    ? "les " + c.nombrePoteaux + " " + typeElement.getPluriel() + " de " + longueurPoteauTxt + " m"
+                    : typeElement.getLeSingulier() + " de " + longueurPoteauTxt + " m";
 
             parts.add(n + " coupe" + (n > 1 ? "s" : "") + " de " + longueurCoupeTxt + " m" + segmentTxt
                     + " pour " + finPhrasePoteau);
@@ -1510,18 +1531,14 @@ public class MainActivity extends AppCompatActivity {
         return meilleure;
     }
 
-    /**
-     * Valide les champs d'un groupe de poteau donné.
-     * @param numeroGroupe position du groupe (1, 2, 3...), utilisée uniquement pour identifier
-     *                      le groupe dans un message d'erreur (avant calcul, on ne connaît pas
-     *                      encore sa longueur).
-     */
+
 
     // ------------------------------------------------------------------
     // Mode client : enregistrement du calcul pour un client
     // ------------------------------------------------------------------
 
     private void configurerModeClient() {
+        clientId = getIntent().getStringExtra(EXTRA_CLIENT_ID);
         calculId = getIntent().getStringExtra(EXTRA_CALCUL_ID);
 
         Client client = clientId == null
@@ -1535,7 +1552,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Calcul - " + client.getNom());
+            getSupportActionBar().setTitle("Calcul " + typeElement.getSingulier() + " - " + client.getNom());
         }
 
         btnEnregistrerClient.setVisibility(View.VISIBLE);
@@ -1696,6 +1713,7 @@ public class MainActivity extends AppCompatActivity {
     private String construireJsonCalcul() throws JSONException {
         JSONObject racine = new JSONObject();
         racine.put("version", 1);
+        racine.put("typeElement", typeElement.getCode());
         racine.put("utiliserStock", dernierUtiliseStock);
         racine.put("entrees", dernieresEntrees);
         racine.put("texteResultats", tvResultats.getText().toString());
@@ -1880,10 +1898,40 @@ public class MainActivity extends AppCompatActivity {
         return resultat;
     }
 
+    // ------------------------------------------------------------------
+    // Type d'élément (poteau, dalle, semelle...) : adaptation des libellés
+    // ------------------------------------------------------------------
+
+    private void appliquerTypeElement() {
+        typeElement = TypeElement.depuisCode(getIntent().getStringExtra(EXTRA_TYPE_ELEMENT));
+
+        btnAjouterPoteau.setText(
+                "Ajouter " + typeElement.getUnAutre() + " " + typeElement.getSingulier());
+    }
+
+    /** Retrouve le TextInputLayout qui contient une zone de saisie. */
+    private TextInputLayout trouverTextInputLayout(View vue) {
+        android.view.ViewParent parent = vue.getParent();
+        while (parent != null) {
+            if (parent instanceof TextInputLayout) {
+                return (TextInputLayout) parent;
+            }
+            parent = parent.getParent();
+        }
+        return null;
+    }
+
+    /**
+     * Valide les champs d'un groupe d'élément (poteau, dalle, semelle...).
+     * @param numeroGroupe position du groupe (1, 2, 3...), utilisée uniquement pour identifier
+     *                      le groupe dans un message d'erreur (avant calcul, on ne connaît pas
+     *                      encore sa longueur).
+     */
     private boolean validerGroupe(GroupePoteau groupe, int numeroGroupe) {
         if (TextUtils.isEmpty(groupe.etNombrePoteaux.getText()) ||
                 TextUtils.isEmpty(groupe.etLongueurPoteaux.getText())) {
-            tvResultats.setText("Poteau #" + numeroGroupe + ": veuillez remplir le nombre de poteaux et la longueur");
+            tvResultats.setText(typeElement.getSingulierMajuscule() + " #" + numeroGroupe
+                    + ": veuillez remplir le nombre de " + typeElement.getPluriel() + " et la longueur");
             cardResultats.setVisibility(View.VISIBLE);
             return false;
         }
@@ -1893,12 +1941,14 @@ public class MainActivity extends AppCompatActivity {
             double longueur = Double.parseDouble(groupe.etLongueurPoteaux.getText().toString());
 
             if (nombrePoteaux <= 0 || longueur <= 0) {
-                tvResultats.setText("Poteau #" + numeroGroupe + ": les valeurs doivent être positives");
+                tvResultats.setText(typeElement.getSingulierMajuscule() + " #" + numeroGroupe
+                        + ": les valeurs doivent être positives");
                 cardResultats.setVisibility(View.VISIBLE);
                 return false;
             }
         } catch (NumberFormatException e) {
-            tvResultats.setText("Poteau #" + numeroGroupe + ": veuillez entrer des nombres valides");
+            tvResultats.setText(typeElement.getSingulierMajuscule() + " #" + numeroGroupe
+                    + ": veuillez entrer des nombres valides");
             cardResultats.setVisibility(View.VISIBLE);
             return false;
         }

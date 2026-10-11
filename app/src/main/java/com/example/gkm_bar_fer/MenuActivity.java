@@ -28,17 +28,9 @@ public class MenuActivity extends AppCompatActivity {
         Button btnDalle = findViewById(R.id.btnMenuDalle);
         Button btnStock = findViewById(R.id.btnMenuStock);
 
-        View.OnClickListener ouvrirCalcul = v -> {
-            Intent intent = new Intent(
-                    MenuActivity.this,
-                    MainActivity.class
-            );
-            startActivity(intent);
-        };
-
-        btnPoteau.setOnClickListener(ouvrirCalcul);
-        btnSemelle.setOnClickListener(ouvrirCalcul);
-        btnDalle.setOnClickListener(ouvrirCalcul);
+        btnPoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.POTEAU));
+        btnSemelle.setOnClickListener(v -> ouvrirCalcul(TypeElement.SEMELLE));
+        btnDalle.setOnClickListener(v -> ouvrirCalcul(TypeElement.DALLE));
 
         btnStock.setOnClickListener(v -> {
             Intent intent = new Intent(
@@ -47,6 +39,15 @@ public class MenuActivity extends AppCompatActivity {
             );
             startActivity(intent);
         });
+    }
+
+    private void ouvrirCalcul(TypeElement type) {
+        Intent intent = new Intent(
+                MenuActivity.this,
+                MainActivity.class
+        );
+        intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, type.getCode());
+        startActivity(intent);
     }
 
     private void configurerMenuNavigation() {

@@ -1,5 +1,8 @@
 package com.example.gkm_bar_fer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Un calcul enregistré pour un client.
  * Les données (entrées + résultats) sont stockées sous forme de JSON,
@@ -47,5 +50,15 @@ public class CalculEnregistre {
 
     public String getDonneesJson() {
         return donneesJson;
+    }
+
+    /** Type d'élément du calcul (poteau par défaut pour les anciens calculs). */
+    public TypeElement getTypeElement() {
+        try {
+            return TypeElement.depuisCode(
+                    new JSONObject(donneesJson).optString("typeElement", null));
+        } catch (JSONException e) {
+            return TypeElement.POTEAU;
+        }
     }
 }

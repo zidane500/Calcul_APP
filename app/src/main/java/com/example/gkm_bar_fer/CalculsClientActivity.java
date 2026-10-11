@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Page d'un client : bouton "Nouveau calcul" + liste de ses calculs enregistrés.
+ * Page d'un client : boutons de calcul (poteau, dalle, semelle, escalier)
+ * + liste de ses calculs enregistrés.
  */
 public class CalculsClientActivity extends AppCompatActivity {
 
@@ -51,7 +52,6 @@ public class CalculsClientActivity extends AppCompatActivity {
         layoutCalculs = findViewById(R.id.layoutCalculs);
         tvAucunCalcul = findViewById(R.id.tvAucunCalcul);
         TextView tvInfoClient = findViewById(R.id.tvInfoClient);
-        Button btnNouveauCalcul = findViewById(R.id.btnNouveauCalcul);
 
         if (client.getVille().isEmpty()) {
             tvInfoClient.setVisibility(View.GONE);
@@ -60,11 +60,18 @@ public class CalculsClientActivity extends AppCompatActivity {
             tvInfoClient.setText(client.getVille());
         }
 
-        btnNouveauCalcul.setOnClickListener(v -> {
-            Intent intent = new Intent(CalculsClientActivity.this, MainActivity.class);
-            intent.putExtra(MainActivity.EXTRA_CLIENT_ID, clientId);
-            startActivity(intent);
-        });
+        findViewById(R.id.btnCalculerPoteau)
+                .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.POTEAU));
+        findViewById(R.id.btnCalculerDalle)
+                .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.DALLE));
+        findViewById(R.id.btnCalculerSemelle)
+                .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.SEMELLE));
+        findViewById(R.id.btnCalculerEscalier)
+                .setOnClickListener(v -> Toast.makeText(
+                        CalculsClientActivity.this,
+                        "Le calcul des escaliers sera disponible prochainement.",
+                        Toast.LENGTH_SHORT
+                ).show());
 
         rafraichirAffichage();
     }
@@ -75,6 +82,13 @@ public class CalculsClientActivity extends AppCompatActivity {
         if (client != null) {
             rafraichirAffichage();
         }
+    }
+
+    private void ouvrirNouveauCalcul(TypeElement type) {
+        Intent intent = new Intent(CalculsClientActivity.this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_CLIENT_ID, clientId);
+        intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, type.getCode());
+        startActivity(intent);
     }
 
     private void configurerHeader() {
@@ -113,13 +127,15 @@ public class CalculsClientActivity extends AppCompatActivity {
 
             tvNom.setText(calcul.getNom());
             boolean modifie = calcul.getDateModification() - calcul.getDateCreation() > 1000;
-            tvDate.setText((modifie ? "Modifié le " : "Enregistré le ")
+            tvDate.setText(calcul.getTypeElement().getSingulierMajuscule() + " · "
+                    + (modifie ? "Modifié le " : "Enregistré le ")
                     + format.format(new Date(calcul.getDateModification())));
 
             btnOuvrir.setOnClickListener(v -> {
                 Intent intent = new Intent(CalculsClientActivity.this, MainActivity.class);
                 intent.putExtra(MainActivity.EXTRA_CLIENT_ID, clientId);
                 intent.putExtra(MainActivity.EXTRA_CALCUL_ID, calcul.getId());
+                intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, calcul.getTypeElement().getCode());
                 startActivity(intent);
             });
 

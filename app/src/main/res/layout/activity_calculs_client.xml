@@ -27,20 +27,96 @@
                 android:textColor="@color/secondary_text"
                 android:textSize="14sp" />
 
-            <Button
-                android:id="@+id/btnNouveauCalcul"
-                style="@style/Widget.Material3.Button"
+            <!-- Ligne 1 : Poteau / Dalle -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnCalculerPoteau"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="Calculer Poteau"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="14dp"
+                    app:elevation="3dp" />
+
+                <Button
+                    android:id="@+id/btnCalculerDalle"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="Calculer Dalle"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="14dp"
+                    app:elevation="3dp" />
+
+            </LinearLayout>
+
+            <!-- Ligne 2 : Semelle / Escalier (pas encore fonctionnel) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:text="+ Nouveau calcul"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:backgroundTint="@color/primary"
-                app:cornerRadius="14dp"
-                app:elevation="3dp" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnCalculerSemelle"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="Calculer Semelle"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="14dp"
+                    app:elevation="3dp" />
+
+                <Button
+                    android:id="@+id/btnCalculerEscalier"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:alpha="0.6"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="Calculer Escalier"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="14dp"
+                    app:elevation="3dp" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvAucunCalcul"
