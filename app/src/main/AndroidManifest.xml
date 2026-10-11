@@ -4,6 +4,7 @@
 
     <application
         android:allowBackup="true"
+        android:name=".GkmApplication"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -29,6 +30,12 @@
             android:exported="false" />
         <activity
             android:name=".StockActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EspaceClientActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CalculsClientActivity"
             android:exported="false" />
         <provider
             android:name="androidx.core.content.FileProvider"

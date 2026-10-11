@@ -5,9 +5,9 @@
         android:icon="@drawable/ic_home"
         android:title="Accueil" />
     <item
-        android:id="@+id/navHistorique"
+        android:id="@+id/navEspaceClient"
         android:icon="@drawable/ic_historique"
-        android:title="Historique" />
+        android:title="Espace Client" />
     <item
         android:id="@+id/navStockDechets"
         android:icon="@drawable/ic_stock_dechets"

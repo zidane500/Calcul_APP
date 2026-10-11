@@ -198,6 +198,23 @@
                         android:layout_marginBottom="14dp"
                         android:background="@color/divider" />
 
+                    <!-- Enregistrer pour le client (visible seulement en mode client) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEnregistrerClient"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginBottom="10dp"
+                        android:minHeight="0dp"
+                        android:text="Enregistrer pour ce client"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:backgroundTint="@color/primary"
+                        app:cornerRadius="12dp"
+                        app:elevation="0dp" />
+
                     <!-- Boutons d'export -->
                     <LinearLayout
                         android:layout_width="match_parent"

@@ -33,6 +33,11 @@ import android.content.res.ColorStateList;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.appbar.MaterialToolbar;
+import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.textfield.TextInputLayout;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +64,17 @@ public class MainActivity extends AppCompatActivity {
     private String dernierResumePoteaux = "";
     private LinkedHashMap<String, ResultatCalcul> derniersResultatsBarres = new LinkedHashMap<>();
     private List<String[]> derniersGroupesPoteaux = new ArrayList<>();
+
+
+    // --- Espace Client ---
+    public static final String EXTRA_CLIENT_ID = "client_id";
+    public static final String EXTRA_CALCUL_ID = "calcul_id";
+    private String clientId = null;
+    private String calculId = null;
+    private String nomCalculCharge = null;
+    private Button btnEnregistrerClient;
+    private JSONArray dernieresEntrees = null;
+    private boolean dernierUtiliseStock = false;
     // Représente un "type de poteau" : ses infos (nombre/longueur) + les barres qui lui sont associées.
     private static class GroupePoteau {
         View rootView;
@@ -376,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
 
         String operationStockId = UUID.randomUUID().toString();
         boolean stockConfirme = false;
+        boolean dechetsEnvoyes = false;
 
         ResultatCalcul(int barresNecessaires, List<Double> listeDechets, boolean utilisationOptimisee,
                        List<BarreUtilisee> detailBarres) {
@@ -397,9 +414,14 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         configurerTiroirNavigation();
+        configurerModeClient();
+
 
 // Premier groupe de poteau affiché par défaut, sans bouton "Supprimer"
         ajouterGroupePoteau(false);
+
+        // Si on ouvre un calcul enregistré, on restaure ses saisies et ses résultats
+        chargerCalculSiDemande();
     }
 
     private void initTypesBarres() {
@@ -418,6 +440,7 @@ public class MainActivity extends AppCompatActivity {
         layoutResultatsBarres = findViewById(R.id.layoutResultatsBarres);
         btnExporterPdf = findViewById(R.id.btnExporterPdf);
         btnExporterExcel = findViewById(R.id.btnExporterExcel);
+        btnEnregistrerClient = findViewById(R.id.btnEnregistrerClient);
 
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
@@ -482,9 +505,9 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 } else if (id == R.id.navStockDechets) {
                     startActivity(new Intent(MainActivity.this, StockActivity.class));
+                } else if (id == R.id.navEspaceClient) {
+                    startActivity(new Intent(MainActivity.this, EspaceClientActivity.class));
                 }
-// Historique : pas encore fonctionnel, aucune action pour l'instant
-// (en attente de vos instructions pour la suite)
 
                 return true;
             }
@@ -603,6 +626,14 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
+
+        // Instantané des saisies au moment du calcul (utilisé pour l'enregistrement client)
+        try {
+            dernieresEntrees = entreesVersJson();
+        } catch (JSONException e) {
+            dernieresEntrees = null;
+        }
+        dernierUtiliseStock = switchUtiliserStock.isChecked();
 
         // 2) Parcourir tous les groupes pour :
         //    a) afficher le détail des besoins par poteau
@@ -925,20 +956,28 @@ public class MainActivity extends AppCompatActivity {
                 dechetsBarresNeuves.isEmpty() ? View.GONE : View.VISIBLE
         );
 
-        final boolean[] dechetsEnvoyes = {false};
+
+        // Calcul restauré : on retrouve l'état "chutes envoyées au stock"
+        if (resultat.dechetsEnvoyes) {
+            btnDechetsAuStock.setText("Retirer chutes envoyées");
+            btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
+                    ContextCompat.getColor(MainActivity.this, R.color.error)));
+        }
+
+
 
 
 
         btnDechetsAuStock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!dechetsEnvoyes[0]) {
+                if (!resultat.dechetsEnvoyes) {
                     StockManager.getInstance(MainActivity.this)
                             .ajouterDechets(typeBarre, dechetsBarresNeuves);
                     btnDechetsAuStock.setText("Retirer chutes envoyées");
                     btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                             ContextCompat.getColor(MainActivity.this, R.color.error)));
-                    dechetsEnvoyes[0] = true;
+                    resultat.dechetsEnvoyes = true;
                     Toast.makeText(MainActivity.this,
                             "Déchets de " + typeBarre + " ajoutés au stock.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -947,7 +986,7 @@ public class MainActivity extends AppCompatActivity {
                     btnDechetsAuStock.setText("Déchets au stock");
                     btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                             ContextCompat.getColor(MainActivity.this, R.color.success)));
-                    dechetsEnvoyes[0] = false;
+                    resultat.dechetsEnvoyes = false;
                     Toast.makeText(MainActivity.this,
                             "Déchets de " + typeBarre + " retirés du stock.", Toast.LENGTH_SHORT).show();
                 }
@@ -1477,6 +1516,370 @@ public class MainActivity extends AppCompatActivity {
      *                      le groupe dans un message d'erreur (avant calcul, on ne connaît pas
      *                      encore sa longueur).
      */
+
+    // ------------------------------------------------------------------
+    // Mode client : enregistrement du calcul pour un client
+    // ------------------------------------------------------------------
+
+    private void configurerModeClient() {
+        calculId = getIntent().getStringExtra(EXTRA_CALCUL_ID);
+
+        Client client = clientId == null
+                ? null
+                : ClientManager.getInstance(this).trouverParId(clientId);
+
+        if (client == null) {
+            clientId = null;
+            btnEnregistrerClient.setVisibility(View.GONE);
+            return;
+        }
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Calcul - " + client.getNom());
+        }
+
+        btnEnregistrerClient.setVisibility(View.VISIBLE);
+        btnEnregistrerClient.setText(calculId != null
+                ? "Enregistrer les modifications"
+                : "Enregistrer pour " + client.getNom());
+        btnEnregistrerClient.setOnClickListener(v -> afficherDialogueEnregistrement());
+    }
+
+    private void afficherDialogueEnregistrement() {
+        if (derniersResultatsBarres.isEmpty() || dernieresEntrees == null) {
+            Toast.makeText(this, "Calculez d'abord avant d'enregistrer.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        View vueDialogue = LayoutInflater.from(this).inflate(R.layout.dialog_nom_calcul, null);
+        final TextInputLayout layoutNom = vueDialogue.findViewById(R.id.layoutNomCalcul);
+        final TextInputEditText etNom = vueDialogue.findViewById(R.id.etNomCalcul);
+
+        if (calculId != null && nomCalculCharge != null) {
+            etNom.setText(nomCalculCharge);
+        } else {
+            String dateDuJour = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE).format(new Date());
+            etNom.setText("Calcul du " + dateDuJour);
+        }
+        etNom.selectAll();
+
+        final AlertDialog dialogue = new AlertDialog.Builder(this)
+                .setTitle(calculId != null ? "Enregistrer les modifications" : "Enregistrer le calcul")
+                .setView(vueDialogue)
+                .setNegativeButton("Ignorer", null)
+                .setPositiveButton("Enregistrer", null)
+                .create();
+
+        dialogue.setOnShowListener(d ->
+                dialogue.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(bouton -> {
+                    String nom = etNom.getText() == null
+                            ? ""
+                            : etNom.getText().toString().trim();
+
+                    if (nom.isEmpty()) {
+                        layoutNom.setError("Le nom du calcul est obligatoire");
+                        return;
+                    }
+                    layoutNom.setError(null);
+
+                    try {
+                        String json = construireJsonCalcul();
+                        CalculManager gestionnaire = CalculManager.getInstance(MainActivity.this);
+                        boolean etaitModification = calculId != null;
+                        boolean succes;
+
+                        if (etaitModification) {
+                            succes = gestionnaire.modifier(calculId, nom, json);
+                        } else {
+                            CalculEnregistre cree = gestionnaire.ajouter(clientId, nom, json);
+                            succes = cree != null;
+                            if (cree != null) {
+                                // Les enregistrements suivants mettront ce calcul à jour
+                                calculId = cree.getId();
+                            }
+                        }
+
+                        if (!succes) {
+                            Toast.makeText(MainActivity.this,
+                                    "L'enregistrement a échoué.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        nomCalculCharge = nom;
+                        btnEnregistrerClient.setText("Enregistrer les modifications");
+
+                        Toast.makeText(MainActivity.this,
+                                etaitModification ? "Modifications enregistrées." : "Calcul enregistré.",
+                                Toast.LENGTH_SHORT).show();
+                        dialogue.dismiss();
+                    } catch (JSONException e) {
+                        Toast.makeText(MainActivity.this,
+                                "Impossible d'enregistrer ce calcul.", Toast.LENGTH_LONG).show();
+                    }
+                })
+        );
+
+        dialogue.show();
+    }
+
+    // ------------------------------------------------------------------
+    // Sérialisation JSON du calcul (saisies + résultats)
+    // ------------------------------------------------------------------
+
+    private JSONArray entreesVersJson() throws JSONException {
+        JSONArray groupes = new JSONArray();
+
+        for (GroupePoteau groupe : listeGroupesPoteaux) {
+            JSONObject jg = new JSONObject();
+            jg.put("nombrePoteaux", groupe.etNombrePoteaux.getText() == null
+                    ? "" : groupe.etNombrePoteaux.getText().toString());
+            jg.put("longueurPoteaux", groupe.etLongueurPoteaux.getText() == null
+                    ? "" : groupe.etLongueurPoteaux.getText().toString());
+
+            JSONArray barres = new JSONArray();
+            for (Map.Entry<String, TextInputEditText> entry : groupe.barresSelectionneesMap.entrySet()) {
+                JSONObject jb = new JSONObject();
+                jb.put("type", entry.getKey());
+                jb.put("quantite", entry.getValue().getText() == null
+                        ? "" : entry.getValue().getText().toString());
+                barres.put(jb);
+            }
+            jg.put("barres", barres);
+
+            groupes.put(jg);
+        }
+
+        return groupes;
+    }
+
+    private JSONObject resultatVersJson(ResultatCalcul resultat) throws JSONException {
+        JSONObject jr = new JSONObject();
+        jr.put("barresNecessaires", resultat.barresNecessaires);
+        jr.put("utilisationOptimisee", resultat.utilisationOptimisee);
+        jr.put("operationStockId", resultat.operationStockId);
+        jr.put("stockConfirme", resultat.stockConfirme);
+        jr.put("dechetsEnvoyes", resultat.dechetsEnvoyes);
+
+        JSONArray dechets = new JSONArray();
+        for (Double dechet : resultat.listeDechets) {
+            dechets.put(dechet.doubleValue());
+        }
+        jr.put("listeDechets", dechets);
+
+        JSONArray barres = new JSONArray();
+        for (BarreUtilisee barre : resultat.detailBarres) {
+            JSONObject jb = new JSONObject();
+            jb.put("resteDisponible", barre.resteDisponible);
+            jb.put("estDuStock", barre.estDuStock);
+            jb.put("longueurOrigineStock", barre.longueurOrigineStock);
+
+            JSONArray coupes = new JSONArray();
+            for (CoupeRequise coupe : barre.coupes) {
+                JSONObject jc = new JSONObject();
+                jc.put("longueur", coupe.longueur);
+                jc.put("longueurPoteau", coupe.longueurPoteau);
+                jc.put("nombrePoteaux", coupe.nombrePoteaux);
+                jc.put("segmentInfo", coupe.segmentInfo == null
+                        ? JSONObject.NULL : coupe.segmentInfo);
+                coupes.put(jc);
+            }
+            jb.put("coupes", coupes);
+
+            barres.put(jb);
+        }
+        jr.put("detailBarres", barres);
+
+        return jr;
+    }
+
+    private String construireJsonCalcul() throws JSONException {
+        JSONObject racine = new JSONObject();
+        racine.put("version", 1);
+        racine.put("utiliserStock", dernierUtiliseStock);
+        racine.put("entrees", dernieresEntrees);
+        racine.put("texteResultats", tvResultats.getText().toString());
+        racine.put("resumePoteaux", dernierResumePoteaux);
+
+        JSONArray groupesPoteaux = new JSONArray();
+        for (String[] ligne : derniersGroupesPoteaux) {
+            JSONArray jl = new JSONArray();
+            for (String valeur : ligne) {
+                jl.put(valeur);
+            }
+            groupesPoteaux.put(jl);
+        }
+        racine.put("groupesPoteaux", groupesPoteaux);
+
+        JSONArray resultats = new JSONArray();
+        for (Map.Entry<String, ResultatCalcul> entry : derniersResultatsBarres.entrySet()) {
+            JSONObject jr = new JSONObject();
+            jr.put("type", entry.getKey());
+            jr.put("resultat", resultatVersJson(entry.getValue()));
+            resultats.put(jr);
+        }
+        racine.put("resultats", resultats);
+
+        return racine.toString();
+    }
+
+    // ------------------------------------------------------------------
+    // Ouverture d'un calcul enregistré (restauration des saisies et résultats)
+    // ------------------------------------------------------------------
+
+    private void chargerCalculSiDemande() {
+        if (clientId == null || calculId == null) {
+            calculId = null;
+            return;
+        }
+
+        CalculEnregistre calcul = CalculManager.getInstance(this).trouverParId(calculId);
+        if (calcul == null || !calcul.getClientId().equals(clientId)) {
+            calculId = null;
+            Toast.makeText(this, "Calcul introuvable.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            JSONObject racine = new JSONObject(calcul.getDonneesJson());
+            restaurerEntrees(racine.optJSONArray("entrees"));
+            switchUtiliserStock.setChecked(racine.optBoolean("utiliserStock", false));
+            restaurerResultats(racine);
+            nomCalculCharge = calcul.getNom();
+        } catch (JSONException e) {
+            calculId = null;
+            Toast.makeText(this, "Ce calcul enregistré est illisible.",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void restaurerEntrees(JSONArray entrees) throws JSONException {
+        if (entrees == null || entrees.length() == 0) {
+            return;
+        }
+
+        layoutGroupesPoteaux.removeAllViews();
+        listeGroupesPoteaux.clear();
+
+        for (int i = 0; i < entrees.length(); i++) {
+            JSONObject jg = entrees.getJSONObject(i);
+
+            // Le premier groupe n'a pas de bouton "Supprimer"
+            ajouterGroupePoteau(i > 0);
+            GroupePoteau groupe = listeGroupesPoteaux.get(listeGroupesPoteaux.size() - 1);
+
+            groupe.etNombrePoteaux.setText(jg.optString("nombrePoteaux", ""));
+            groupe.etLongueurPoteaux.setText(jg.optString("longueurPoteaux", ""));
+
+            JSONArray barres = jg.optJSONArray("barres");
+            if (barres == null) {
+                continue;
+            }
+            for (int j = 0; j < barres.length(); j++) {
+                JSONObject jb = barres.getJSONObject(j);
+                String type = jb.getString("type");
+
+                ajouterBarreSelectionnee(groupe, type);
+
+                TextInputEditText etQuantite = groupe.barresSelectionneesMap.get(type);
+                if (etQuantite != null) {
+                    etQuantite.setText(jb.optString("quantite", ""));
+                }
+            }
+        }
+    }
+
+    private void restaurerResultats(JSONObject racine) throws JSONException {
+        dernieresEntrees = racine.optJSONArray("entrees");
+        dernierUtiliseStock = racine.optBoolean("utiliserStock", false);
+        dernierResumePoteaux = racine.optString("resumePoteaux", "");
+
+        derniersGroupesPoteaux = new ArrayList<>();
+        JSONArray groupesPoteaux = racine.optJSONArray("groupesPoteaux");
+        if (groupesPoteaux != null) {
+            for (int i = 0; i < groupesPoteaux.length(); i++) {
+                JSONArray jl = groupesPoteaux.getJSONArray(i);
+                String[] ligne = new String[jl.length()];
+                for (int k = 0; k < jl.length(); k++) {
+                    ligne[k] = jl.getString(k);
+                }
+                derniersGroupesPoteaux.add(ligne);
+            }
+        }
+
+        derniersResultatsBarres.clear();
+        layoutResultatsBarres.removeAllViews();
+
+        JSONArray resultats = racine.optJSONArray("resultats");
+        if (resultats != null) {
+            for (int i = 0; i < resultats.length(); i++) {
+                JSONObject jr = resultats.getJSONObject(i);
+                String type = jr.getString("type");
+                ResultatCalcul resultat = resultatDepuisJson(jr.getJSONObject("resultat"));
+
+                derniersResultatsBarres.put(type, resultat);
+                ajouterResultatBarre(type, resultat);
+            }
+        }
+
+        tvResultats.setText(racine.optString("texteResultats", ""));
+        cardResultats.setVisibility(View.VISIBLE);
+    }
+
+    private ResultatCalcul resultatDepuisJson(JSONObject jr) throws JSONException {
+        List<Double> dechets = new ArrayList<>();
+        JSONArray jd = jr.optJSONArray("listeDechets");
+        if (jd != null) {
+            for (int i = 0; i < jd.length(); i++) {
+                dechets.add(jd.getDouble(i));
+            }
+        }
+
+        List<BarreUtilisee> barres = new ArrayList<>();
+        JSONArray jbs = jr.optJSONArray("detailBarres");
+        if (jbs != null) {
+            for (int i = 0; i < jbs.length(); i++) {
+                JSONObject jb = jbs.getJSONObject(i);
+
+                BarreUtilisee barre = new BarreUtilisee(jb.optDouble("resteDisponible", 0.0));
+                barre.estDuStock = jb.optBoolean("estDuStock", false);
+                barre.longueurOrigineStock = jb.optDouble("longueurOrigineStock", 0.0);
+
+                JSONArray jcs = jb.optJSONArray("coupes");
+                if (jcs != null) {
+                    for (int k = 0; k < jcs.length(); k++) {
+                        JSONObject jc = jcs.getJSONObject(k);
+                        String segment = jc.isNull("segmentInfo")
+                                ? null
+                                : jc.optString("segmentInfo", null);
+
+                        barre.coupes.add(new CoupeRequise(
+                                jc.getDouble("longueur"),
+                                jc.getDouble("longueurPoteau"),
+                                jc.getInt("nombrePoteaux"),
+                                segment
+                        ));
+                    }
+                }
+
+                barres.add(barre);
+            }
+        }
+
+        ResultatCalcul resultat = new ResultatCalcul(
+                jr.getInt("barresNecessaires"),
+                dechets,
+                jr.optBoolean("utilisationOptimisee", false),
+                barres
+        );
+        resultat.operationStockId =
+                jr.optString("operationStockId", UUID.randomUUID().toString());
+        resultat.stockConfirme = jr.optBoolean("stockConfirme", false);
+        resultat.dechetsEnvoyes = jr.optBoolean("dechetsEnvoyes", false);
+
+        return resultat;
+    }
+
     private boolean validerGroupe(GroupePoteau groupe, int numeroGroupe) {
         if (TextUtils.isEmpty(groupe.etNombrePoteaux.getText()) ||
                 TextUtils.isEmpty(groupe.etLongueurPoteaux.getText())) {
