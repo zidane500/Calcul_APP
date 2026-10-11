@@ -73,6 +73,22 @@
 
     </LinearLayout>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnConfirmerStock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginTop="8dp"
+        android:text="Confirmer utilisation du stock"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:backgroundTint="@color/primary"
+        app:cornerRadius="10dp"
+        app:elevation="0dp" />
+
     <!-- Détail caché au départ -->
     <TextView
         android:id="@+id/tvDetailBarres"

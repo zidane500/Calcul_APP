@@ -31,6 +31,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import android.content.res.ColorStateList;
 import androidx.core.content.ContextCompat;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout layoutGroupesPoteaux;
     private Button btnAjouterPoteau;
     private Button btnCalculer;
+    private MaterialSwitch switchUtiliserStock;
     private CardView cardResultats;
     private TextView tvResultats;
 
@@ -89,6 +91,12 @@ public class MainActivity extends AppCompatActivity {
         List<CoupeRequise> coupes = new ArrayList<>();
         double resteDisponible;
 
+        // Indique que le morceau provient du stock existant.
+        boolean estDuStock;
+
+        // Longueur du morceau en stock avant les coupes.
+        double longueurOrigineStock;
+
         BarreUtilisee(double resteDisponible) {
             this.resteDisponible = resteDisponible;
         }
@@ -136,9 +144,51 @@ public class MainActivity extends AppCompatActivity {
         }
 
         void ligne(String texte, Paint paint, float interligne) {
-            assurerEspace(interligne);
-            canvas.drawText(texte, marge, y, paint);
-            y += interligne;
+            float largeurDisponible = largeur - 2f * marge;
+
+            for (String paragraphe : texte.split("\n", -1)) {
+                if (paragraphe.isEmpty()) {
+                    assurerEspace(interligne);
+                    y += interligne;
+                    continue;
+                }
+
+                String restant = paragraphe;
+
+                while (!restant.isEmpty()) {
+                    int nombreCaracteres = paint.breakText(
+                            restant,
+                            true,
+                            largeurDisponible,
+                            null
+                    );
+
+                    // Garantit que la boucle avance.
+                    nombreCaracteres = Math.max(1, nombreCaracteres);
+
+                    int fin = nombreCaracteres;
+
+                    // Évite de couper un mot lorsque c'est possible.
+                    if (fin < restant.length()) {
+                        int dernierEspace = restant.lastIndexOf(' ', fin);
+
+                        if (dernierEspace > 0) {
+                            fin = dernierEspace;
+                        }
+                    }
+
+                    assurerEspace(interligne);
+                    canvas.drawText(
+                            restant.substring(0, fin),
+                            marge,
+                            y,
+                            paint
+                    );
+                    y += interligne;
+
+                    restant = restant.substring(fin).trim();
+                }
+            }
         }
 
         void terminer() {
@@ -324,6 +374,9 @@ public class MainActivity extends AppCompatActivity {
         boolean utilisationOptimisee;
         List<BarreUtilisee> detailBarres; // Quelle(s) coupe(s), de quel poteau, sur quelle barre
 
+        String operationStockId = UUID.randomUUID().toString();
+        boolean stockConfirme = false;
+
         ResultatCalcul(int barresNecessaires, List<Double> listeDechets, boolean utilisationOptimisee,
                        List<BarreUtilisee> detailBarres) {
             this.barresNecessaires = barresNecessaires;
@@ -359,6 +412,7 @@ public class MainActivity extends AppCompatActivity {
         layoutGroupesPoteaux = findViewById(R.id.layoutGroupesPoteaux);
         btnAjouterPoteau = findViewById(R.id.btnAjouterPoteau);
         btnCalculer = findViewById(R.id.btnCalculer);
+        switchUtiliserStock = findViewById(R.id.switchUtiliserStock);
         cardResultats = findViewById(R.id.cardResultats);
         tvResultats = findViewById(R.id.tvResultats);
         layoutResultatsBarres = findViewById(R.id.layoutResultatsBarres);
@@ -367,6 +421,8 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
+
+        switchUtiliserStock = findViewById(R.id.switchUtiliserStock);
     }
 
     private void setupListeners() {
@@ -631,12 +687,49 @@ public class MainActivity extends AppCompatActivity {
         layoutResultatsBarres.removeAllViews();
         for (Map.Entry<String, List<CoupeRequise>> entry : coupesParTypeBarre.entrySet()) {
             String typeBarre = entry.getKey();
-            ResultatCalcul resultat = calculerBarresNecessaires(entry.getValue());
+            List<MorceauFer> morceauxDisponibles =
+                    switchUtiliserStock.isChecked()
+                            ? StockManager.getInstance(this).obtenirMorceaux(typeBarre)
+                            : new ArrayList<>();
+
+            ResultatCalcul resultat = calculerBarresNecessaires(
+                    entry.getValue(),
+                    morceauxDisponibles
+            );
             derniersResultatsBarres.put(typeBarre, resultat);
             ajouterResultatBarre(typeBarre, resultat);
         }
 
         cardResultats.setVisibility(View.VISIBLE);
+    }
+
+    private void actualiserBoutonStock(Button bouton, boolean confirme) {
+        if (confirme) {
+            bouton.setText("Annuler utilisation du stock");
+
+            bouton.setTextColor(
+                    ContextCompat.getColor(this, R.color.white)
+            );
+
+            bouton.setBackgroundTintList(
+                    ColorStateList.valueOf(
+                            ContextCompat.getColor(this, R.color.error)
+                    )
+            );
+
+        } else {
+            bouton.setText("Confirmer utilisation du stock");
+
+            bouton.setTextColor(
+                    ContextCompat.getColor(this, R.color.white)
+            );
+
+            bouton.setBackgroundTintList(
+                    ColorStateList.valueOf(
+                            ContextCompat.getColor(this, R.color.primary)
+                    )
+            );
+        }
     }
 
     /**
@@ -651,6 +744,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvResumeBarre = itemView.findViewById(R.id.tvResumeBarre);
         Button btnAfficherDetail = itemView.findViewById(R.id.btnAfficherDetail);
         Button btnDechetsAuStock = itemView.findViewById(R.id.btnDechetsAuStock);
+        Button btnConfirmerStock =
+                itemView.findViewById(R.id.btnConfirmerStock);
         Button btnResumer = itemView.findViewById(R.id.btnResumer);
         TextView tvResumeBarresDetail = itemView.findViewById(R.id.tvResumeBarresDetail);
         TextView tvDetailBarres = itemView.findViewById(R.id.tvDetailBarres);
@@ -698,6 +793,101 @@ public class MainActivity extends AppCompatActivity {
         tvDetailBarres.setText(detail.toString());
         tvResumeBarresDetail.setText(formatterResumeBarres(resultat.detailBarres));
 
+        final List<BarreUtilisee> barresStockUtilisees = new ArrayList<>();
+
+        for (BarreUtilisee barre : resultat.detailBarres) {
+            if (barre.estDuStock && !barre.coupes.isEmpty()) {
+                barresStockUtilisees.add(barre);
+            }
+        }
+
+        btnConfirmerStock.setVisibility(
+                barresStockUtilisees.isEmpty() ? View.GONE : View.VISIBLE
+        );
+
+        btnConfirmerStock.setEnabled(true);
+        actualiserBoutonStock(btnConfirmerStock, resultat.stockConfirme);
+
+        btnConfirmerStock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StockManager manager =
+                        StockManager.getInstance(MainActivity.this);
+
+                if (!resultat.stockConfirme) {
+                    List<Double> origines = new ArrayList<>();
+                    List<Double> restes = new ArrayList<>();
+
+                    for (BarreUtilisee barre : barresStockUtilisees) {
+                        origines.add(barre.longueurOrigineStock);
+
+                        if (barre.resteDisponible > 1e-9) {
+                            restes.add(barre.resteDisponible);
+                        }
+                    }
+
+                    boolean succes = manager.confirmerUtilisationStock(
+                            resultat.operationStockId,
+                            typeBarre,
+                            origines,
+                            restes
+                    );
+
+                    if (!succes) {
+                        Toast.makeText(
+                                MainActivity.this,
+                                "Confirmation impossible : vérifiez le stock. "
+                                        + "L'opération peut aussi être déjà enregistrée "
+                                        + "ou la sauvegarde avoir échoué.",
+                                Toast.LENGTH_LONG
+                        ).show();
+                        return;
+                    }
+
+                    resultat.stockConfirme = true;
+
+                    Toast.makeText(
+                            MainActivity.this,
+                            "Utilisation du stock confirmée pour " + typeBarre + ".",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                } else {
+                    boolean succes = manager.annulerUtilisationStock(
+                            resultat.operationStockId
+                    );
+
+                    if (!succes) {
+                        Toast.makeText(
+                                MainActivity.this,
+                                "Annulation impossible : le stock a pu être modifié "
+                                        + "depuis la confirmation, ou la sauvegarde "
+                                        + "a échoué.",
+                                Toast.LENGTH_LONG
+                        ).show();
+                        return;
+                    }
+
+                    resultat.stockConfirme = false;
+
+                    // L'ancienne opération reste enregistrée comme annulée.
+                    // Une nouvelle confirmation utilisera un nouvel identifiant.
+                    resultat.operationStockId = UUID.randomUUID().toString();
+
+                    Toast.makeText(
+                            MainActivity.this,
+                            "Utilisation du stock annulée pour " + typeBarre + ".",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+
+                actualiserBoutonStock(
+                        btnConfirmerStock,
+                        resultat.stockConfirme
+                );
+            }
+        });
+
         btnAfficherDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -723,6 +913,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final List<Double> dechetsBarresNeuves = new ArrayList<>();
+
+        for (BarreUtilisee barre : resultat.detailBarres) {
+            if (!barre.estDuStock && barre.resteDisponible > 1e-9) {
+                dechetsBarresNeuves.add(barre.resteDisponible);
+            }
+        }
+
+        btnDechetsAuStock.setVisibility(
+                dechetsBarresNeuves.isEmpty() ? View.GONE : View.VISIBLE
+        );
+
         final boolean[] dechetsEnvoyes = {false};
 
 
@@ -731,7 +933,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!dechetsEnvoyes[0]) {
-                    StockManager.getInstance(MainActivity.this).ajouterDechets(typeBarre, resultat.listeDechets);
+                    StockManager.getInstance(MainActivity.this)
+                            .ajouterDechets(typeBarre, dechetsBarresNeuves);
                     btnDechetsAuStock.setText("Retirer chutes envoyées");
                     btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                             ContextCompat.getColor(MainActivity.this, R.color.error)));
@@ -739,7 +942,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,
                             "Déchets de " + typeBarre + " ajoutés au stock.", Toast.LENGTH_SHORT).show();
                 } else {
-                    StockManager.getInstance(MainActivity.this).retirerDechets(typeBarre, resultat.listeDechets);
+                    StockManager.getInstance(MainActivity.this)
+                            .retirerDechets(typeBarre, dechetsBarresNeuves);
                     btnDechetsAuStock.setText("Déchets au stock");
                     btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                             ContextCompat.getColor(MainActivity.this, R.color.success)));
@@ -926,7 +1130,10 @@ public class MainActivity extends AppCompatActivity {
             for (BarreUtilisee barre : resultat.detailBarres) {
                 classeur.ajouterLigne(feuille, Arrays.asList(
                         GenerateurXlsx.Cellule.nombre(numeroBarre, false),
-                        GenerateurXlsx.Cellule.texte(formatterDescriptionCoupes(barre), false),
+                        GenerateurXlsx.Cellule.texte(
+                                formatterDescriptionCoupes(barre) + marqueurStock(barre),
+                                false
+                        ),
                         GenerateurXlsx.Cellule.nombre(
                                 barre.resteDisponible > 1e-9 ? barre.resteDisponible : 0.0, false)));
                 numeroBarre++;
@@ -1009,11 +1216,29 @@ public class MainActivity extends AppCompatActivity {
         return TextUtils.join(" + ", parts);
     }
 
+    private String marqueurStock(BarreUtilisee barre) {
+        if (!barre.estDuStock) {
+            return "";
+        }
+
+        return " (depuis le stock, chute initiale de "
+                + String.format(
+                Locale.FRANCE,
+                "%.2f",
+                barre.longueurOrigineStock
+        )
+                + " m)";
+    }
+
     private String formatterDetailBarre(BarreUtilisee barre) {
         List<Double> chutes = barre.resteDisponible > 1e-9
                 ? Collections.singletonList(barre.resteDisponible)
                 : Collections.<Double>emptyList();
-        return formatterDescriptionCoupes(barre) + " avec " + formatterChute(chutes);
+
+        return formatterDescriptionCoupes(barre)
+                + " avec "
+                + formatterChute(chutes)
+                + marqueurStock(barre);
     }
 
     /**
@@ -1060,13 +1285,64 @@ public class MainActivity extends AppCompatActivity {
         }
         return TextUtils.join(" et ", parts);
     }
-    private ResultatCalcul calculerBarresNecessaires(List<CoupeRequise> coupesRequises) {
-        int barresNecessaires = 0;
-        List<BarreUtilisee> barresOuvertes = new ArrayList<>(); // barres réutilisables (coupes ≤ 12 m)
-        List<BarreUtilisee> barresFermees = new ArrayList<>();  // barres "figées" pour les coupes > 12 m
-        List<Double> listeDechets = new ArrayList<>();
+    private ResultatCalcul calculerBarresNecessaires(
+            List<CoupeRequise> coupesRequises,
+            List<MorceauFer> morceauxDisponibles) {
 
-        List<CoupeRequise> coupesTriees = new ArrayList<>(coupesRequises);
+        final double epsilon = 1e-9;
+
+        // Copie de travail : aucune modification du stock réel.
+        List<MorceauFer> stockDisponible = new ArrayList<>();
+        for (MorceauFer morceau : morceauxDisponibles) {
+            if (morceau.quantite > 0
+                    && morceau.longueur > 0
+                    && !Double.isNaN(morceau.longueur)
+                    && !Double.isInfinite(morceau.longueur)) {
+
+                stockDisponible.add(new MorceauFer(
+                        morceau.longueur,
+                        morceau.quantite
+                ));
+            }
+        }
+
+        // Comme dans le calcul existant, une longueur > 12 m
+        // est décomposée en segments de 12 m maximum.
+        List<CoupeRequise> coupesTriees = new ArrayList<>();
+
+        for (CoupeRequise coupe : coupesRequises) {
+            if (coupe.longueur <= 0
+                    || Double.isNaN(coupe.longueur)
+                    || Double.isInfinite(coupe.longueur)) {
+                continue;
+            }
+
+            if (coupe.longueur > LONGUEUR_BARRE_STANDARD) {
+                int nombreSegments = (int) Math.ceil(
+                        coupe.longueur / LONGUEUR_BARRE_STANDARD
+                );
+
+                for (int i = 0; i < nombreSegments; i++) {
+                    double longueurSegment = Math.min(
+                            LONGUEUR_BARRE_STANDARD,
+                            coupe.longueur - i * LONGUEUR_BARRE_STANDARD
+                    );
+
+                    if (longueurSegment > epsilon) {
+                        coupesTriees.add(new CoupeRequise(
+                                longueurSegment,
+                                coupe.longueurPoteau,
+                                coupe.nombrePoteaux,
+                                "segment " + (i + 1) + "/" + nombreSegments
+                        ));
+                    }
+                }
+            } else {
+                coupesTriees.add(coupe);
+            }
+        }
+
+        // Traiter les plus grandes coupes en premier.
         Collections.sort(coupesTriees, new Comparator<CoupeRequise>() {
             @Override
             public int compare(CoupeRequise a, CoupeRequise b) {
@@ -1074,68 +1350,125 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        List<BarreUtilisee> barresUtilisees = new ArrayList<>();
+        int barresNecessaires = 0;
+
         for (CoupeRequise coupe : coupesTriees) {
-            double longueurCoupe = coupe.longueur;
-            if (longueurCoupe <= 0) {
-                continue;
-            }
 
-            if (longueurCoupe > LONGUEUR_BARRE_STANDARD) {
-                int barresParCoupe = (int) Math.ceil(longueurCoupe / LONGUEUR_BARRE_STANDARD);
-                barresNecessaires += barresParCoupe;
-                listeDechets.add((barresParCoupe * LONGUEUR_BARRE_STANDARD) - longueurCoupe);
+            // Chercher d'abord parmi les morceaux de stock déjà entamés.
+            BarreUtilisee meilleureBarreStock = trouverBarreCompatible(
+                    barresUtilisees,
+                    coupe.longueur,
+                    true
+            );
 
-                for (int seg = 1; seg <= barresParCoupe; seg++) {
-                    double longueurSegment = Math.min(LONGUEUR_BARRE_STANDARD,
-                            longueurCoupe - (seg - 1) * LONGUEUR_BARRE_STANDARD);
-                    BarreUtilisee barre = new BarreUtilisee(LONGUEUR_BARRE_STANDARD - longueurSegment);
-                    barre.coupes.add(new CoupeRequise(longueurSegment, coupe.longueurPoteau,
-                            coupe.nombrePoteaux, "segment " + seg + "/" + barresParCoupe));
-                    barresFermees.add(barre);
-                }
-                continue;
-            }
+            // Chercher aussi le plus petit morceau de stock non entamé
+            // capable de contenir cette coupe.
+            MorceauFer meilleurMorceau = null;
 
-            int indexTrouve = -1;
-            double meilleurReste = -1;
-            for (int i = 0; i < barresOuvertes.size(); i++) {
-                double reste = barresOuvertes.get(i).resteDisponible;
-                if (reste >= longueurCoupe && (meilleurReste == -1 || reste < meilleurReste)) {
-                    indexTrouve = i;
-                    meilleurReste = reste;
+            for (MorceauFer morceau : stockDisponible) {
+                if (morceau.quantite > 0
+                        && morceau.longueur + epsilon >= coupe.longueur
+                        && (meilleurMorceau == null
+                        || morceau.longueur < meilleurMorceau.longueur)) {
+                    meilleurMorceau = morceau;
                 }
             }
 
-            if (indexTrouve != -1) {
-                BarreUtilisee barre = barresOuvertes.get(indexTrouve);
-                barre.resteDisponible -= longueurCoupe;
-                barre.coupes.add(coupe);
-            } else {
+            BarreUtilisee barreChoisie = meilleureBarreStock;
+
+            // Entre stock entamé et stock non entamé, choisir celui
+            // qui laissera le moins de reste après cette coupe.
+            if (meilleurMorceau != null
+                    && (barreChoisie == null
+                    || meilleurMorceau.longueur < barreChoisie.resteDisponible)) {
+
+                barreChoisie = new BarreUtilisee(meilleurMorceau.longueur);
+                barreChoisie.estDuStock = true;
+                barreChoisie.longueurOrigineStock = meilleurMorceau.longueur;
+
+                meilleurMorceau.quantite--;
+                barresUtilisees.add(barreChoisie);
+            }
+
+            // Aucun morceau du stock ne convient :
+            // essayer une barre neuve déjà ouverte.
+            if (barreChoisie == null) {
+                barreChoisie = trouverBarreCompatible(
+                        barresUtilisees,
+                        coupe.longueur,
+                        false
+                );
+            }
+
+            // Sinon, prévoir l'achat d'une nouvelle barre.
+            if (barreChoisie == null) {
+                barreChoisie = new BarreUtilisee(LONGUEUR_BARRE_STANDARD);
+                barresUtilisees.add(barreChoisie);
                 barresNecessaires++;
-                BarreUtilisee barre = new BarreUtilisee(LONGUEUR_BARRE_STANDARD - longueurCoupe);
-                barre.coupes.add(coupe);
-                barresOuvertes.add(barre);
+            }
+
+            barreChoisie.coupes.add(coupe);
+            barreChoisie.resteDisponible = Math.max(
+                    0.0,
+                    barreChoisie.resteDisponible - coupe.longueur
+            );
+
+            if (barreChoisie.resteDisponible < epsilon) {
+                barreChoisie.resteDisponible = 0.0;
             }
         }
 
-        for (BarreUtilisee barre : barresOuvertes) {
-            if (barre.resteDisponible > 1e-9) {
+        // Tous les restes sont conservés pour l'affichage et les exports.
+        List<Double> listeDechets = new ArrayList<>();
+        double totalDechets = 0.0;
+        double longueurTotaleUtilisee = 0.0;
+
+        for (BarreUtilisee barre : barresUtilisees) {
+            longueurTotaleUtilisee += barre.estDuStock
+                    ? barre.longueurOrigineStock
+                    : LONGUEUR_BARRE_STANDARD;
+
+            if (barre.resteDisponible > epsilon) {
                 listeDechets.add(barre.resteDisponible);
+                totalDechets += barre.resteDisponible;
             }
         }
 
-        double totalDechets = 0;
-        for (double dechet : listeDechets) {
-            totalDechets += dechet;
+        // Conserve le critère existant : moins de 20 % de restes,
+        // en tenant compte cette fois des longueurs issues du stock.
+        boolean utilisationOptimisee = longueurTotaleUtilisee <= epsilon
+                || totalDechets / longueurTotaleUtilisee < 0.2;
+
+        return new ResultatCalcul(
+                barresNecessaires,
+                listeDechets,
+                utilisationOptimisee,
+                barresUtilisees
+        );
+    }
+
+    private BarreUtilisee trouverBarreCompatible(
+            List<BarreUtilisee> barres,
+            double longueurCoupe,
+            boolean depuisStock) {
+
+        final double epsilon = 1e-9;
+        BarreUtilisee meilleure = null;
+
+        for (BarreUtilisee barre : barres) {
+            if (barre.estDuStock != depuisStock) {
+                continue;
+            }
+
+            if (barre.resteDisponible + epsilon >= longueurCoupe
+                    && (meilleure == null
+                    || barre.resteDisponible < meilleure.resteDisponible)) {
+                meilleure = barre;
+            }
         }
-        boolean utilisationOptimisee = barresNecessaires == 0
-                || (totalDechets / (barresNecessaires * LONGUEUR_BARRE_STANDARD)) < 0.2;
 
-        List<BarreUtilisee> detailBarres = new ArrayList<>();
-        detailBarres.addAll(barresFermees);
-        detailBarres.addAll(barresOuvertes);
-
-        return new ResultatCalcul(barresNecessaires, listeDechets, utilisationOptimisee, detailBarres);
+        return meilleure;
     }
 
     /**
