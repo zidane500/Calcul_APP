@@ -11,7 +11,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
 
 /**
  * Gère le stock de chutes de fer, par type de barre (N6, N8, N12...).
@@ -27,16 +31,20 @@ public class StockManager {
 
     private static final String CLE_VERSION = "stock_version";
     private static final String PREFIXE_OPERATION = "stock_operation_";
+    private static final String CLE_HISTORIQUE = "historique_json";
+    private static final int MAX_MOUVEMENTS = 500;
 
     private static StockManager instance;
 
     private final SharedPreferences preferences;
     private final Map<String, List<MorceauFer>> stock;
+    private final List<MouvementStock> historique;
 
     private StockManager(Context context) {
         preferences = context.getApplicationContext()
                 .getSharedPreferences(PREFS_NOM, Context.MODE_PRIVATE);
         stock = chargerDepuisPreferences();
+        historique = chargerHistorique();
     }
 
     public static synchronized StockManager getInstance(Context context) {
@@ -77,6 +85,15 @@ public class StockManager {
      * au lieu de créer une nouvelle ligne.
      */
     public void ajouter(String typeFer, double longueur, int quantite) {
+        ajouter(typeFer, longueur, quantite, "Ajout manuel");
+    }
+
+    public void ajouter(String typeFer, double longueur, int quantite, String motif) {
+        ajouterInterne(typeFer, longueur, quantite, motif, nouveauGroupe());
+    }
+
+    private void ajouterInterne(String typeFer, double longueur, int quantite,
+                                String motif, String groupe) {
         if (quantite <= 0 || longueur <= 0) {
             return;
         }
@@ -95,6 +112,7 @@ public class StockManager {
         }
 
         sauvegarder();
+        journaliser(MouvementStock.AJOUT, typeFer, longueur, quantite, motif, groupe);
     }
 
     /**
@@ -109,8 +127,9 @@ public class StockManager {
                 comptage.put(d, comptage.getOrDefault(d, 0) + 1);
             }
         }
+        String groupe = nouveauGroupe();
         for (Map.Entry<Double, Integer> entry : comptage.entrySet()) {
-            ajouter(typeFer, entry.getKey(), entry.getValue());
+            ajouterInterne(typeFer, entry.getKey(), entry.getValue(), "Chutes d'un calcul", groupe);
         }
     }
 
@@ -120,6 +139,15 @@ public class StockManager {
      * type ou la longueur n'existent pas dans le stock (retrait déjà fait, ou stock vidé entre-temps).
      */
     public void retirer(String typeFer, double longueur, int quantite) {
+        retirer(typeFer, longueur, quantite, "Retrait manuel");
+    }
+
+    public void retirer(String typeFer, double longueur, int quantite, String motif) {
+        retirerInterne(typeFer, longueur, quantite, motif, nouveauGroupe());
+    }
+
+    private void retirerInterne(String typeFer, double longueur, int quantite,
+                                String motif, String groupe) {
         if (quantite <= 0 || longueur <= 0) {
             return;
         }
@@ -134,6 +162,8 @@ public class StockManager {
             return;
         }
 
+        int quantiteRetiree = Math.min(quantite, existant.quantite);
+
         existant.quantite -= quantite;
         if (existant.quantite <= 0) {
             morceaux.remove(existant);
@@ -143,6 +173,7 @@ public class StockManager {
         }
 
         sauvegarder();
+        journaliser(MouvementStock.RETRAIT, typeFer, longueur, quantiteRetiree, motif, groupe);
     }
 
     /**
@@ -156,8 +187,10 @@ public class StockManager {
                 comptage.put(d, comptage.getOrDefault(d, 0) + 1);
             }
         }
+        String groupe = nouveauGroupe();
         for (Map.Entry<Double, Integer> entry : comptage.entrySet()) {
-            retirer(typeFer, entry.getKey(), entry.getValue());
+            retirerInterne(typeFer, entry.getKey(), entry.getValue(),
+                    "Chutes d'un calcul retirées", groupe);
         }
     }
 
@@ -253,6 +286,7 @@ public class StockManager {
 
         try {
             JSONObject avant = convertirStockEnJson(stock);
+            Map<String, List<MorceauFer>> stockAvantMouvements = convertirJsonEnStock(avant);
 
             // Travail sur une copie indépendante.
             Map<String, List<MorceauFer>> copie =
@@ -346,6 +380,7 @@ public class StockManager {
 
             stock.clear();
             stock.putAll(copie);
+            journaliserDifference(stockAvantMouvements, copie, "Utilisation du stock (calcul)");
             return true;
 
         } catch (JSONException e) {
@@ -387,6 +422,8 @@ public class StockManager {
                     convertirJsonEnStock(avant);
 
             String stockActuel = convertirStockEnJson(stock).toString();
+            Map<String, List<MorceauFer>> stockAvantAnnulation =
+                    convertirJsonEnStock(new JSONObject(stockActuel));
 
             operation.put("etat", "annulee");
 
@@ -407,11 +444,170 @@ public class StockManager {
 
             stock.clear();
             stock.putAll(stockRestaure);
+            journaliserDifference(stockAvantAnnulation, stockRestaure, "Annulation d'une opération");
             return true;
 
         } catch (JSONException e) {
             return false;
         }
+    }
+
+    // ------------------------------------------------------------------
+    // Historique des mouvements et opérations groupées
+    // ------------------------------------------------------------------
+
+    /**
+     * Coupe une longueur requise dans des morceaux du stock : retire les morceaux entiers
+     * utilisés, puis remet en stock le reste de chaque coupe. Les deux mouvements partagent
+     * le même groupe, donc l'historique les affiche dans un seul bloc.
+     *
+     * Retourne false (sans rien modifier) si la demande est invalide ou le stock insuffisant.
+     */
+    public synchronized boolean couper(String typeFer, double longueurMorceau,
+                                       double longueurRequise, int nombre) {
+        if (nombre < 1 || longueurMorceau <= 0.0 || longueurRequise <= 0.0
+                || longueurRequise > longueurMorceau + 1e-9) {
+            return false;
+        }
+
+        List<MorceauFer> morceaux = stock.get(typeFer);
+        if (morceaux == null) {
+            return false;
+        }
+
+        MorceauFer existant = trouverMorceau(morceaux, longueurMorceau);
+        if (existant == null || existant.quantite < nombre) {
+            return false;
+        }
+
+        double reste = Math.round((longueurMorceau - longueurRequise) * 100.0) / 100.0;
+        String groupe = nouveauGroupe();
+        String titre = String.format(Locale.FRANCE, "Coupe de %.2f m", longueurRequise);
+
+        retirerInterne(typeFer, longueurMorceau, nombre, titre, groupe);
+        if (reste > 1e-9) {
+            ajouterInterne(typeFer, reste, nombre, "Reste remis en stock", groupe);
+        }
+        return true;
+    }
+
+    private String nouveauGroupe() {
+        return UUID.randomUUID().toString();
+    }
+
+    /** Retourne l'historique des mouvements, du plus récent au plus ancien. */
+    public synchronized List<MouvementStock> getHistorique() {
+        List<MouvementStock> copie = new ArrayList<>();
+        for (int i = historique.size() - 1; i >= 0; i--) {
+            copie.add(historique.get(i));
+        }
+        return copie;
+    }
+
+    private void journaliser(String action, String typeFer, double longueur,
+                             int quantite, String motif, String groupe) {
+        if (quantite <= 0) {
+            return;
+        }
+
+        historique.add(new MouvementStock(
+                System.currentTimeMillis(), action, typeFer, longueur, quantite, motif, groupe));
+
+        while (historique.size() > MAX_MOUVEMENTS) {
+            historique.remove(0);
+        }
+
+        sauvegarderHistorique();
+    }
+
+    /** Compare deux états du stock et journalise chaque ajout / retrait constaté. */
+    private void journaliserDifference(Map<String, List<MorceauFer>> avant,
+                                       Map<String, List<MorceauFer>> apres,
+                                       String motif) {
+        String groupe = nouveauGroupe();
+        Map<String, Map<Long, Integer>> a = aplatir(avant);
+        Map<String, Map<Long, Integer>> b = aplatir(apres);
+
+        TreeSet<String> types = new TreeSet<>(a.keySet());
+        types.addAll(b.keySet());
+
+        for (String type : types) {
+            Map<Long, Integer> qa = a.containsKey(type) ? a.get(type) : new TreeMap<Long, Integer>();
+            Map<Long, Integer> qb = b.containsKey(type) ? b.get(type) : new TreeMap<Long, Integer>();
+
+            TreeSet<Long> longueurs = new TreeSet<>(qa.keySet());
+            longueurs.addAll(qb.keySet());
+
+            for (Long cle : longueurs) {
+                int delta = qb.getOrDefault(cle, 0) - qa.getOrDefault(cle, 0);
+                double longueur = cle / 1000.0;
+
+                if (delta > 0) {
+                    journaliser(MouvementStock.AJOUT, type, longueur, delta, motif, groupe);
+                } else if (delta < 0) {
+                    journaliser(MouvementStock.RETRAIT, type, longueur, -delta, motif, groupe);
+                }
+            }
+        }
+    }
+
+    private Map<String, Map<Long, Integer>> aplatir(Map<String, List<MorceauFer>> source) {
+        Map<String, Map<Long, Integer>> resultat = new TreeMap<>();
+        for (Map.Entry<String, List<MorceauFer>> entree : source.entrySet()) {
+            Map<Long, Integer> quantites = new TreeMap<>();
+            for (MorceauFer m : entree.getValue()) {
+                long cle = Math.round(m.longueur * 1000.0);
+                quantites.put(cle, quantites.getOrDefault(cle, 0) + m.quantite);
+            }
+            resultat.put(entree.getKey(), quantites);
+        }
+        return resultat;
+    }
+
+    private void sauvegarderHistorique() {
+        try {
+            JSONArray tableau = new JSONArray();
+            for (MouvementStock m : historique) {
+                JSONObject objet = new JSONObject();
+                objet.put("date", m.date);
+                objet.put("action", m.action);
+                objet.put("type", m.typeFer);
+                objet.put("longueur", m.longueur);
+                objet.put("quantite", m.quantite);
+                objet.put("motif", m.motif);
+                objet.put("groupe", m.groupe);
+                tableau.put(objet);
+            }
+            preferences.edit().putString(CLE_HISTORIQUE, tableau.toString()).apply();
+        } catch (JSONException e) {
+            // Historique non sauvegardé : le stock lui-même n'est pas affecté
+        }
+    }
+
+    private List<MouvementStock> chargerHistorique() {
+        List<MouvementStock> resultat = new ArrayList<>();
+        String json = preferences.getString(CLE_HISTORIQUE, null);
+        if (json == null) {
+            return resultat;
+        }
+
+        try {
+            JSONArray tableau = new JSONArray(json);
+            for (int i = 0; i < tableau.length(); i++) {
+                JSONObject objet = tableau.getJSONObject(i);
+                resultat.add(new MouvementStock(
+                        objet.getLong("date"),
+                        objet.getString("action"),
+                        objet.getString("type"),
+                        objet.getDouble("longueur"),
+                        objet.getInt("quantite"),
+                        objet.optString("motif", ""),
+                        objet.optString("groupe", "")));
+            }
+        } catch (JSONException e) {
+            // Historique corrompu : on repart d'un historique vide
+        }
+        return resultat;
     }
 
     private boolean longueurValide(Double longueur) {
