@@ -40,6 +40,14 @@
                     app:cornerRadius="14dp"
                     app:elevation="3dp" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRetirerFer"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Retirer Fer" />
+
                 <TextView
                     android:id="@+id/tvStockVide"
                     android:layout_width="match_parent"
