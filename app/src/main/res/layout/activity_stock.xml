@@ -25,36 +25,73 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAjouterFer"
                     style="@style/Widget.Material3.Button"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:layout_marginBottom="20dp"
-                    android:text="+ Ajouter Fer"
+                    android:layout_marginBottom="12dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Ajouter Fer"
                     android:textAllCaps="false"
+                    android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@color/white"
                     app:backgroundTint="@color/primary"
                     app:cornerRadius="14dp"
-                    app:elevation="3dp" />
+                    app:elevation="3dp"
+                    app:icon="@drawable/ic_btn_ajouter"
+                    app:iconGravity="textStart"
+                    app:iconPadding="10dp"
+                    app:iconSize="22dp"
+                    app:iconTint="@color/white" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnHistoriqueStock"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Historique" />
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="12dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Historique"
+                    android:textAllCaps="false"
+                    android:textColor="@color/add_poteau_text"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/add_poteau_background"
+                    app:cornerRadius="14dp"
+                    app:icon="@drawable/ic_btn_historique"
+                    app:iconGravity="textStart"
+                    app:iconPadding="10dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/add_poteau_text"
+                    app:strokeColor="@color/add_poteau_stroke"
+                    app:strokeWidth="1dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnRetirerFer"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Retirer Fer" />
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="20dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="Retirer Fer"
+                    android:textAllCaps="false"
+                    android:textColor="@color/retirer_text"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/retirer_background"
+                    app:cornerRadius="14dp"
+                    app:icon="@drawable/ic_btn_retirer"
+                    app:iconGravity="textStart"
+                    app:iconPadding="10dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/retirer_text"
+                    app:strokeColor="@color/retirer_stroke"
+                    app:strokeWidth="1dp" />
 
                 <TextView
                     android:id="@+id/tvStockVide"

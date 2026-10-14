@@ -48,6 +48,11 @@
     <color name="barre_input_text">#111827</color>
     <color name="barre_delete">#DC3545</color>
 
+    <!-- Bouton Retirer Fer (action sensible) -->
+    <color name="retirer_text">#C62828</color>
+    <color name="retirer_background">#FDF3F2</color>
+    <color name="retirer_stroke">#F4C7C3</color>
+
     <!-- État vide -->
     <color name="empty_barres_icon">#1976D2</color>
 </resources>
