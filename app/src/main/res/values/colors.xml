@@ -55,4 +55,15 @@
 
     <!-- État vide -->
     <color name="empty_barres_icon">#1976D2</color>
+
+    <!-- Historique du stock -->
+    <color name="historique_fond">#E9ECEF</color>
+    <color name="historique_titre_fond">#FFF200</color>
+    <color name="historique_titre_texte">#1F2937</color>
+
+    <!-- Interface Ajouter au stock -->
+    <color name="input_stroke">#D1D5DB</color>
+    <color name="input_background">#F8FAFC</color>
+    <color name="input_text">#1F2937</color>
+    <color name="dialog_title">#1976D2</color>
 </resources>

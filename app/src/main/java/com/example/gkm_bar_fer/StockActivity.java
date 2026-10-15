@@ -3,6 +3,7 @@ package com.example.gkm_bar_fer;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -584,11 +585,24 @@ public class StockActivity extends AppCompatActivity {
             conteneur.addView(carte);
         }
 
-        new AlertDialog.Builder(this)
-                .setTitle("Historique du stock")
+        View titre = LayoutInflater.from(this).inflate(R.layout.titre_historique_stock, null);
+
+        AlertDialog dialogue = new AlertDialog.Builder(this)
+                .setCustomTitle(titre)
                 .setView(vue)
                 .setPositiveButton("Fermer", null)
-                .show();
+                .create();
+
+        // Fond gris pour toute la boîte de dialogue (les cartes blanches ressortent dessus)
+        GradientDrawable fondDialogue = new GradientDrawable();
+        fondDialogue.setColor(ContextCompat.getColor(this, R.color.historique_fond));
+        fondDialogue.setCornerRadius(28 * densite);
+        if (dialogue.getWindow() != null) {
+            dialogue.getWindow().setBackgroundDrawable(
+                    new InsetDrawable(fondDialogue, (int) (24 * densite)));
+        }
+
+        dialogue.show();
     }
 
     // ------------------------------------------------------------------
