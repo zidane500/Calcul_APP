@@ -147,6 +147,17 @@ public class StockActivity extends AppCompatActivity {
                 return true;
             }
 
+            if (id == R.id.navEspaceClient) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+
+                startActivity(new Intent(
+                        StockActivity.this,
+                        EspaceClientActivity.class
+                ));
+                finish();
+                return true;
+            }
+
             return false;
         });
     }
