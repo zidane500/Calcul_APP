@@ -248,7 +248,7 @@
 
                 </LinearLayout>
 
-                <!-- Deuxième ligne : Semelle centrée -->
+                <!-- Deuxième ligne : Semelle et Poutre -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -256,16 +256,11 @@
                     android:orientation="horizontal"
                     android:baselineAligned="false">
 
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1" />
-
+                    <!-- Semelle -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
                         android:layout_marginEnd="6dp"
                         app:cardBackgroundColor="#EBEFF5"
                         app:cardCornerRadius="16dp"
@@ -313,10 +308,57 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <Space
+                    <!-- Poutre -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1" />
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        app:cardBackgroundColor="#EBEFF5"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnMenuPoutre"
+                                style="@style/Widget.Material3.Button.TextButton"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minWidth="0dp"
+                                android:minHeight="80dp"
+                                android:enabled="true"
+                                android:paddingStart="4dp"
+                                android:paddingEnd="4dp"
+                                android:text="Poutre"
+                                android:textAllCaps="false"
+                                android:textColor="#FFFFFF"
+                                android:textSize="15sp"
+                                app:backgroundTint="#2E4A62"
+                                app:cornerRadius="16dp"
+                                app:icon="@drawable/ic_poutre"
+                                app:iconGravity="textTop"
+                                app:iconSize="28dp"
+                                app:iconPadding="10dp"
+                                app:iconTint="#FFFFFF" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:gravity="center"
+                                android:text="Disponible"
+                                android:textColor="#59677A"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 

@@ -76,7 +76,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="12dp"
                 android:orientation="horizontal">
 
                 <Button
@@ -115,6 +115,39 @@
                     app:backgroundTint="@color/primary"
                     app:cornerRadius="14dp"
                     app:elevation="3dp" />
+
+            </LinearLayout>
+
+            <!-- Ligne 3 : Poutre -->
+            <LinearLayout
+                android:layout_width="392dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnCalculerPoutre"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="Calculer Poutre"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="14dp"
+                    app:elevation="3dp" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1" />
 
             </LinearLayout>
 

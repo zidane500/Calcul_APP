@@ -9,6 +9,7 @@ public enum TypeElement {
     POTEAU("poteau", "poteaux", false),
     DALLE("dalle", "dalles", true),
     SEMELLE("semelle", "semelles", true),
+    POUTRE("poutre", "poutres", true),
     ESCALIER("escalier", "escaliers", false);
 
     private final String singulier;

@@ -26,11 +26,13 @@ public class MenuActivity extends AppCompatActivity {
         Button btnPoteau = findViewById(R.id.btnMenuPoteau);
         Button btnSemelle = findViewById(R.id.btnMenuSemelle);
         Button btnDalle = findViewById(R.id.btnMenuDalle);
+        Button btnPoutre = findViewById(R.id.btnMenuPoutre);
         Button btnStock = findViewById(R.id.btnMenuStock);
 
         btnPoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.POTEAU));
         btnSemelle.setOnClickListener(v -> ouvrirCalcul(TypeElement.SEMELLE));
         btnDalle.setOnClickListener(v -> ouvrirCalcul(TypeElement.DALLE));
+        btnPoutre.setOnClickListener(v -> ouvrirCalcul(TypeElement.POUTRE));
 
         btnStock.setOnClickListener(v -> {
             Intent intent = new Intent(
