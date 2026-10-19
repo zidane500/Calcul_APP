@@ -27,12 +27,14 @@ public class MenuActivity extends AppCompatActivity {
         Button btnSemelle = findViewById(R.id.btnMenuSemelle);
         Button btnDalle = findViewById(R.id.btnMenuDalle);
         Button btnPoutre = findViewById(R.id.btnMenuPoutre);
+        Button btnPrePoteau = findViewById(R.id.btnMenuPrePoteau);
         Button btnStock = findViewById(R.id.btnMenuStock);
 
         btnPoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.POTEAU));
         btnSemelle.setOnClickListener(v -> ouvrirCalcul(TypeElement.SEMELLE));
         btnDalle.setOnClickListener(v -> ouvrirCalcul(TypeElement.DALLE));
         btnPoutre.setOnClickListener(v -> ouvrirCalcul(TypeElement.POUTRE));
+        btnPrePoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.PRE_POTEAU));
 
         btnStock.setOnClickListener(v -> {
             Intent intent = new Intent(
@@ -103,6 +105,12 @@ public class MenuActivity extends AppCompatActivity {
                         EspaceClientActivity.class
                 );
                 startActivity(intent);
+                return true;
+            }
+
+            if (id == R.id.navParametres) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                ParametresDialog.afficher(this);
                 return true;
             }
 

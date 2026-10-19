@@ -22,6 +22,15 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Locale;
+
 import java.util.List;
 
 public class EspaceClientActivity extends AppCompatActivity {
@@ -29,6 +38,11 @@ public class EspaceClientActivity extends AppCompatActivity {
     private LinearLayout layoutClients;
     private TextView tvClientsVide;
     private ClientManager clientManager;
+    // Recherche par nom
+    private TextInputEditText etRecherche;
+    private View layoutRechercheClient;
+    private TextView tvResultatRecherche;
+    private String requete = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +53,15 @@ public class EspaceClientActivity extends AppCompatActivity {
 
         layoutClients = findViewById(R.id.layoutClients);
         tvClientsVide = findViewById(R.id.tvClientsVide);
+        layoutRechercheClient = findViewById(R.id.layoutRechercheClient);
+        etRecherche = findViewById(R.id.etRechercheClient);
+        tvResultatRecherche = findViewById(R.id.tvResultatRecherche);
         Button btnAjouterClient = findViewById(R.id.btnAjouterClient);
 
         clientManager = ClientManager.getInstance(this);
 
         btnAjouterClient.setOnClickListener(v -> afficherDialogueAjoutClient());
-
+        configurerRecherche();
         rafraichirAffichage();
     }
 
@@ -121,6 +138,18 @@ public class EspaceClientActivity extends AppCompatActivity {
                 return true;
             }
 
+            if (id == R.id.navParametres) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                ParametresDialog.afficher(this);
+                return true;
+            }
+
+            if (id == R.id.navParametres) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                ParametresDialog.afficher(this);
+                return true;
+            }
+
             return false;
         });
     }
@@ -129,11 +158,26 @@ public class EspaceClientActivity extends AppCompatActivity {
     // Affichage de la liste des clients
     // ------------------------------------------------------------------
 
-    private void rafraichirAffichage() {
-        layoutClients.removeAllViews();
-        List<Client> clients = clientManager.getClients();
+    private void rafraichirAffichage() {        layoutClients.removeAllViews();
+        List<Client> tousLesClients = clientManager.getClients();
+
+        if (tousLesClients.isEmpty()) {
+            // Plus aucun client : on masque la recherche et on l'efface.
+            layoutRechercheClient.setVisibility(View.GONE);
+            tvClientsVide.setText("Aucun client pour l'instant.");
+            tvClientsVide.setVisibility(View.VISIBLE);
+            if (etRecherche.getText() != null && etRecherche.getText().length() > 0) {
+                etRecherche.setText("");
+            }
+            return;
+        }
+        layoutRechercheClient.setVisibility(View.VISIBLE);
+
+        List<Client> clients = filtrerClients(tousLesClients, requete);
+        mettreAJourResultatRecherche(clients.size(), tousLesClients.size());
 
         if (clients.isEmpty()) {
+            tvClientsVide.setText("Aucun client trouvé pour « " + requete + " ».");
             tvClientsVide.setVisibility(View.VISIBLE);
             return;
         }
@@ -201,6 +245,76 @@ public class EspaceClientActivity extends AppCompatActivity {
     }
 
     // ------------------------------------------------------------------
+    // Recherche d'un client par nom
+    // ------------------------------------------------------------------
+
+    private void configurerRecherche() {
+        etRecherche.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                requete = s == null ? "" : s.toString().trim();
+                rafraichirAffichage();
+            }
+        });
+
+        // Touche "Rechercher" du clavier : on ferme simplement le clavier.
+        etRecherche.setOnEditorActionListener((vue, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                InputMethodManager imm =
+                        (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(vue.getWindowToken(), 0);
+                }
+                vue.clearFocus();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /** Garde les clients dont le nom contient le texte (sans tenir compte des majuscules ni des accents). */
+    private List<Client> filtrerClients(List<Client> clients, String texte) {
+        String recherche = normaliser(texte);
+        if (recherche.isEmpty()) {
+            return clients;
+        }
+
+        List<Client> resultat = new ArrayList<>();
+        for (Client client : clients) {
+            if (normaliser(client.getNom()).contains(recherche)) {
+                resultat.add(client);
+            }
+        }
+        return resultat;
+    }
+
+    private static String normaliser(String texte) {
+        if (texte == null) {
+            return "";
+        }
+        String sansAccents = Normalizer.normalize(texte, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "");
+        return sansAccents.toLowerCase(Locale.ROOT).trim();
+    }
+
+    private void mettreAJourResultatRecherche(int trouves, int total) {
+        if (requete.isEmpty()) {
+            tvResultatRecherche.setText(total + (total > 1 ? " clients" : " client"));
+        } else {
+            tvResultatRecherche.setText(
+                    trouves + (trouves > 1 ? " résultats" : " résultat") + " sur " + total);
+        }
+    }
+
+    // ------------------------------------------------------------------
     // Modal "Ajouter Client"
     // ------------------------------------------------------------------
 
@@ -245,6 +359,7 @@ public class EspaceClientActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT
                     ).show();
                     dialogue.dismiss();
+                    etRecherche.setText("");
                     rafraichirAffichage();
                 })
         );

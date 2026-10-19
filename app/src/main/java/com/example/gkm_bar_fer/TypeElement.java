@@ -10,28 +10,36 @@ public enum TypeElement {
     DALLE("dalle", "dalles", true),
     SEMELLE("semelle", "semelles", true),
     POUTRE("poutre", "poutres", true),
+    PRE_POTEAU("pré-poteau", "pré-poteaux", false, "pre_poteau"),
     ESCALIER("escalier", "escaliers", false);
 
     private final String singulier;
     private final String pluriel;
     private final boolean feminin;
+    private final String code;
 
     TypeElement(String singulier, String pluriel, boolean feminin) {
+        // Par défaut, le code est le singulier (ex : "poteau") : les calculs déjà enregistrés restent valides.
+        this(singulier, pluriel, feminin, singulier);
+    }
+
+    TypeElement(String singulier, String pluriel, boolean feminin, String code) {
         this.singulier = singulier;
         this.pluriel = pluriel;
         this.feminin = feminin;
+        this.code = code;
     }
 
-    /** Code stocké dans les Intent et dans les calculs enregistrés. */
+    /** Code stocké dans les Intent et dans les calculs enregistrés (sans accent ni tiret). */
     public String getCode() {
-        return singulier;
+        return code;
     }
 
     /** Retrouve un type à partir de son code. Par défaut : POTEAU. */
     public static TypeElement depuisCode(String code) {
         if (code != null) {
             for (TypeElement type : values()) {
-                if (type.singulier.equals(code)) {
+                if (type.code.equals(code)) {
                     return type;
                 }
             }

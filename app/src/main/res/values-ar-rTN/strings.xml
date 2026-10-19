@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="drawer_open">فتح القائمة</string>
+    <string name="drawer_close">إغلاق القائمة</string>
+    <string name="menu_accueil">الرئيسية</string>
+    <string name="menu_espace_client">فضاء الحرفاء</string>
+    <string name="menu_stock_dechets">مخزون الفضلات</string>
+    <string name="menu_parametres">الإعدادات</string>
+
+    <string name="parametres_titre">الإعدادات</string>
+    <string name="parametres_langue">اللغة</string>
+    <string name="parametres_confirmer">تأكيد</string>
+    <string name="parametres_avertissement">سيؤدي تغيير اللغة إلى إعادة تشغيل هذه الشاشة، وستفقد المدخلات غير المحفوظة.</string>
+</resources>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Fer Pro</string>
     <string name="infos_poteaux">Informations des Poteaux</string>
     <string name="nombre_poteaux">Nombre de poteaux</string>
@@ -17,6 +17,17 @@
     <!-- Tiroir de navigation -->
     <string name="drawer_open">Ouvrir le menu</string>
     <string name="drawer_close">Fermer le menu</string>
+
+    <string name="menu_accueil">Accueil</string>
+    <string name="menu_espace_client">Espace Client</string>
+    <string name="menu_stock_dechets">Stock Déchets</string>
+    <string name="menu_parametres">Paramètres</string>
+
+    <!-- Paramètres -->
+    <string name="parametres_titre">Paramètres</string>
+    <string name="parametres_langue">Langue</string>
+    <string name="parametres_confirmer">Confirmer</string>
+    <string name="parametres_avertissement">Le changement de langue redémarre cet écran : les saisies non enregistrées seront perdues.</string>
 
     <!-- Ajoutez aussi ces chaînes pour les types de barres -->
     <string name="n6">N6</string>

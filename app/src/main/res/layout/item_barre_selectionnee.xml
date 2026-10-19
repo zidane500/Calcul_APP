@@ -51,20 +51,13 @@
 
 
         <com.google.android.material.textfield.TextInputEditText
-
             android:id="@+id/etNombreBarres"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:hint="Quantité"
-
+            android:imeOptions="actionDone"
             android:inputType="number"
-
-            android:maxLength="3"
-
-            android:text="0" />
+            android:maxLength="3" />
 
 
 

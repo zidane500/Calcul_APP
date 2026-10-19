@@ -39,6 +39,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.graphics.Rect;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout layoutGroupesPoteaux;
@@ -73,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_TYPE_ELEMENT = "type_element";
     private TypeElement typeElement = TypeElement.POTEAU;
     private String clientId = null;
+    private String nomClient = null;
     private String calculId = null;
     private String nomCalculCharge = null;
     private Button btnEnregistrerClient;
@@ -511,6 +517,9 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, StockActivity.class));
                 } else if (id == R.id.navEspaceClient) {
                     startActivity(new Intent(MainActivity.this, EspaceClientActivity.class));
+                } else if (id == R.id.navParametres) {
+                    // Écran de calcul : changer la langue le redémarre, on prévient l'utilisateur.
+                    ParametresDialog.afficher(MainActivity.this, true);
                 }
 
                 return true;
@@ -568,7 +577,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String typeSelectionne = (String) parent.getItemAtPosition(position);
-                ajouterBarreSelectionnee(groupe, typeSelectionne);
+                ajouterBarreSelectionnee(groupe, typeSelectionne, true);
                 groupe.autoCompleteBarreType.setText("");
             }
         });
@@ -590,10 +599,20 @@ public class MainActivity extends AppCompatActivity {
         layoutGroupesPoteaux.addView(groupeView);
     }
 
-    private void ajouterBarreSelectionnee(GroupePoteau groupe, String typeBarre) {
+    /**
+     * Ajoute une ligne "type de barre + quantité" au groupe.
+     * @param focaliser true quand l'utilisateur vient de choisir le type : on l'amène directement
+     *                  sur la quantité (défilement + curseur + clavier numérique). false lors de la
+     *                  restauration d'un calcul enregistré, pour ne pas ouvrir le clavier.
+     */
+    private void ajouterBarreSelectionnee(GroupePoteau groupe, String typeBarre, boolean focaliser) {
         // Vérifier si le type n'est pas déjà sélectionné pour ce groupe
         if (groupe.barresSelectionneesMap.containsKey(typeBarre)) {
             Toast.makeText(this, typeBarre + " est déjà sélectionné", Toast.LENGTH_SHORT).show();
+            if (focaliser) {
+                // On amène l'utilisateur sur la quantité de la ligne qui existe déjà.
+                focaliserQuantite(groupe.barresSelectionneesMap.get(typeBarre));
+            }
             return;
         }
 
@@ -607,7 +626,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton btnSupprimer = barreView.findViewById(R.id.btnSupprimer);
 
         tvTypeBarre.setText(typeBarre);
-        etNombreBarres.setText("0");
+
 
         // Stocker la référence à l'EditText
         groupe.barresSelectionneesMap.put(typeBarre, etNombreBarres);
@@ -626,6 +645,54 @@ public class MainActivity extends AppCompatActivity {
         // Masquer le message "Aucune barre"
         groupe.tvAucuneBarre.setText("•••");
         groupe.tvAucuneBarre.setVisibility(View.VISIBLE);
+
+        // Touche "Terminé" du clavier : on referme le clavier et on quitte le champ.
+        etNombreBarres.setOnEditorActionListener((vue, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                InputMethodManager imm =
+                        (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(vue.getWindowToken(), 0);
+                }
+                vue.clearFocus();
+                return true;
+            }
+            return false;
+        });
+
+        // Le type vient d'être choisi : on passe directement à la saisie de la quantité.
+        if (focaliser) {
+            focaliserQuantite(etNombreBarres);
+        }
+    }
+
+    /**
+     * Amène l'utilisateur sur un champ "Quantité" : la ligne est rendue visible, le champ prend le
+     * focus avec son contenu sélectionné (taper remplace le "0") et le clavier numérique s'ouvre.
+     */
+    private void focaliserQuantite(final TextInputEditText champ) {
+        if (champ == null) {
+            return;
+        }
+
+        // Petit délai : laisse le menu déroulant se fermer et la nouvelle ligne se dessiner.
+        champ.postDelayed(() -> {
+            if (!champ.isAttachedToWindow()) {
+                return; // ligne supprimée entre-temps
+            }
+
+            champ.requestRectangleOnScreen(
+                    new Rect(0, 0, champ.getWidth(), champ.getHeight()), false);
+
+            champ.requestFocus();
+            champ.setSelection(champ.length()); // curseur à la fin, rien de sélectionné
+
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.showSoftInput(champ, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }, 200);
     }
 
     private void supprimerBarreSelectionnee(GroupePoteau groupe, String typeBarre, View barreView) {
@@ -882,7 +949,8 @@ public class MainActivity extends AppCompatActivity {
                             resultat.operationStockId,
                             typeBarre,
                             origines,
-                            restes
+                            restes,
+                            nomClient
                     );
 
                     if (!succes) {
@@ -994,7 +1062,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!resultat.dechetsEnvoyes) {
                     StockManager.getInstance(MainActivity.this)
-                            .ajouterDechets(typeBarre, dechetsBarresNeuves);
+                            .ajouterDechets(typeBarre, dechetsBarresNeuves, nomClient);
                     btnDechetsAuStock.setText("Retirer chutes envoyées");
                     btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                             ContextCompat.getColor(MainActivity.this, R.color.error)));
@@ -1003,7 +1071,7 @@ public class MainActivity extends AppCompatActivity {
                             "Déchets de " + typeBarre + " ajoutés au stock.", Toast.LENGTH_SHORT).show();
                 } else {
                     StockManager.getInstance(MainActivity.this)
-                            .retirerDechets(typeBarre, dechetsBarresNeuves);
+                            .retirerDechets(typeBarre, dechetsBarresNeuves, nomClient);
                     btnDechetsAuStock.setText("Déchets au stock");
                     btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                             ContextCompat.getColor(MainActivity.this, R.color.success)));
@@ -1018,8 +1086,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Génère un PDF récapitulatif (poteaux + barres à acheter + détail barre par barre)
-     * à partir des derniers résultats calculés, puis propose de l'ouvrir/partager.
+     * Génère le rapport PDF professionnel (en-tête avec le nom du client, chiffres clés,
+     * besoins, approvisionnement, plan de coupe, pied de page avec logo Fer Pro),
+     * puis propose de l'ouvrir/partager.
      */
     private void exporterResultatsEnPdf() {
         if (derniersResultatsBarres.isEmpty()) {
@@ -1027,72 +1096,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        Paint paintTitre = new Paint();
-        paintTitre.setTextSize(18);
-        paintTitre.setFakeBoldText(true);
-        paintTitre.setColor(Color.parseColor("#2196F3"));
-
-        Paint paintDate = new Paint();
-        paintDate.setTextSize(10);
-        paintDate.setColor(Color.GRAY);
-
-        Paint paintSection = new Paint();
-        paintSection.setTextSize(14);
-        paintSection.setFakeBoldText(true);
-        paintSection.setColor(Color.BLACK);
-
-        Paint paintTexte = new Paint();
-        paintTexte.setTextSize(11);
-        paintTexte.setColor(Color.DKGRAY);
-
         PdfDocument pdfDocument = new PdfDocument();
-        CurseurPdf curseur = new CurseurPdf(pdfDocument, 595, 842, 40);
-
-        curseur.ligne("GKM Bar Fer - Résultats de calcul (" + typeElement.getPlurielMajuscule() + ")", paintTitre, 24);
-        String date = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRANCE).format(new Date());
-        curseur.ligne("Généré le " + date, paintDate, 22);
-
-        for (String ligne : dernierResumePoteaux.split("\n")) {
-            curseur.ligne(ligne, paintTexte, 14);
-        }
-        curseur.y += 10;
-
-        curseur.ligne("Barres à acheter (optimisé sur l'ensemble du chantier)", paintSection, 22);
-
-        for (Map.Entry<String, ResultatCalcul> entry : derniersResultatsBarres.entrySet()) {
-            String typeBarre = entry.getKey();
-            ResultatCalcul resultat = entry.getValue();
-
-            curseur.assurerEspace(50);
-            curseur.y += 6;
-            curseur.ligne("Type de barre : " + typeBarre, paintSection, 18);
-            curseur.ligne("Barres à acheter : " + resultat.barresNecessaires, paintTexte, 14);
-            curseur.ligne("Optimisé : " + (resultat.utilisationOptimisee ? "Oui" : "Non"), paintTexte, 14);
-
-            if (resultat.listeDechets.isEmpty()) {
-                curseur.ligne("Déchets : Aucun", paintTexte, 14);
-            } else {
-                Map<Double, Integer> dechetsParLongueur = new HashMap<>();
-                for (Double dechet : resultat.listeDechets) {
-                    dechetsParLongueur.put(dechet, dechetsParLongueur.getOrDefault(dechet, 0) + 1);
-                }
-                StringBuilder dechetsTxt = new StringBuilder("Déchets : ");
-                for (Map.Entry<Double, Integer> d : dechetsParLongueur.entrySet()) {
-                    dechetsTxt.append(d.getValue()).append("x ")
-                            .append(String.format(Locale.FRANCE, "%.2f", d.getKey())).append("m   ");
-                }
-                curseur.ligne(dechetsTxt.toString(), paintTexte, 14);
-            }
-
-            curseur.ligne("Détail des barres :", paintTexte, 14);
-            int numeroBarre = 1;
-            for (BarreUtilisee barre : resultat.detailBarres) {
-                curseur.ligne("  Barre " + numeroBarre + " : " + formatterDetailBarre(barre), paintTexte, 13);
-                numeroBarre++;
-            }
-        }
-
-        curseur.terminer();
+        RapportPdf.generer(pdfDocument, construireDonneesRapport());
 
         try {
             File dossierBase = getExternalFilesDir(null);
@@ -1104,7 +1109,11 @@ public class MainActivity extends AppCompatActivity {
                 dossierExports.mkdirs();
             }
 
-            String nomFichier = "GKM_" + typeElement.getPlurielMajuscule() + "_" + System.currentTimeMillis() + ".pdf";
+            String partieClient = (nomClient == null || nomClient.trim().isEmpty())
+                    ? ""
+                    : "_" + nomClient.trim().replaceAll("[^\\p{L}\\p{N}]+", "_");
+            String nomFichier = "FerPro_" + typeElement.getPlurielMajuscule() + partieClient
+                    + "_" + System.currentTimeMillis() + ".pdf";
             File fichierPdf = new File(dossierExports, nomFichier);
 
             FileOutputStream fos = new FileOutputStream(fichierPdf);
@@ -1131,6 +1140,63 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Erreur lors de la génération du PDF : " + e.getMessage(),
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * Transforme les derniers résultats calculés en données simples pour {@link RapportPdf}.
+     */
+    private RapportPdf.Donnees construireDonneesRapport() {
+        RapportPdf.Donnees donnees = new RapportPdf.Donnees();
+        donnees.nomClient = nomClient;
+        donnees.typeSingulier = typeElement.getSingulier();
+        donnees.typePluriel = typeElement.getPluriel();
+        donnees.date = new SimpleDateFormat("dd/MM/yyyy 'à' HH:mm", Locale.FRANCE).format(new Date());
+        donnees.longueurBarreStandard = LONGUEUR_BARRE_STANDARD;
+        donnees.logo = RapportPdf.chargerLogo(this);
+
+        // Besoins : une ligne = {longueur, nombre, type de barre, coupes/élément, total des coupes}
+        for (String[] ligne : derniersGroupesPoteaux) {
+            if (ligne.length < 5) {
+                continue;
+            }
+            try {
+                RapportPdf.Besoin besoin = new RapportPdf.Besoin();
+                besoin.longueur = Double.parseDouble(ligne[0].replace(',', '.'));
+                besoin.nombre = Integer.parseInt(ligne[1]);
+                besoin.typeFer = ligne[2];
+                besoin.coupesParElement = Integer.parseInt(ligne[3]);
+                besoin.totalCoupes = Integer.parseInt(ligne[4]);
+                donnees.besoins.add(besoin);
+            } catch (NumberFormatException ignore) {
+                // ligne illisible : ignorée
+            }
+        }
+
+        // Barres par type de fer
+        for (Map.Entry<String, ResultatCalcul> entry : derniersResultatsBarres.entrySet()) {
+            ResultatCalcul resultat = entry.getValue();
+
+            RapportPdf.GroupeBarres groupe = new RapportPdf.GroupeBarres();
+            groupe.typeFer = entry.getKey();
+            groupe.barresAcheter = resultat.barresNecessaires;
+
+            for (BarreUtilisee barre : resultat.detailBarres) {
+                RapportPdf.BarreDetail detail = new RapportPdf.BarreDetail();
+                detail.depuisStock = barre.estDuStock;
+                detail.longueurTotale = barre.estDuStock
+                        ? barre.longueurOrigineStock
+                        : LONGUEUR_BARRE_STANDARD;
+                for (CoupeRequise coupe : barre.coupes) {
+                    detail.coupes.add(coupe.longueur);
+                }
+                detail.chute = barre.resteDisponible;
+                detail.affectation = formatterDescriptionCoupes(barre) + marqueurStock(barre);
+                groupe.barres.add(detail);
+            }
+            donnees.groupes.add(groupe);
+        }
+
+        return donnees;
     }
 
     private void exporterResultatsEnExcel() {
@@ -1550,6 +1616,7 @@ public class MainActivity extends AppCompatActivity {
             btnEnregistrerClient.setVisibility(View.GONE);
             return;
         }
+        nomClient = client.getNom();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Calcul " + typeElement.getSingulier() + " - " + client.getNom());
@@ -1797,7 +1864,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject jb = barres.getJSONObject(j);
                 String type = jb.getString("type");
 
-                ajouterBarreSelectionnee(groupe, type);
+                ajouterBarreSelectionnee(groupe, type, false);
 
                 TextInputEditText etQuantite = groupe.barresSelectionneesMap.get(type);
                 if (etQuantite != null) {

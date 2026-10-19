@@ -362,6 +362,73 @@
 
                 </LinearLayout>
 
+                <!-- Troisième ligne : Pré-poteau -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        app:cardBackgroundColor="#EBEFF5"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnMenuPrePoteau"
+                                style="@style/Widget.Material3.Button.TextButton"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minWidth="0dp"
+                                android:minHeight="80dp"
+                                android:enabled="true"
+                                android:paddingStart="4dp"
+                                android:paddingEnd="4dp"
+                                android:text="Pré-poteau"
+                                android:textAllCaps="false"
+                                android:textColor="#FFFFFF"
+                                android:textSize="15sp"
+                                app:backgroundTint="#3E6B63"
+                                app:cornerRadius="16dp"
+                                app:icon="@drawable/ic_pre_poteau"
+                                app:iconGravity="textTop"
+                                app:iconSize="28dp"
+                                app:iconPadding="10dp"
+                                app:iconTint="#FFFFFF" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:gravity="center"
+                                android:text="Disponible"
+                                android:textColor="#59677A"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp" />
+
+                </LinearLayout>
+
                 <!-- Accès direct au stock -->
                 <TextView
                     android:layout_width="match_parent"

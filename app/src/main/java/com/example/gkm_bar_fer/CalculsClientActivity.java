@@ -68,6 +68,8 @@ public class CalculsClientActivity extends AppCompatActivity {
                 .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.SEMELLE));
         findViewById(R.id.btnCalculerPoutre)
                 .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.POUTRE));
+        findViewById(R.id.btnCalculerPrePoteau)
+                .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.PRE_POTEAU));
         findViewById(R.id.btnCalculerEscalier)
                 .setOnClickListener(v -> Toast.makeText(
                         CalculsClientActivity.this,

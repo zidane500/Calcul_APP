@@ -118,7 +118,7 @@
 
             </LinearLayout>
 
-            <!-- Ligne 3 : Poutre -->
+            <!-- Ligne 3 : Poutre / Pré-poteau -->
             <LinearLayout
                 android:layout_width="392dp"
                 android:layout_height="wrap_content"
@@ -143,11 +143,23 @@
                     app:cornerRadius="14dp"
                     app:elevation="3dp" />
 
-                <Space
+                <Button
+                    android:id="@+id/btnCalculerPrePoteau"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:layout_weight="1" />
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="Calculer Pré-poteau"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="14dp"
+                    app:elevation="3dp" />
 
             </LinearLayout>
 

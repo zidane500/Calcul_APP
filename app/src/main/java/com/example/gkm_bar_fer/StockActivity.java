@@ -30,6 +30,10 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import java.util.Collections;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +48,11 @@ public class StockActivity extends AppCompatActivity {
     private StockManager stockManager;
     private String typeFerSelectionne;
 
+    // Filtre par type de fer (null = tous les types)
+    private ChipGroup chipGroupFiltre;
+    private View layoutFiltreStock;
+    private String filtreType = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +62,8 @@ public class StockActivity extends AppCompatActivity {
 
         layoutStock = findViewById(R.id.layoutStock);
         tvStockVide = findViewById(R.id.tvStockVide);
+        layoutFiltreStock = findViewById(R.id.layoutFiltreStock);
+        chipGroupFiltre = findViewById(R.id.chipGroupFiltre);
         Button btnAjouterFer = findViewById(R.id.btnAjouterFer);
 
         stockManager = StockManager.getInstance(this);
@@ -170,18 +181,40 @@ public class StockActivity extends AppCompatActivity {
      * Reconstruit entièrement l'affichage du stock à partir des données actuelles.
      */
     private void rafraichirAffichageStock() {
-        layoutStock.removeAllViews();
         Map<String, List<MorceauFer>> stock = stockManager.getStock();
 
         if (stock.isEmpty()) {
+            filtreType = null;
+            layoutFiltreStock.setVisibility(View.GONE);
+            layoutStock.removeAllViews();
             tvStockVide.setVisibility(View.VISIBLE);
             return;
         }
         tvStockVide.setVisibility(View.GONE);
 
+        // Le type filtré a pu disparaître du stock (tout retiré) : on revient à "Tous".
+        if (filtreType != null && !stock.containsKey(filtreType)) {
+            filtreType = null;
+        }
+
+        construireFiltre(stock);
+        afficherCartesStock(stock);
+    }
+
+    /**
+     * Affiche les cartes du stock, en ne gardant que le type de fer filtré (ou tous).
+     */
+    private void afficherCartesStock(Map<String, List<MorceauFer>> stock) {
+        layoutStock.removeAllViews();
+
         LayoutInflater inflater = LayoutInflater.from(this);
         for (Map.Entry<String, List<MorceauFer>> entry : stock.entrySet()) {
             String typeFer = entry.getKey();
+
+            if (filtreType != null && !filtreType.equals(typeFer)) {
+                continue;
+            }
+
             List<MorceauFer> morceaux = entry.getValue();
 
             View itemView = inflater.inflate(
@@ -197,6 +230,71 @@ public class StockActivity extends AppCompatActivity {
             tvDetail.setText(formatterDetailStock(morceaux));
 
             layoutStock.addView(itemView);
+        }
+    }
+
+    /**
+     * Reconstruit la rangée de puces : "Tous" + un type de fer par puce (triés N8, N10, N12...).
+     * Le filtre n'est affiché que s'il y a au moins deux types de fer en stock.
+     */
+    private void construireFiltre(final Map<String, List<MorceauFer>> stock) {
+        List<String> types = new ArrayList<>(stock.keySet());
+        Collections.sort(types, (a, b) -> {
+            int comparaison = Integer.compare(extraireNumero(a), extraireNumero(b));
+            return comparaison != 0 ? comparaison : a.compareTo(b);
+        });
+
+        if (types.size() < 2) {
+            filtreType = null;
+            layoutFiltreStock.setVisibility(View.GONE);
+            return;
+        }
+        layoutFiltreStock.setVisibility(View.VISIBLE);
+
+        chipGroupFiltre.removeAllViews();
+
+        Chip chipTous = creerPuce("Tous", null, stock);
+        chipGroupFiltre.addView(chipTous);
+        int idSelection = chipTous.getId();
+
+        for (String type : types) {
+            Chip puce = creerPuce(type, type, stock);
+            chipGroupFiltre.addView(puce);
+            if (type.equals(filtreType)) {
+                idSelection = puce.getId();
+            }
+        }
+
+        chipGroupFiltre.check(idSelection);
+    }
+
+    private Chip creerPuce(String texte, final String type, final Map<String, List<MorceauFer>> stock) {
+        Chip puce = (Chip) LayoutInflater.from(this)
+                .inflate(R.layout.item_chip_filtre, chipGroupFiltre, false);
+        puce.setId(View.generateViewId());
+        puce.setText(texte);
+        puce.setOnClickListener(v -> {
+            filtreType = type;
+            afficherCartesStock(stock);
+        });
+        return puce;
+    }
+
+    /** "N10" -> 10 ; sans chiffre, le type passe en dernier. */
+    private int extraireNumero(String type) {
+        StringBuilder chiffres = new StringBuilder();
+        for (char c : type.toCharArray()) {
+            if (Character.isDigit(c)) {
+                chiffres.append(c);
+            }
+        }
+        if (chiffres.length() == 0) {
+            return Integer.MAX_VALUE;
+        }
+        try {
+            return Integer.parseInt(chiffres.toString());
+        } catch (NumberFormatException e) {
+            return Integer.MAX_VALUE;
         }
     }
 
@@ -564,6 +662,15 @@ public class StockActivity extends AppCompatActivity {
             tvBadge.setTextColor(couleurTexte);
 
             tvDate.setText(format.format(new Date(premier.date)));
+
+            // Calcul fait dans l'espace d'un client : on affiche son nom entre le badge et la date.
+            TextView tvClient = carte.findViewById(R.id.tvCarteClient);
+            if (premier.client.isEmpty()) {
+                tvClient.setVisibility(View.INVISIBLE);
+            } else {
+                tvClient.setText(premier.client);
+                tvClient.setVisibility(View.VISIBLE);
+            }
 
             String titre = premier.typeFer;
             if (!premier.motif.isEmpty()) {

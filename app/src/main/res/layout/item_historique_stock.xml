@@ -34,12 +34,30 @@
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
+            <!-- Nom du client (calcul fait dans l'espace d'un client). INVISIBLE (et non GONE)
+     quand il n'y en a pas, pour que la date reste alignée à droite. -->
             <TextView
-                android:id="@+id/tvCarteDate"
+                android:id="@+id/tvCarteClient"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:gravity="end"
+                android:drawablePadding="4dp"
+                android:drawableStart="@drawable/ic_client"
+                android:drawableTint="#6B7280"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:textColor="#374151"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/tvCarteDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="#6B7280"
                 android:textSize="12sp" />
         </LinearLayout>

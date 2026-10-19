@@ -94,6 +94,11 @@ public class StockManager {
 
     private void ajouterInterne(String typeFer, double longueur, int quantite,
                                 String motif, String groupe) {
+        ajouterInterne(typeFer, longueur, quantite, motif, groupe, "");
+    }
+
+    private void ajouterInterne(String typeFer, double longueur, int quantite,
+                                String motif, String groupe, String client) {
         if (quantite <= 0 || longueur <= 0) {
             return;
         }
@@ -112,7 +117,7 @@ public class StockManager {
         }
 
         sauvegarder();
-        journaliser(MouvementStock.AJOUT, typeFer, longueur, quantite, motif, groupe);
+        journaliser(MouvementStock.AJOUT, typeFer, longueur, quantite, motif, groupe, client);
     }
 
     /**
@@ -121,6 +126,14 @@ public class StockManager {
      * deviennent une seule ligne "2,00 m x3").
      */
     public void ajouterDechets(String typeFer, List<Double> dechets) {
+        ajouterDechets(typeFer, dechets, null);
+    }
+
+    /**
+     * Même chose, en indiquant d'où vient le calcul : nomClient = nom du client si le calcul est
+     * fait dans son espace, null ou vide pour un calcul libre. L'historique affiche cette origine.
+     */
+    public void ajouterDechets(String typeFer, List<Double> dechets, String nomClient) {
         Map<Double, Integer> comptage = new LinkedHashMap<>();
         for (Double d : dechets) {
             if (d != null && d > 1e-9) {
@@ -129,7 +142,8 @@ public class StockManager {
         }
         String groupe = nouveauGroupe();
         for (Map.Entry<Double, Integer> entry : comptage.entrySet()) {
-            ajouterInterne(typeFer, entry.getKey(), entry.getValue(), "Chutes d'un calcul", groupe);
+            ajouterInterne(typeFer, entry.getKey(), entry.getValue(),
+                    "Chutes d'un calcul" + suffixeLibre(nomClient), groupe, nettoyerClient(nomClient));
         }
     }
 
@@ -148,6 +162,11 @@ public class StockManager {
 
     private void retirerInterne(String typeFer, double longueur, int quantite,
                                 String motif, String groupe) {
+        retirerInterne(typeFer, longueur, quantite, motif, groupe, "");
+    }
+
+    private void retirerInterne(String typeFer, double longueur, int quantite,
+                                String motif, String groupe, String client) {
         if (quantite <= 0 || longueur <= 0) {
             return;
         }
@@ -173,7 +192,7 @@ public class StockManager {
         }
 
         sauvegarder();
-        journaliser(MouvementStock.RETRAIT, typeFer, longueur, quantiteRetiree, motif, groupe);
+        journaliser(MouvementStock.RETRAIT, typeFer, longueur, quantiteRetiree, motif, groupe, client);
     }
 
     /**
@@ -181,6 +200,11 @@ public class StockManager {
      * ajouterDechets(...), avec le même regroupement par longueur.
      */
     public void retirerDechets(String typeFer, List<Double> dechets) {
+        retirerDechets(typeFer, dechets, null);
+    }
+
+    /** Même chose, en indiquant l'origine du calcul (voir ajouterDechets). */
+    public void retirerDechets(String typeFer, List<Double> dechets, String nomClient) {
         Map<Double, Integer> comptage = new LinkedHashMap<>();
         for (Double d : dechets) {
             if (d != null && d > 1e-9) {
@@ -190,8 +214,19 @@ public class StockManager {
         String groupe = nouveauGroupe();
         for (Map.Entry<Double, Integer> entry : comptage.entrySet()) {
             retirerInterne(typeFer, entry.getKey(), entry.getValue(),
-                    "Chutes d'un calcul retirées", groupe);
+                    "Chutes d'un calcul" + suffixeLibre(nomClient) + " retirées",
+                    groupe, nettoyerClient(nomClient));
         }
+    }
+
+    /** Nom du client nettoyé : "" si le calcul est libre. */
+    private static String nettoyerClient(String nomClient) {
+        return nomClient == null ? "" : nomClient.trim();
+    }
+
+    /** " libre" quand le calcul n'appartient à aucun client, sinon rien. */
+    private static String suffixeLibre(String nomClient) {
+        return nettoyerClient(nomClient).isEmpty() ? " libre" : "";
     }
 
     private MorceauFer trouverMorceau(List<MorceauFer> morceaux, double longueur) {
@@ -269,6 +304,19 @@ public class StockManager {
             String typeFer,
             List<Double> origines,
             List<Double> restes) {
+        return confirmerUtilisationStock(operationId, typeFer, origines, restes, null);
+    }
+
+    /**
+     * Même chose, en indiquant l'origine du calcul : nomClient = nom du client si le calcul est
+     * fait dans son espace, null ou vide pour un calcul libre. L'historique affiche cette origine.
+     */
+    public synchronized boolean confirmerUtilisationStock(
+            String operationId,
+            String typeFer,
+            List<Double> origines,
+            List<Double> restes,
+            String nomClient) {
 
         if (operationId == null || operationId.trim().isEmpty()
                 || typeFer == null || typeFer.trim().isEmpty()
@@ -355,6 +403,7 @@ public class StockManager {
 
             JSONObject operation = new JSONObject();
             operation.put("etat", "confirmee");
+            operation.put("client", nettoyerClient(nomClient));   // sert aussi à l'annulation
             operation.put("versionApres", nouvelleVersion);
             operation.put("stockAvant", avant);
 
@@ -380,7 +429,9 @@ public class StockManager {
 
             stock.clear();
             stock.putAll(copie);
-            journaliserDifference(stockAvantMouvements, copie, "Utilisation du stock (calcul)");
+            journaliserDifference(stockAvantMouvements, copie,
+                    "Utilisation du stock (calcul" + suffixeLibre(nomClient) + ")",
+                    nettoyerClient(nomClient));
             return true;
 
         } catch (JSONException e) {
@@ -444,7 +495,13 @@ public class StockManager {
 
             stock.clear();
             stock.putAll(stockRestaure);
-            journaliserDifference(stockAvantAnnulation, stockRestaure, "Annulation d'une opération");
+            // L'annulation garde l'origine de la confirmation (client ou calcul libre).
+            // Les anciennes opérations, sans origine enregistrée, gardent le motif d'avant.
+            boolean origineConnue = operation.has("client");
+            String clientOperation = operation.optString("client", "");
+            String motifAnnulation = "Annulation d'une opération"
+                    + (origineConnue && clientOperation.isEmpty() ? " (calcul libre)" : "");
+            journaliserDifference(stockAvantAnnulation, stockRestaure, motifAnnulation, clientOperation);
             return true;
 
         } catch (JSONException e) {
@@ -506,12 +563,18 @@ public class StockManager {
 
     private void journaliser(String action, String typeFer, double longueur,
                              int quantite, String motif, String groupe) {
+        journaliser(action, typeFer, longueur, quantite, motif, groupe, "");
+    }
+
+    private void journaliser(String action, String typeFer, double longueur,
+                             int quantite, String motif, String groupe, String client) {
         if (quantite <= 0) {
             return;
         }
 
         historique.add(new MouvementStock(
-                System.currentTimeMillis(), action, typeFer, longueur, quantite, motif, groupe));
+                System.currentTimeMillis(), action, typeFer, longueur, quantite, motif, groupe,
+                client));
 
         while (historique.size() > MAX_MOUVEMENTS) {
             historique.remove(0);
@@ -523,7 +586,7 @@ public class StockManager {
     /** Compare deux états du stock et journalise chaque ajout / retrait constaté. */
     private void journaliserDifference(Map<String, List<MorceauFer>> avant,
                                        Map<String, List<MorceauFer>> apres,
-                                       String motif) {
+                                       String motif, String client) {
         String groupe = nouveauGroupe();
         Map<String, Map<Long, Integer>> a = aplatir(avant);
         Map<String, Map<Long, Integer>> b = aplatir(apres);
@@ -543,9 +606,9 @@ public class StockManager {
                 double longueur = cle / 1000.0;
 
                 if (delta > 0) {
-                    journaliser(MouvementStock.AJOUT, type, longueur, delta, motif, groupe);
+                    journaliser(MouvementStock.AJOUT, type, longueur, delta, motif, groupe, client);
                 } else if (delta < 0) {
-                    journaliser(MouvementStock.RETRAIT, type, longueur, -delta, motif, groupe);
+                    journaliser(MouvementStock.RETRAIT, type, longueur, -delta, motif, groupe, client);
                 }
             }
         }
@@ -576,6 +639,7 @@ public class StockManager {
                 objet.put("quantite", m.quantite);
                 objet.put("motif", m.motif);
                 objet.put("groupe", m.groupe);
+                objet.put("client", m.client);
                 tableau.put(objet);
             }
             preferences.edit().putString(CLE_HISTORIQUE, tableau.toString()).apply();
@@ -602,7 +666,8 @@ public class StockManager {
                         objet.getDouble("longueur"),
                         objet.getInt("quantite"),
                         objet.optString("motif", ""),
-                        objet.optString("groupe", "")));
+                        objet.optString("groupe", ""),
+                        objet.optString("client", "")));
             }
         } catch (JSONException e) {
             // Historique corrompu : on repart d'un historique vide
