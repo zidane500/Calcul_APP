@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Page d'un client : boutons de calcul (poteau, dalle, semelle, escalier)
+ * Page d'un client : boutons de calcul (poteau, dalle, semelle, poutre, pré-poteau)
  * + liste de ses calculs enregistrés.
  */
 public class CalculsClientActivity extends AppCompatActivity {
@@ -70,12 +70,7 @@ public class CalculsClientActivity extends AppCompatActivity {
                 .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.POUTRE));
         findViewById(R.id.btnCalculerPrePoteau)
                 .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.PRE_POTEAU));
-        findViewById(R.id.btnCalculerEscalier)
-                .setOnClickListener(v -> Toast.makeText(
-                        CalculsClientActivity.this,
-                        "Le calcul des escaliers sera disponible prochainement.",
-                        Toast.LENGTH_SHORT
-                ).show());
+
 
         rafraichirAffichage();
     }

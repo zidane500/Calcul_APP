@@ -10,8 +10,8 @@ public enum TypeElement {
     DALLE("dalle", "dalles", true),
     SEMELLE("semelle", "semelles", true),
     POUTRE("poutre", "poutres", true),
-    PRE_POTEAU("pré-poteau", "pré-poteaux", false, "pre_poteau"),
-    ESCALIER("escalier", "escaliers", false);
+    PRE_POTEAU("pré-poteau", "pré-poteaux", false, "pre_poteau");
+
 
     private final String singulier;
     private final String pluriel;
@@ -77,11 +77,8 @@ public enum TypeElement {
         return feminin ? "cette" : "ce";
     }
 
-    /** ex : "le poteau", "la dalle", "l'escalier" */
+    /** ex : "le poteau", "la dalle" */
     public String getLeSingulier() {
-        if (this == ESCALIER) {
-            return "l'" + singulier;
-        }
         return (feminin ? "la " : "le ") + singulier;
     }
 
