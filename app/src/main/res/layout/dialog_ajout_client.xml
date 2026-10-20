@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:hint="Nom du client *">
+        android:hint="@string/nom_client_requis">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etNomClient"
@@ -28,7 +28,7 @@
         android:id="@+id/layoutVilleClient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ville (optionnel)">
+        android:hint="@string/ville_optionnel">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etVilleClient"

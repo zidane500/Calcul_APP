@@ -54,7 +54,7 @@
             android:id="@+id/etNombreBarres"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Quantité"
+            android:hint="@string/quantite"
             android:imeOptions="actionDone"
             android:inputType="number"
             android:maxLength="3" />
@@ -77,7 +77,7 @@
 
         android:background="?attr/selectableItemBackgroundBorderless"
 
-        android:contentDescription="Supprimer" />
+        android:contentDescription="@string/supprimer" />
 
 
 

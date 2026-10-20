@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Textes des résultats du calcul (générés par i18n_etape3.py) -->
+    <string name="entete_groupe">%1$s de %2$s m (%3$s)</string>
+    <string name="erreur_au_moins_une_barre">"Veuillez saisir au moins un type de barre avec une quantité positive.\n\n"</string>
+    <string name="ligne_besoin">"  • %1$s: %2$s/%3$s → %4$s au total\n"</string>
+    <string name="titre_optimise_chantier">=== Optimisé sur l\'ensemble du chantier ===</string>
+    <string name="erreur_remplir_champs">%1$s #%2$d: veuillez remplir le nombre de %3$s et la longueur</string>
+    <string name="erreur_valeurs_positives">%1$s #%2$d: les valeurs doivent être positives</string>
+    <string name="erreur_nombres_valides">%1$s #%2$d: veuillez entrer des nombres valides</string>
+    <string name="barre_deja_selectionnee">%1$s est déjà sélectionné</string>
+    <string name="oui">Oui</string>
+    <string name="non">Non</string>
+    <string name="resume_titre_type">"• %1$s:\n"</string>
+    <string name="resume_barres_acheter">"  - Barres à acheter: %1$d\n"</string>
+    <string name="resume_dechets_aucun">"  - Déchets: Aucun"</string>
+    <string name="resume_dechets_nombre">"  - Déchets: %1$s\n"</string>
+    <string name="resume_chute_unique">"    * Chute: %1$s m"</string>
+    <string name="resume_optimise">"\n  - Optimisé: %1$s"</string>
+    <string name="barre_numero">Barre %1$d : %2$s</string>
+    <string name="detail_barre">%1$s avec %2$s%3$s</string>
+    <string name="chute_aucune">0 chutes</string>
+    <string name="chute_une">chute %1$s m</string>
+    <string name="liaison_et">" et "</string>
+    <string name="marqueur_stock">" (depuis le stock, chute initiale de %1$s m)"</string>
+    <string name="resume_barre_une">1 Barre : %1$s</string>
+    <string name="segment_info">" (segment %1$s)"</string>
+    <string name="coupes_pour_plusieurs">%1$s de %2$s m%3$s pour les %4$s de %5$s m</string>
+    <string name="coupes_pour_un">%1$s de %2$s m%3$s pour %4$s de %5$s m</string>
+    <string name="bouton_annuler_stock">Annuler utilisation du stock</string>
+    <string name="btn_afficher_detail">Afficher détail</string>
+    <string name="btn_masquer_detail">Masquer détail</string>
+    <string name="btn_masquer_resume">Masquer résumé</string>
+    <string name="btn_retirer_chutes">Retirer chutes envoyées</string>
+    <string name="stock_confirmation_impossible">Confirmation impossible : vérifiez le stock. L\'opération peut aussi être déjà enregistrée ou la sauvegarde avoir échoué.</string>
+    <string name="stock_utilisation_confirmee">Utilisation du stock confirmée pour %1$s.</string>
+    <string name="stock_annulation_impossible">Annulation impossible : le stock a pu être modifié depuis la confirmation, ou la sauvegarde a échoué.</string>
+    <string name="stock_utilisation_annulee">Utilisation du stock annulée pour %1$s.</string>
+    <string name="dechets_ajoutes">Déchets de %1$s ajoutés au stock.</string>
+    <string name="dechets_retires">Déchets de %1$s retirés du stock.</string>
+    <string name="calculer_d_abord">Veuillez d\'abord calculer les résultats.</string>
+    <string name="erreur_pdf">Erreur lors de la génération du PDF : %1$s</string>
+    <string name="erreur_excel">Erreur lors de la génération du fichier Excel : %1$s</string>
+    <string name="aucune_app_pdf">Aucune application pour ouvrir le PDF. Fichier enregistré : %1$s</string>
+    <string name="aucune_app_excel">Aucune application pour ouvrir le fichier Excel. Fichier enregistré : %1$s</string>
+    <string name="ouvrir_pdf_avec">Ouvrir le PDF avec</string>
+    <string name="ouvrir_excel_avec">Ouvrir le fichier Excel avec</string>
+    <string name="btn_enregistrer_modifs">Enregistrer les modifications</string>
+    <string name="btn_enregistrer_pour">Enregistrer pour %1$s</string>
+    <string name="calculer_avant_enregistrer">Calculez d\'abord avant d\'enregistrer.</string>
+    <string name="nom_calcul_defaut">Calcul du %1$s</string>
+    <string name="dialog_titre_enregistrer">Enregistrer le calcul</string>
+    <string name="dialog_ignorer">Ignorer</string>
+    <string name="dialog_enregistrer">Enregistrer</string>
+    <string name="nom_calcul_obligatoire">Le nom du calcul est obligatoire</string>
+    <string name="enregistrement_echoue">L\'enregistrement a échoué.</string>
+    <string name="modifs_enregistrees">Modifications enregistrées.</string>
+    <string name="calcul_enregistre">Calcul enregistré.</string>
+    <string name="impossible_enregistrer">Impossible d\'enregistrer ce calcul.</string>
+    <string name="calcul_introuvable">Calcul introuvable.</string>
+    <string name="calcul_illisible">Ce calcul enregistré est illisible.</string>
+    <string name="calcul_modifie_le">Modifié le %1$s</string>
+    <string name="calcul_enregistre_le">Enregistré le %1$s</string>
+
+    <plurals name="nb_coupes">
+        <item quantity="one">%d coupe</item>
+        <item quantity="other">%d coupes</item>
+    </plurals>
+    <plurals name="nb_chutes">
+        <item quantity="one">%d chute</item>
+        <item quantity="other">%d chutes</item>
+    </plurals>
+    <plurals name="chutes_de">
+        <item quantity="one">%1$d chute de %2$s m</item>
+        <item quantity="other">%1$d chutes de %2$s m</item>
+    </plurals>
+    <plurals name="resume_chutes_multiples">
+        <item quantity="one">"    * %1$d chute: %2$s m"</item>
+        <item quantity="other">"    * %1$d chutes: %2$s m"</item>
+    </plurals>
+    <plurals name="resume_barres_identiques">
+        <item quantity="one">%1$d Barre : pour chaque Barre, %2$s</item>
+        <item quantity="other">%1$d Barres : pour chaque Barre, %2$s</item>
+    </plurals>
+</resources>

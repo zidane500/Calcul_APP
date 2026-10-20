@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -555,18 +556,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Libellés adaptés au type d'élément (poteau, dalle, semelle...)
         TextView tvTitreGroupe = groupeView.findViewById(R.id.tvTitreGroupe);
-        tvTitreGroupe.setText("Informations des " + typeElement.getPlurielMajuscule());
+        tvTitreGroupe.setText(typeElement.infos(this));
 
         TextInputLayout layoutNombre = trouverTextInputLayout(groupe.etNombrePoteaux);
         if (layoutNombre != null) {
-            layoutNombre.setHint("Nombre de " + typeElement.getPluriel());
+            layoutNombre.setHint(typeElement.nombre(this));
         }
         TextInputLayout layoutLongueur = trouverTextInputLayout(groupe.etLongueurPoteaux);
         if (layoutLongueur != null) {
-            layoutLongueur.setHint("Longueur de " + typeElement.getSingulier());
+            layoutLongueur.setHint(typeElement.longueur(this));
         }
-        btnSupprimerGroupe.setContentDescription(
-                "Supprimer " + typeElement.getCe() + " " + typeElement.getSingulier());
+        btnSupprimerGroupe.setContentDescription(typeElement.supprimer(this));
 
         // Adapteur pour le dropdown de sélection des types de barres
         ArrayAdapter<String> adapterTypesBarres = new ArrayAdapter<>(this,
@@ -608,7 +608,7 @@ public class MainActivity extends AppCompatActivity {
     private void ajouterBarreSelectionnee(GroupePoteau groupe, String typeBarre, boolean focaliser) {
         // Vérifier si le type n'est pas déjà sélectionné pour ce groupe
         if (groupe.barresSelectionneesMap.containsKey(typeBarre)) {
-            Toast.makeText(this, typeBarre + " est déjà sélectionné", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.barre_deja_selectionnee, typeBarre), Toast.LENGTH_SHORT).show();
             if (focaliser) {
                 // On amène l'utilisateur sur la quantité de la ligne qui existe déjà.
                 focaliserQuantite(groupe.barresSelectionneesMap.get(typeBarre));
@@ -733,9 +733,10 @@ public class MainActivity extends AppCompatActivity {
             int nombrePoteaux = Integer.parseInt(groupe.etNombrePoteaux.getText().toString());
             double longueurPoteaux = Double.parseDouble(groupe.etLongueurPoteaux.getText().toString());
 
-            String libellePoteaux = String.format(Locale.FRANCE, "%s de %.2f m (%d %s)",
-                    typeElement.getPlurielMajuscule(), longueurPoteaux, nombrePoteaux,
-                    nombrePoteaux > 1 ? typeElement.getPluriel() : typeElement.getSingulier());
+            String libellePoteaux = getString(R.string.entete_groupe,
+                    typeElement.plurielDefiniMajuscule(this),
+                    String.format(Locale.FRANCE, "%.2f", longueurPoteaux),
+                    typeElement.compte(this, nombrePoteaux));
 
             detailPoteaux.append("=== ").append(libellePoteaux).append(" ===\n");
 
@@ -749,7 +750,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (barresParType.isEmpty()) {
-                detailPoteaux.append("Veuillez saisir au moins un type de barre avec une quantité positive.\n\n");
+                detailPoteaux.append(getString(R.string.erreur_au_moins_une_barre));
                 continue;
             }
 
@@ -758,9 +759,12 @@ public class MainActivity extends AppCompatActivity {
                 int nombreParPoteau = entry.getValue();
                 int totalCoupesNecessaires = nombreParPoteau * nombrePoteaux;
 
-                detailPoteaux.append("  • ").append(typeBarre).append(": ")
-                        .append(nombreParPoteau).append(" coupes/").append(typeElement.getSingulier()).append(" → ")
-                        .append(totalCoupesNecessaires).append(" coupes au total\n");
+                detailPoteaux.append(getString(R.string.ligne_besoin,
+                        typeBarre,
+                        getResources().getQuantityString(R.plurals.nb_coupes, nombreParPoteau, nombreParPoteau),
+                        typeElement.singulier(this),
+                        getResources().getQuantityString(R.plurals.nb_coupes,
+                                totalCoupesNecessaires, totalCoupesNecessaires)));
 
                 // Ajouter ces coupes à la liste globale du type de barre (partagée entre TOUS les poteaux)
                 List<CoupeRequise> coupes = coupesParTypeBarre.get(typeBarre);
@@ -797,7 +801,7 @@ public class MainActivity extends AppCompatActivity {
         // 3) Un seul calcul d'optimisation par type de barre, sur l'ensemble des coupes
         //    demandées par TOUS les poteaux de ce type (réutilisation des chutes entre poteaux différents).
         tvResultats.setText(detailPoteaux.toString()
-                + "=== Optimisé sur l'ensemble du chantier ===");
+                + getString(R.string.titre_optimise_chantier));
 
         dernierResumePoteaux = detailPoteaux.toString().trim();
         derniersResultatsBarres.clear();
@@ -824,7 +828,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void actualiserBoutonStock(Button bouton, boolean confirme) {
         if (confirme) {
-            bouton.setText("Annuler utilisation du stock");
+            bouton.setText(R.string.bouton_annuler_stock);
 
             bouton.setTextColor(
                     ContextCompat.getColor(this, R.color.white)
@@ -837,7 +841,7 @@ public class MainActivity extends AppCompatActivity {
             );
 
         } else {
-            bouton.setText("Confirmer utilisation du stock");
+            bouton.setText(R.string.confirmer_utilisation_stock);
 
             bouton.setTextColor(
                     ContextCompat.getColor(this, R.color.white)
@@ -870,13 +874,15 @@ public class MainActivity extends AppCompatActivity {
         TextView tvDetailBarres = itemView.findViewById(R.id.tvDetailBarres);
 
         StringBuilder resume = new StringBuilder();
-        resume.append("• ").append(typeBarre).append(":\n");
-        resume.append("  - Barres à acheter: ").append(resultat.barresNecessaires).append("\n");
+        resume.append(getString(R.string.resume_titre_type, typeBarre));
+        resume.append(getString(R.string.resume_barres_acheter, resultat.barresNecessaires));
 
         if (resultat.listeDechets.isEmpty()) {
-            resume.append("  - Déchets: Aucun");
+            resume.append(getString(R.string.resume_dechets_aucun));
         } else {
-            resume.append("  - Déchets: ").append(resultat.listeDechets.size()).append(" chutes\n");
+            int nbDechets = resultat.listeDechets.size();
+            resume.append(getString(R.string.resume_dechets_nombre,
+                    getResources().getQuantityString(R.plurals.nb_chutes, nbDechets, nbDechets)));
 
             Map<Double, Integer> dechetsParLongueur = new HashMap<>();
             for (Double dechet : resultat.listeDechets) {
@@ -885,18 +891,20 @@ public class MainActivity extends AppCompatActivity {
 
             List<String> lignesDechets = new ArrayList<>();
             for (Map.Entry<Double, Integer> entryDechet : dechetsParLongueur.entrySet()) {
-                if (entryDechet.getValue() == 1) {
-                    lignesDechets.add("    * Chute: "
-                            + String.format(Locale.FRANCE, "%.2f", entryDechet.getKey()) + " m");
+                String longueurTxt = String.format(Locale.FRANCE, "%.2f", entryDechet.getKey());
+                int n = entryDechet.getValue();
+                if (n == 1) {
+                    lignesDechets.add(getString(R.string.resume_chute_unique, longueurTxt));
                 } else {
-                    lignesDechets.add("    * " + entryDechet.getValue() + " chutes: "
-                            + String.format(Locale.FRANCE, "%.2f", entryDechet.getKey()) + " m");
+                    lignesDechets.add(getResources().getQuantityString(
+                            R.plurals.resume_chutes_multiples, n, n, longueurTxt));
                 }
             }
             resume.append(TextUtils.join("\n", lignesDechets));
             resume.append("\n");
         }
-        resume.append("\n  - Optimisé: ").append(resultat.utilisationOptimisee ? "Oui" : "Non");
+        resume.append(getString(R.string.resume_optimise,
+                getString(resultat.utilisationOptimisee ? R.string.oui : R.string.non)));
         tvResumeBarre.setText(resume.toString());
 
         StringBuilder detail = new StringBuilder();
@@ -905,12 +913,11 @@ public class MainActivity extends AppCompatActivity {
             if (numeroBarre > 1) {
                 detail.append("\n");
             }
-            detail.append("Barre ").append(numeroBarre).append(" : ")
-                    .append(formatterDetailBarre(barre));
+            detail.append(getString(R.string.barre_numero, numeroBarre, formatterDetailBarre(barre, this)));
             numeroBarre++;
         }
         tvDetailBarres.setText(detail.toString());
-        tvResumeBarresDetail.setText(formatterResumeBarres(resultat.detailBarres));
+        tvResumeBarresDetail.setText(formatterResumeBarres(resultat.detailBarres, this));
 
         final List<BarreUtilisee> barresStockUtilisees = new ArrayList<>();
 
@@ -956,9 +963,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!succes) {
                         Toast.makeText(
                                 MainActivity.this,
-                                "Confirmation impossible : vérifiez le stock. "
-                                        + "L'opération peut aussi être déjà enregistrée "
-                                        + "ou la sauvegarde avoir échoué.",
+                                MainActivity.this.getString(R.string.stock_confirmation_impossible),
                                 Toast.LENGTH_LONG
                         ).show();
                         return;
@@ -968,7 +973,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(
                             MainActivity.this,
-                            "Utilisation du stock confirmée pour " + typeBarre + ".",
+                            MainActivity.this.getString(R.string.stock_utilisation_confirmee, typeBarre),
                             Toast.LENGTH_SHORT
                     ).show();
 
@@ -980,9 +985,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!succes) {
                         Toast.makeText(
                                 MainActivity.this,
-                                "Annulation impossible : le stock a pu être modifié "
-                                        + "depuis la confirmation, ou la sauvegarde "
-                                        + "a échoué.",
+                                MainActivity.this.getString(R.string.stock_annulation_impossible),
                                 Toast.LENGTH_LONG
                         ).show();
                         return;
@@ -996,7 +999,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(
                             MainActivity.this,
-                            "Utilisation du stock annulée pour " + typeBarre + ".",
+                            MainActivity.this.getString(R.string.stock_utilisation_annulee, typeBarre),
                             Toast.LENGTH_SHORT
                     ).show();
                 }
@@ -1014,12 +1017,12 @@ public class MainActivity extends AppCompatActivity {
                 boolean estVisible = tvDetailBarres.getVisibility() == View.VISIBLE;
                 tvDetailBarres.setVisibility(estVisible ? View.GONE : View.VISIBLE);
                 btnResumer.setVisibility(estVisible ? View.GONE : View.VISIBLE);
-                btnAfficherDetail.setText(estVisible ? "Afficher détail" : "Masquer détail");
+                btnAfficherDetail.setText(estVisible ? R.string.btn_afficher_detail : R.string.btn_masquer_detail);
 
                 if (estVisible) {
                     // On replie aussi le résumé s'il était ouvert
                     tvResumeBarresDetail.setVisibility(View.GONE);
-                    btnResumer.setText("Résumer");
+                    btnResumer.setText(R.string.resumer);
                 }
             }
         });
@@ -1029,7 +1032,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 boolean estVisible = tvResumeBarresDetail.getVisibility() == View.VISIBLE;
                 tvResumeBarresDetail.setVisibility(estVisible ? View.GONE : View.VISIBLE);
-                btnResumer.setText(estVisible ? "Résumer" : "Masquer résumé");
+                btnResumer.setText(estVisible ? R.string.resumer : R.string.btn_masquer_resume);
             }
         });
 
@@ -1048,7 +1051,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Calcul restauré : on retrouve l'état "chutes envoyées au stock"
         if (resultat.dechetsEnvoyes) {
-            btnDechetsAuStock.setText("Retirer chutes envoyées");
+            btnDechetsAuStock.setText(R.string.btn_retirer_chutes);
             btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                     ContextCompat.getColor(MainActivity.this, R.color.error)));
         }
@@ -1063,21 +1066,21 @@ public class MainActivity extends AppCompatActivity {
                 if (!resultat.dechetsEnvoyes) {
                     StockManager.getInstance(MainActivity.this)
                             .ajouterDechets(typeBarre, dechetsBarresNeuves, nomClient);
-                    btnDechetsAuStock.setText("Retirer chutes envoyées");
+                    btnDechetsAuStock.setText(R.string.btn_retirer_chutes);
                     btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                             ContextCompat.getColor(MainActivity.this, R.color.error)));
                     resultat.dechetsEnvoyes = true;
                     Toast.makeText(MainActivity.this,
-                            "Déchets de " + typeBarre + " ajoutés au stock.", Toast.LENGTH_SHORT).show();
+                            MainActivity.this.getString(R.string.dechets_ajoutes, typeBarre), Toast.LENGTH_SHORT).show();
                 } else {
                     StockManager.getInstance(MainActivity.this)
                             .retirerDechets(typeBarre, dechetsBarresNeuves, nomClient);
-                    btnDechetsAuStock.setText("Déchets au stock");
+                    btnDechetsAuStock.setText(R.string.dechets_au_stock);
                     btnDechetsAuStock.setBackgroundTintList(ColorStateList.valueOf(
                             ContextCompat.getColor(MainActivity.this, R.color.success)));
                     resultat.dechetsEnvoyes = false;
                     Toast.makeText(MainActivity.this,
-                            "Déchets de " + typeBarre + " retirés du stock.", Toast.LENGTH_SHORT).show();
+                            MainActivity.this.getString(R.string.dechets_retires, typeBarre), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -1092,7 +1095,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void exporterResultatsEnPdf() {
         if (derniersResultatsBarres.isEmpty()) {
-            Toast.makeText(this, "Veuillez d'abord calculer les résultats.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.calculer_d_abord, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1112,7 +1115,7 @@ public class MainActivity extends AppCompatActivity {
             String partieClient = (nomClient == null || nomClient.trim().isEmpty())
                     ? ""
                     : "_" + nomClient.trim().replaceAll("[^\\p{L}\\p{N}]+", "_");
-            String nomFichier = "FerPro_" + typeElement.getPlurielMajuscule() + partieClient
+            String nomFichier = "FerPro_" + typeElement.plurielDefiniMajuscule(contexteFrancais()) + partieClient
                     + "_" + System.currentTimeMillis() + ".pdf";
             File fichierPdf = new File(dossierExports, nomFichier);
 
@@ -1130,14 +1133,14 @@ public class MainActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             try {
-                startActivity(Intent.createChooser(intent, "Ouvrir le PDF avec"));
+                startActivity(Intent.createChooser(intent, getString(R.string.ouvrir_pdf_avec)));
             } catch (ActivityNotFoundException e) {
                 Toast.makeText(this,
-                        "Aucune application pour ouvrir le PDF. Fichier enregistré : " + fichierPdf.getName(),
+                        getString(R.string.aucune_app_pdf, fichierPdf.getName()),
                         Toast.LENGTH_LONG).show();
             }
         } catch (IOException e) {
-            Toast.makeText(this, "Erreur lors de la génération du PDF : " + e.getMessage(),
+            Toast.makeText(this, getString(R.string.erreur_pdf, e.getMessage()),
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -1148,8 +1151,9 @@ public class MainActivity extends AppCompatActivity {
     private RapportPdf.Donnees construireDonneesRapport() {
         RapportPdf.Donnees donnees = new RapportPdf.Donnees();
         donnees.nomClient = nomClient;
-        donnees.typeSingulier = typeElement.getSingulier();
-        donnees.typePluriel = typeElement.getPluriel();
+        final Context fr = contexteFrancais();   // le PDF reste en français pour l'instant
+        donnees.typeSingulier = typeElement.singulier(fr);
+        donnees.typePluriel = typeElement.plurielDefini(fr);
         donnees.date = new SimpleDateFormat("dd/MM/yyyy 'à' HH:mm", Locale.FRANCE).format(new Date());
         donnees.longueurBarreStandard = LONGUEUR_BARRE_STANDARD;
         donnees.logo = RapportPdf.chargerLogo(this);
@@ -1190,7 +1194,7 @@ public class MainActivity extends AppCompatActivity {
                     detail.coupes.add(coupe.longueur);
                 }
                 detail.chute = barre.resteDisponible;
-                detail.affectation = formatterDescriptionCoupes(barre) + marqueurStock(barre);
+                detail.affectation = formatterDescriptionCoupes(barre, fr) + marqueurStock(barre, fr);
                 groupe.barres.add(detail);
             }
             donnees.groupes.add(groupe);
@@ -1201,18 +1205,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void exporterResultatsEnExcel() {
         if (derniersResultatsBarres.isEmpty()) {
-            Toast.makeText(this, "Veuillez d'abord calculer les résultats.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.calculer_d_abord, Toast.LENGTH_SHORT).show();
             return;
         }
 
         GenerateurXlsx classeur = new GenerateurXlsx();
+        final Context fr = contexteFrancais();   // l'Excel reste en français pour l'instant
 
-        int feuillePoteaux = classeur.ajouterFeuille(typeElement.getPlurielMajuscule());
+        int feuillePoteaux = classeur.ajouterFeuille(typeElement.plurielDefiniMajuscule(fr));
         classeur.ajouterLigne(feuillePoteaux, Arrays.asList(
-                GenerateurXlsx.Cellule.texte("Longueur " + typeElement.getSingulier() + " (m)", true),
-                GenerateurXlsx.Cellule.texte("Nombre de " + typeElement.getPluriel(), true),
+                GenerateurXlsx.Cellule.texte("Longueur " + typeElement.singulier(fr) + " (m)", true),
+                GenerateurXlsx.Cellule.texte("Nombre de " + typeElement.plurielDefini(fr), true),
                 GenerateurXlsx.Cellule.texte("Type de barre", true),
-                GenerateurXlsx.Cellule.texte("Coupes / " + typeElement.getSingulier(), true),
+                GenerateurXlsx.Cellule.texte("Coupes / " + typeElement.singulier(fr), true),
                 GenerateurXlsx.Cellule.texte("Total coupes", true)));
 
         for (String[] ligne : derniersGroupesPoteaux) {
@@ -1257,7 +1262,7 @@ public class MainActivity extends AppCompatActivity {
                 classeur.ajouterLigne(feuille, Arrays.asList(
                         GenerateurXlsx.Cellule.nombre(numeroBarre, false),
                         GenerateurXlsx.Cellule.texte(
-                                formatterDescriptionCoupes(barre) + marqueurStock(barre),
+                                formatterDescriptionCoupes(barre, fr) + marqueurStock(barre, fr),
                                 false
                         ),
                         GenerateurXlsx.Cellule.nombre(
@@ -1276,7 +1281,7 @@ public class MainActivity extends AppCompatActivity {
                 dossierExports.mkdirs();
             }
 
-            String nomFichier = "GKM_" + typeElement.getPlurielMajuscule() + "_" + System.currentTimeMillis() + ".xlsx";
+            String nomFichier = "GKM_" + typeElement.plurielDefiniMajuscule(fr) + "_" + System.currentTimeMillis() + ".xlsx";
             File fichierXlsx = new File(dossierExports, nomFichier);
             classeur.ecrire(fichierXlsx);
 
@@ -1290,15 +1295,14 @@ public class MainActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             try {
-                startActivity(Intent.createChooser(intent, "Ouvrir le fichier Excel avec"));
+                startActivity(Intent.createChooser(intent, getString(R.string.ouvrir_excel_avec)));
             } catch (ActivityNotFoundException e) {
                 Toast.makeText(this,
-                        "Aucune application pour ouvrir le fichier Excel. Fichier enregistré : "
-                                + fichierXlsx.getName(),
+                        getString(R.string.aucune_app_excel, fichierXlsx.getName()),
                         Toast.LENGTH_LONG).show();
             }
         } catch (IOException e) {
-            Toast.makeText(this, "Erreur lors de la génération du fichier Excel : " + e.getMessage(),
+            Toast.makeText(this, getString(R.string.erreur_excel, e.getMessage()),
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -1313,10 +1317,10 @@ public class MainActivity extends AppCompatActivity {
      */
 
     /**
-     * Regroupe et met en forme les coupes d'une barre donnée, ex :
-     * "2× Poteaux de 2,00 m (2,00 m) + Poteaux de 10,00 m (10,00 m)"
+     * Regroupe et met en forme les coupes d'une barre donnée, dans la langue du Context, ex :
+     * "2 coupes de 2,00 m pour le poteau de 2,00 m + 1 coupe de 10,00 m pour les 3 poteaux de 10,00 m"
      */
-    private String formatterDescriptionCoupes(BarreUtilisee barre) {
+    private String formatterDescriptionCoupes(BarreUtilisee barre, Context ctx) {
         LinkedHashMap<String, Integer> comptage = new LinkedHashMap<>();
         LinkedHashMap<String, CoupeRequise> exemples = new LinkedHashMap<>();
         for (CoupeRequise c : barre.coupes) {
@@ -1329,42 +1333,42 @@ public class MainActivity extends AppCompatActivity {
         for (Map.Entry<String, Integer> e : comptage.entrySet()) {
             CoupeRequise c = exemples.get(e.getKey());
             int n = e.getValue();
+            String nbCoupes = ctx.getResources().getQuantityString(R.plurals.nb_coupes, n, n);
             String longueurCoupeTxt = String.format(Locale.FRANCE, "%.2f", c.longueur);
             String longueurPoteauTxt = String.format(Locale.FRANCE, "%.2f", c.longueurPoteau);
-            String segmentTxt = c.segmentInfo != null ? " (" + c.segmentInfo + ")" : "";
-            String finPhrasePoteau = c.nombrePoteaux > 1
-                    ? "les " + c.nombrePoteaux + " " + typeElement.getPluriel() + " de " + longueurPoteauTxt + " m"
-                    : typeElement.getLeSingulier() + " de " + longueurPoteauTxt + " m";
+            String segmentTxt = c.segmentInfo != null
+                    ? ctx.getString(R.string.segment_info, extraireSegment(c.segmentInfo))
+                    : "";
 
-            parts.add(n + " coupe" + (n > 1 ? "s" : "") + " de " + longueurCoupeTxt + " m" + segmentTxt
-                    + " pour " + finPhrasePoteau);
+            if (c.nombrePoteaux > 1) {
+                parts.add(ctx.getString(R.string.coupes_pour_plusieurs, nbCoupes, longueurCoupeTxt,
+                        segmentTxt, typeElement.compteGenitif(ctx, c.nombrePoteaux), longueurPoteauTxt));
+            } else {
+                parts.add(ctx.getString(R.string.coupes_pour_un, nbCoupes, longueurCoupeTxt,
+                        segmentTxt, typeElement.defini(ctx), longueurPoteauTxt));
+            }
         }
         return TextUtils.join(" + ", parts);
     }
 
-    private String marqueurStock(BarreUtilisee barre) {
+    private String marqueurStock(BarreUtilisee barre, Context ctx) {
         if (!barre.estDuStock) {
             return "";
         }
 
-        return " (depuis le stock, chute initiale de "
-                + String.format(
-                Locale.FRANCE,
-                "%.2f",
-                barre.longueurOrigineStock
-        )
-                + " m)";
+        return ctx.getString(R.string.marqueur_stock,
+                String.format(Locale.FRANCE, "%.2f", barre.longueurOrigineStock));
     }
 
-    private String formatterDetailBarre(BarreUtilisee barre) {
+    private String formatterDetailBarre(BarreUtilisee barre, Context ctx) {
         List<Double> chutes = barre.resteDisponible > 1e-9
                 ? Collections.singletonList(barre.resteDisponible)
                 : Collections.<Double>emptyList();
 
-        return formatterDescriptionCoupes(barre)
-                + " avec "
-                + formatterChute(chutes)
-                + marqueurStock(barre);
+        return ctx.getString(R.string.detail_barre,
+                formatterDescriptionCoupes(barre, ctx),
+                formatterChute(chutes, ctx),
+                marqueurStock(barre, ctx));
     }
 
     /**
@@ -1372,10 +1376,10 @@ public class MainActivity extends AppCompatActivity {
      * récapitulative, ex : "3 Barres : pour chaque Barre, 1 coupe de 9,00 m pour les 5
      * poteaux de 9,00 m avec chute 3,00 m".
      */
-    private String formatterResumeBarres(List<BarreUtilisee> detailBarres) {
+    private String formatterResumeBarres(List<BarreUtilisee> detailBarres, Context ctx) {
         LinkedHashMap<String, Integer> comptage = new LinkedHashMap<>();
         for (BarreUtilisee barre : detailBarres) {
-            String description = formatterDetailBarre(barre);
+            String description = formatterDetailBarre(barre, ctx);
             comptage.put(description, comptage.getOrDefault(description, 0) + 1);
         }
 
@@ -1384,17 +1388,18 @@ public class MainActivity extends AppCompatActivity {
             int nombre = entry.getValue();
             String description = entry.getKey();
             if (nombre == 1) {
-                lignes.add("1 Barre : " + description);
+                lignes.add(ctx.getString(R.string.resume_barre_une, description));
             } else {
-                lignes.add(nombre + " Barres : pour chaque Barre, " + description);
+                lignes.add(ctx.getResources().getQuantityString(
+                        R.plurals.resume_barres_identiques, nombre, nombre, description));
             }
         }
         return TextUtils.join("\n", lignes);
     }
 
-    private String formatterChute(List<Double> chutes) {
+    private String formatterChute(List<Double> chutes, Context ctx) {
         if (chutes.isEmpty()) {
-            return "0 chutes";
+            return ctx.getString(R.string.chute_aucune);
         }
         Map<Double, Integer> comptageChutes = new LinkedHashMap<>();
         for (Double d : chutes) {
@@ -1403,14 +1408,16 @@ public class MainActivity extends AppCompatActivity {
         List<String> parts = new ArrayList<>();
         for (Map.Entry<Double, Integer> e : comptageChutes.entrySet()) {
             String longueurTxt = String.format(Locale.FRANCE, "%.2f", e.getKey());
-            if (e.getValue() == 1) {
-                parts.add("chute " + longueurTxt + " m");
+            int n = e.getValue();
+            if (n == 1) {
+                parts.add(ctx.getString(R.string.chute_une, longueurTxt));
             } else {
-                parts.add(e.getValue() + " chutes de " + longueurTxt + " m");
+                parts.add(ctx.getResources().getQuantityString(R.plurals.chutes_de, n, n, longueurTxt));
             }
         }
-        return TextUtils.join(" et ", parts);
+        return TextUtils.join(ctx.getString(R.string.liaison_et), parts);
     }
+
     private ResultatCalcul calculerBarresNecessaires(
             List<CoupeRequise> coupesRequises,
             List<MorceauFer> morceauxDisponibles) {
@@ -1619,19 +1626,19 @@ public class MainActivity extends AppCompatActivity {
         nomClient = client.getNom();
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Calcul " + typeElement.getSingulier() + " - " + client.getNom());
+            getSupportActionBar().setTitle(typeElement.titreCalcul(this, client.getNom()));
         }
 
         btnEnregistrerClient.setVisibility(View.VISIBLE);
         btnEnregistrerClient.setText(calculId != null
-                ? "Enregistrer les modifications"
-                : "Enregistrer pour " + client.getNom());
+                ? getString(R.string.btn_enregistrer_modifs)
+                : getString(R.string.btn_enregistrer_pour, client.getNom()));
         btnEnregistrerClient.setOnClickListener(v -> afficherDialogueEnregistrement());
     }
 
     private void afficherDialogueEnregistrement() {
         if (derniersResultatsBarres.isEmpty() || dernieresEntrees == null) {
-            Toast.makeText(this, "Calculez d'abord avant d'enregistrer.",
+            Toast.makeText(this, R.string.calculer_avant_enregistrer,
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -1644,15 +1651,15 @@ public class MainActivity extends AppCompatActivity {
             etNom.setText(nomCalculCharge);
         } else {
             String dateDuJour = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE).format(new Date());
-            etNom.setText("Calcul du " + dateDuJour);
+            etNom.setText(getString(R.string.nom_calcul_defaut, dateDuJour));
         }
         etNom.selectAll();
 
         final AlertDialog dialogue = new AlertDialog.Builder(this)
-                .setTitle(calculId != null ? "Enregistrer les modifications" : "Enregistrer le calcul")
+                .setTitle(calculId != null ? R.string.btn_enregistrer_modifs : R.string.dialog_titre_enregistrer)
                 .setView(vueDialogue)
-                .setNegativeButton("Ignorer", null)
-                .setPositiveButton("Enregistrer", null)
+                .setNegativeButton(R.string.dialog_ignorer, null)
+                .setPositiveButton(R.string.dialog_enregistrer, null)
                 .create();
 
         dialogue.setOnShowListener(d ->
@@ -1662,7 +1669,7 @@ public class MainActivity extends AppCompatActivity {
                             : etNom.getText().toString().trim();
 
                     if (nom.isEmpty()) {
-                        layoutNom.setError("Le nom du calcul est obligatoire");
+                        layoutNom.setError(getString(R.string.nom_calcul_obligatoire));
                         return;
                     }
                     layoutNom.setError(null);
@@ -1686,20 +1693,20 @@ public class MainActivity extends AppCompatActivity {
 
                         if (!succes) {
                             Toast.makeText(MainActivity.this,
-                                    "L'enregistrement a échoué.", Toast.LENGTH_LONG).show();
+                                    MainActivity.this.getString(R.string.enregistrement_echoue), Toast.LENGTH_LONG).show();
                             return;
                         }
 
                         nomCalculCharge = nom;
-                        btnEnregistrerClient.setText("Enregistrer les modifications");
+                        btnEnregistrerClient.setText(R.string.btn_enregistrer_modifs);
 
                         Toast.makeText(MainActivity.this,
-                                etaitModification ? "Modifications enregistrées." : "Calcul enregistré.",
+                                MainActivity.this.getString(etaitModification ? R.string.modifs_enregistrees : R.string.calcul_enregistre),
                                 Toast.LENGTH_SHORT).show();
                         dialogue.dismiss();
                     } catch (JSONException e) {
                         Toast.makeText(MainActivity.this,
-                                "Impossible d'enregistrer ce calcul.", Toast.LENGTH_LONG).show();
+                                MainActivity.this.getString(R.string.impossible_enregistrer), Toast.LENGTH_LONG).show();
                     }
                 })
         );
@@ -1821,7 +1828,7 @@ public class MainActivity extends AppCompatActivity {
         CalculEnregistre calcul = CalculManager.getInstance(this).trouverParId(calculId);
         if (calcul == null || !calcul.getClientId().equals(clientId)) {
             calculId = null;
-            Toast.makeText(this, "Calcul introuvable.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.calcul_introuvable, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1833,7 +1840,7 @@ public class MainActivity extends AppCompatActivity {
             nomCalculCharge = calcul.getNom();
         } catch (JSONException e) {
             calculId = null;
-            Toast.makeText(this, "Ce calcul enregistré est illisible.",
+            Toast.makeText(this, R.string.calcul_illisible,
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -1907,7 +1914,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        tvResultats.setText(racine.optString("texteResultats", ""));
+        tvResultats.setText(construireTexteBesoins());
         cardResultats.setVisibility(View.VISIBLE);
     }
 
@@ -1972,8 +1979,7 @@ public class MainActivity extends AppCompatActivity {
     private void appliquerTypeElement() {
         typeElement = TypeElement.depuisCode(getIntent().getStringExtra(EXTRA_TYPE_ELEMENT));
 
-        btnAjouterPoteau.setText(
-                "Ajouter " + typeElement.getUnAutre() + " " + typeElement.getSingulier());
+        btnAjouterPoteau.setText(typeElement.ajouter(this));
     }
 
     /** Retrouve le TextInputLayout qui contient une zone de saisie. */
@@ -1997,8 +2003,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean validerGroupe(GroupePoteau groupe, int numeroGroupe) {
         if (TextUtils.isEmpty(groupe.etNombrePoteaux.getText()) ||
                 TextUtils.isEmpty(groupe.etLongueurPoteaux.getText())) {
-            tvResultats.setText(typeElement.getSingulierMajuscule() + " #" + numeroGroupe
-                    + ": veuillez remplir le nombre de " + typeElement.getPluriel() + " et la longueur");
+            tvResultats.setText(getString(R.string.erreur_remplir_champs,
+                    typeElement.singulierMajuscule(this), numeroGroupe, typeElement.plurielDefini(this)));
             cardResultats.setVisibility(View.VISIBLE);
             return false;
         }
@@ -2008,19 +2014,81 @@ public class MainActivity extends AppCompatActivity {
             double longueur = Double.parseDouble(groupe.etLongueurPoteaux.getText().toString());
 
             if (nombrePoteaux <= 0 || longueur <= 0) {
-                tvResultats.setText(typeElement.getSingulierMajuscule() + " #" + numeroGroupe
-                        + ": les valeurs doivent être positives");
+                tvResultats.setText(getString(R.string.erreur_valeurs_positives,
+                        typeElement.singulierMajuscule(this), numeroGroupe));
                 cardResultats.setVisibility(View.VISIBLE);
                 return false;
             }
         } catch (NumberFormatException e) {
-            tvResultats.setText(typeElement.getSingulierMajuscule() + " #" + numeroGroupe
-                    + ": veuillez entrer des nombres valides");
+            tvResultats.setText(getString(R.string.erreur_nombres_valides,
+                    typeElement.singulierMajuscule(this), numeroGroupe));
             cardResultats.setVisibility(View.VISIBLE);
             return false;
         }
 
         return true;
+    }
+
+    /** Contexte en français : sert aux PDF et Excel, qui restent en français pour l'instant. */
+    private Context contexteFrancais() {
+        Configuration configuration = new Configuration(getResources().getConfiguration());
+        configuration.setLocale(Locale.FRENCH);
+        return createConfigurationContext(configuration);
+    }
+
+    /** "segment 1/2" (anciens calculs) ou "1/2" -> "1/2". */
+    private static String extraireSegment(String info) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\d+/\\d+").matcher(info);
+        return m.find() ? m.group() : info;
+    }
+
+    /**
+     * Reconstruit, dans la langue actuelle, le texte des besoins ("=== Poteaux de ... ===")
+     * à partir des données du calcul. Sert à l'ouverture d'un calcul enregistré : le texte
+     * n'est plus figé dans la langue où il a été enregistré.
+     */
+    private String construireTexteBesoins() {
+        StringBuilder texte = new StringBuilder();
+        String dernierGroupe = null;
+
+        for (String[] ligne : derniersGroupesPoteaux) {
+            if (ligne.length < 5) {
+                continue;
+            }
+            try {
+                int nombre = Integer.parseInt(ligne[1]);
+                int parElement = Integer.parseInt(ligne[3]);
+                int total = Integer.parseInt(ligne[4]);
+
+                String cleGroupe = ligne[0] + "|" + ligne[1];
+                if (!cleGroupe.equals(dernierGroupe)) {
+                    if (dernierGroupe != null) {
+                        texte.append("\n");
+                    }
+                    texte.append("=== ")
+                            .append(getString(R.string.entete_groupe,
+                                    typeElement.plurielDefiniMajuscule(this),
+                                    ligne[0],
+                                    typeElement.compte(this, nombre)))
+                            .append(" ===\n");
+                    dernierGroupe = cleGroupe;
+                }
+
+                texte.append(getString(R.string.ligne_besoin,
+                        ligne[2],
+                        getResources().getQuantityString(R.plurals.nb_coupes, parElement, parElement),
+                        typeElement.singulier(this),
+                        getResources().getQuantityString(R.plurals.nb_coupes, total, total)));
+            } catch (NumberFormatException ignore) {
+                // ligne illisible : ignorée
+            }
+        }
+
+        if (texte.length() > 0) {
+            texte.append("\n");
+        }
+        texte.append(getString(R.string.titre_optimise_chantier));
+        return texte.toString();
     }
 
     private int getValeur(TextInputEditText editText) {

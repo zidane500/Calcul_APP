@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Noms des types d'éléments (générés par i18n_etape3.py) -->
+    <string name="type_poteau_singulier">poteau</string>
+    <string name="type_poteau_defini">le poteau</string>
+    <string name="type_poteau_pluriel_defini">poteaux</string>
+    <string name="type_poteau_infos">Informations des Poteaux</string>
+    <string name="type_poteau_nombre">Nombre de poteaux</string>
+    <string name="type_poteau_longueur">Longueur de poteau</string>
+    <string name="type_poteau_ajouter">Ajouter un autre poteau</string>
+    <string name="type_poteau_supprimer">Supprimer ce poteau</string>
+    <string name="type_poteau_titre_calcul">Calcul poteau - %1$s</string>
+    <plurals name="nb_poteau">
+        <item quantity="one">%d poteau</item>
+        <item quantity="other">%d poteaux</item>
+    </plurals>
+    <plurals name="nbg_poteau">
+        <item quantity="one">%d poteau</item>
+        <item quantity="other">%d poteaux</item>
+    </plurals>
+
+    <string name="type_dalle_singulier">dalle</string>
+    <string name="type_dalle_defini">la dalle</string>
+    <string name="type_dalle_pluriel_defini">dalles</string>
+    <string name="type_dalle_infos">Informations des Dalles</string>
+    <string name="type_dalle_nombre">Nombre de dalles</string>
+    <string name="type_dalle_longueur">Longueur de dalle</string>
+    <string name="type_dalle_ajouter">Ajouter une autre dalle</string>
+    <string name="type_dalle_supprimer">Supprimer cette dalle</string>
+    <string name="type_dalle_titre_calcul">Calcul dalle - %1$s</string>
+    <plurals name="nb_dalle">
+        <item quantity="one">%d dalle</item>
+        <item quantity="other">%d dalles</item>
+    </plurals>
+    <plurals name="nbg_dalle">
+        <item quantity="one">%d dalle</item>
+        <item quantity="other">%d dalles</item>
+    </plurals>
+
+    <string name="type_semelle_singulier">semelle</string>
+    <string name="type_semelle_defini">la semelle</string>
+    <string name="type_semelle_pluriel_defini">semelles</string>
+    <string name="type_semelle_infos">Informations des Semelles</string>
+    <string name="type_semelle_nombre">Nombre de semelles</string>
+    <string name="type_semelle_longueur">Longueur de semelle</string>
+    <string name="type_semelle_ajouter">Ajouter une autre semelle</string>
+    <string name="type_semelle_supprimer">Supprimer cette semelle</string>
+    <string name="type_semelle_titre_calcul">Calcul semelle - %1$s</string>
+    <plurals name="nb_semelle">
+        <item quantity="one">%d semelle</item>
+        <item quantity="other">%d semelles</item>
+    </plurals>
+    <plurals name="nbg_semelle">
+        <item quantity="one">%d semelle</item>
+        <item quantity="other">%d semelles</item>
+    </plurals>
+
+    <string name="type_poutre_singulier">poutre</string>
+    <string name="type_poutre_defini">la poutre</string>
+    <string name="type_poutre_pluriel_defini">poutres</string>
+    <string name="type_poutre_infos">Informations des Poutres</string>
+    <string name="type_poutre_nombre">Nombre de poutres</string>
+    <string name="type_poutre_longueur">Longueur de poutre</string>
+    <string name="type_poutre_ajouter">Ajouter une autre poutre</string>
+    <string name="type_poutre_supprimer">Supprimer cette poutre</string>
+    <string name="type_poutre_titre_calcul">Calcul poutre - %1$s</string>
+    <plurals name="nb_poutre">
+        <item quantity="one">%d poutre</item>
+        <item quantity="other">%d poutres</item>
+    </plurals>
+    <plurals name="nbg_poutre">
+        <item quantity="one">%d poutre</item>
+        <item quantity="other">%d poutres</item>
+    </plurals>
+
+    <string name="type_pre_poteau_singulier">pré-poteau</string>
+    <string name="type_pre_poteau_defini">le pré-poteau</string>
+    <string name="type_pre_poteau_pluriel_defini">pré-poteaux</string>
+    <string name="type_pre_poteau_infos">Informations des Pré-poteaux</string>
+    <string name="type_pre_poteau_nombre">Nombre de pré-poteaux</string>
+    <string name="type_pre_poteau_longueur">Longueur de pré-poteau</string>
+    <string name="type_pre_poteau_ajouter">Ajouter un autre pré-poteau</string>
+    <string name="type_pre_poteau_supprimer">Supprimer ce pré-poteau</string>
+    <string name="type_pre_poteau_titre_calcul">Calcul pré-poteau - %1$s</string>
+    <plurals name="nb_pre_poteau">
+        <item quantity="one">%d pré-poteau</item>
+        <item quantity="other">%d pré-poteaux</item>
+    </plurals>
+    <plurals name="nbg_pre_poteau">
+        <item quantity="one">%d pré-poteau</item>
+        <item quantity="other">%d pré-poteaux</item>
+    </plurals>
+
+    <string name="type_escalier_singulier">escalier</string>
+    <string name="type_escalier_defini">l\'escalier</string>
+    <string name="type_escalier_pluriel_defini">escaliers</string>
+    <string name="type_escalier_infos">Informations des Escaliers</string>
+    <string name="type_escalier_nombre">Nombre de escaliers</string>
+    <string name="type_escalier_longueur">Longueur de escalier</string>
+    <string name="type_escalier_ajouter">Ajouter un autre escalier</string>
+    <string name="type_escalier_supprimer">Supprimer cet escalier</string>
+    <string name="type_escalier_titre_calcul">Calcul escalier - %1$s</string>
+    <plurals name="nb_escalier">
+        <item quantity="one">%d escalier</item>
+        <item quantity="other">%d escaliers</item>
+    </plurals>
+    <plurals name="nbg_escalier">
+        <item quantity="one">%d escalier</item>
+        <item quantity="other">%d escaliers</item>
+    </plurals>
+
+</resources>

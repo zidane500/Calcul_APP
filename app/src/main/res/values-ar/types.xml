@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Noms des types d'éléments (générés par i18n_etape3.py) -->
+    <string name="type_poteau_singulier">عمود</string>
+    <string name="type_poteau_defini">العمود</string>
+    <string name="type_poteau_pluriel_defini">الأعمدة</string>
+    <string name="type_poteau_infos">معلومات الأعمدة</string>
+    <string name="type_poteau_nombre">عدد الأعمدة</string>
+    <string name="type_poteau_longueur">طول العمود</string>
+    <string name="type_poteau_ajouter">إضافة عمود آخر</string>
+    <string name="type_poteau_supprimer">حذف هذا العمود</string>
+    <string name="type_poteau_titre_calcul">حساب العمود - %1$s</string>
+    <plurals name="nb_poteau">
+        <item quantity="zero">%d عمود</item>
+        <item quantity="one">عمود واحد</item>
+        <item quantity="two">عمودان</item>
+        <item quantity="few">%d أعمدة</item>
+        <item quantity="many">%d عمودا</item>
+        <item quantity="other">%d عمود</item>
+    </plurals>
+    <plurals name="nbg_poteau">
+        <item quantity="zero">%d عمود</item>
+        <item quantity="one">عمود واحد</item>
+        <item quantity="two">عمودين</item>
+        <item quantity="few">%d أعمدة</item>
+        <item quantity="many">%d عمودا</item>
+        <item quantity="other">%d عمود</item>
+    </plurals>
+
+    <string name="type_dalle_singulier">بلاطة</string>
+    <string name="type_dalle_defini">البلاطة</string>
+    <string name="type_dalle_pluriel_defini">البلاطات</string>
+    <string name="type_dalle_infos">معلومات البلاطات</string>
+    <string name="type_dalle_nombre">عدد البلاطات</string>
+    <string name="type_dalle_longueur">طول البلاطة</string>
+    <string name="type_dalle_ajouter">إضافة بلاطة أخرى</string>
+    <string name="type_dalle_supprimer">حذف هذه البلاطة</string>
+    <string name="type_dalle_titre_calcul">حساب البلاطة - %1$s</string>
+    <plurals name="nb_dalle">
+        <item quantity="zero">%d بلاطة</item>
+        <item quantity="one">بلاطة واحدة</item>
+        <item quantity="two">بلاطتان</item>
+        <item quantity="few">%d بلاطات</item>
+        <item quantity="many">%d بلاطة</item>
+        <item quantity="other">%d بلاطة</item>
+    </plurals>
+    <plurals name="nbg_dalle">
+        <item quantity="zero">%d بلاطة</item>
+        <item quantity="one">بلاطة واحدة</item>
+        <item quantity="two">بلاطتين</item>
+        <item quantity="few">%d بلاطات</item>
+        <item quantity="many">%d بلاطة</item>
+        <item quantity="other">%d بلاطة</item>
+    </plurals>
+
+    <string name="type_semelle_singulier">أساس</string>
+    <string name="type_semelle_defini">الأساس</string>
+    <string name="type_semelle_pluriel_defini">الأسس</string>
+    <string name="type_semelle_infos">معلومات الأسس</string>
+    <string name="type_semelle_nombre">عدد الأسس</string>
+    <string name="type_semelle_longueur">طول الأساس</string>
+    <string name="type_semelle_ajouter">إضافة أساس آخر</string>
+    <string name="type_semelle_supprimer">حذف هذا الأساس</string>
+    <string name="type_semelle_titre_calcul">حساب الأساس - %1$s</string>
+    <plurals name="nb_semelle">
+        <item quantity="zero">%d أساس</item>
+        <item quantity="one">أساس واحد</item>
+        <item quantity="two">أساسان</item>
+        <item quantity="few">%d أسس</item>
+        <item quantity="many">%d أساسا</item>
+        <item quantity="other">%d أساس</item>
+    </plurals>
+    <plurals name="nbg_semelle">
+        <item quantity="zero">%d أساس</item>
+        <item quantity="one">أساس واحد</item>
+        <item quantity="two">أساسين</item>
+        <item quantity="few">%d أسس</item>
+        <item quantity="many">%d أساسا</item>
+        <item quantity="other">%d أساس</item>
+    </plurals>
+
+    <string name="type_poutre_singulier">رافدة</string>
+    <string name="type_poutre_defini">الرافدة</string>
+    <string name="type_poutre_pluriel_defini">الروافد</string>
+    <string name="type_poutre_infos">معلومات الروافد</string>
+    <string name="type_poutre_nombre">عدد الروافد</string>
+    <string name="type_poutre_longueur">طول الرافدة</string>
+    <string name="type_poutre_ajouter">إضافة رافدة أخرى</string>
+    <string name="type_poutre_supprimer">حذف هذه الرافدة</string>
+    <string name="type_poutre_titre_calcul">حساب الرافدة - %1$s</string>
+    <plurals name="nb_poutre">
+        <item quantity="zero">%d رافدة</item>
+        <item quantity="one">رافدة واحدة</item>
+        <item quantity="two">رافدتان</item>
+        <item quantity="few">%d روافد</item>
+        <item quantity="many">%d رافدة</item>
+        <item quantity="other">%d رافدة</item>
+    </plurals>
+    <plurals name="nbg_poutre">
+        <item quantity="zero">%d رافدة</item>
+        <item quantity="one">رافدة واحدة</item>
+        <item quantity="two">رافدتين</item>
+        <item quantity="few">%d روافد</item>
+        <item quantity="many">%d رافدة</item>
+        <item quantity="other">%d رافدة</item>
+    </plurals>
+
+    <string name="type_pre_poteau_singulier">عمود مسبق الصنع</string>
+    <string name="type_pre_poteau_defini">العمود المسبق الصنع</string>
+    <string name="type_pre_poteau_pluriel_defini">الأعمدة المسبقة الصنع</string>
+    <string name="type_pre_poteau_infos">معلومات الأعمدة المسبقة الصنع</string>
+    <string name="type_pre_poteau_nombre">عدد الأعمدة المسبقة الصنع</string>
+    <string name="type_pre_poteau_longueur">طول العمود المسبق الصنع</string>
+    <string name="type_pre_poteau_ajouter">إضافة عمود مسبق الصنع آخر</string>
+    <string name="type_pre_poteau_supprimer">حذف هذا العمود المسبق الصنع</string>
+    <string name="type_pre_poteau_titre_calcul">حساب العمود المسبق الصنع - %1$s</string>
+    <plurals name="nb_pre_poteau">
+        <item quantity="zero">%d عمود مسبق الصنع</item>
+        <item quantity="one">عمود مسبق الصنع واحد</item>
+        <item quantity="two">عمودان مسبقا الصنع</item>
+        <item quantity="few">%d أعمدة مسبقة الصنع</item>
+        <item quantity="many">%d عمودا مسبق الصنع</item>
+        <item quantity="other">%d عمود مسبق الصنع</item>
+    </plurals>
+    <plurals name="nbg_pre_poteau">
+        <item quantity="zero">%d عمود مسبق الصنع</item>
+        <item quantity="one">عمود مسبق الصنع واحد</item>
+        <item quantity="two">عمودين مسبقي الصنع</item>
+        <item quantity="few">%d أعمدة مسبقة الصنع</item>
+        <item quantity="many">%d عمودا مسبق الصنع</item>
+        <item quantity="other">%d عمود مسبق الصنع</item>
+    </plurals>
+
+    <string name="type_escalier_singulier">درج</string>
+    <string name="type_escalier_defini">الدرج</string>
+    <string name="type_escalier_pluriel_defini">الأدراج</string>
+    <string name="type_escalier_infos">معلومات الأدراج</string>
+    <string name="type_escalier_nombre">عدد الأدراج</string>
+    <string name="type_escalier_longueur">طول الدرج</string>
+    <string name="type_escalier_ajouter">إضافة درج آخر</string>
+    <string name="type_escalier_supprimer">حذف هذا الدرج</string>
+    <string name="type_escalier_titre_calcul">حساب الدرج - %1$s</string>
+    <plurals name="nb_escalier">
+        <item quantity="zero">%d درج</item>
+        <item quantity="one">درج واحد</item>
+        <item quantity="two">درجان</item>
+        <item quantity="few">%d أدراج</item>
+        <item quantity="many">%d درجا</item>
+        <item quantity="other">%d درج</item>
+    </plurals>
+    <plurals name="nbg_escalier">
+        <item quantity="zero">%d درج</item>
+        <item quantity="one">درج واحد</item>
+        <item quantity="two">درجين</item>
+        <item quantity="few">%d أدراج</item>
+        <item quantity="many">%d درجا</item>
+        <item quantity="other">%d درج</item>
+    </plurals>
+
+</resources>

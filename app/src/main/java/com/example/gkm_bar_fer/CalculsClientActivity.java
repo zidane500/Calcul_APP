@@ -126,9 +126,9 @@ public class CalculsClientActivity extends AppCompatActivity {
 
             tvNom.setText(calcul.getNom());
             boolean modifie = calcul.getDateModification() - calcul.getDateCreation() > 1000;
-            tvDate.setText(calcul.getTypeElement().getSingulierMajuscule() + " · "
-                    + (modifie ? "Modifié le " : "Enregistré le ")
-                    + format.format(new Date(calcul.getDateModification())));
+            tvDate.setText(calcul.getTypeElement().singulierMajuscule(CalculsClientActivity.this) + " · "
+                    + getString(modifie ? R.string.calcul_modifie_le : R.string.calcul_enregistre_le,
+                    format.format(new Date(calcul.getDateModification()))));
 
             btnOuvrir.setOnClickListener(v -> {
                 Intent intent = new Intent(CalculsClientActivity.this, MainActivity.class);

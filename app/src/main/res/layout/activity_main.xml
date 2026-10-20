@@ -94,7 +94,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Utiliser le stock"
+                            android:text="@string/utiliser_stock"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="@color/primary" />
@@ -103,7 +103,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Utiliser les chutes disponibles avant d’acheter"
+                            android:text="@string/utiliser_chutes_desc"
                             android:textSize="12sp"
                             android:textColor="@android:color/darker_gray" />
 
@@ -184,7 +184,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:includeFontPadding="false"
-                            android:text="Synthèse du calcul et optimisation"
+                            android:text="@string/synthese_calcul"
                             android:textColor="@color/secondary_text"
                             android:textSize="12sp" />
 
@@ -205,7 +205,7 @@
                         android:layout_height="46dp"
                         android:layout_marginBottom="10dp"
                         android:minHeight="0dp"
-                        android:text="Enregistrer pour ce client"
+                        android:text="@string/enregistrer_pour_client"
                         android:textAllCaps="false"
                         android:textColor="@color/white"
                         android:textSize="14sp"
@@ -231,7 +231,7 @@
                             android:minHeight="0dp"
                             android:paddingStart="8dp"
                             android:paddingEnd="8dp"
-                            android:text="Exporter PDF"
+                            android:text="@string/exporter_pdf"
                             android:textAllCaps="false"
                             android:textColor="@color/on_surface"
                             android:textSize="12sp"
@@ -255,7 +255,7 @@
                             android:minHeight="0dp"
                             android:paddingStart="8dp"
                             android:paddingEnd="8dp"
-                            android:text="Exporter Excel"
+                            android:text="@string/exporter_excel"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
                             android:textSize="12sp"
@@ -282,6 +282,7 @@
                     <!-- Résultat général -->
                     <TextView
                         android:id="@+id/tvResultats"
+                        android:textDirection="locale"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:includeFontPadding="false"

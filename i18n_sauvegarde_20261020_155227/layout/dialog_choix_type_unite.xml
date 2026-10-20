@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="22dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="24dp"
+    android:background="@color/surface">
+
+    <!-- Titre -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:text="Ajouter du fer au stock"
+        android:textColor="@color/primary_dark"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Sous-titre -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="22dp"
+        android:text="Sélectionnez le type de fer et l’unité à ajouter."
+        android:textColor="@color/secondary_text"
+        android:textSize="13sp" />
+
+    <!-- Type de fer -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="7dp"
+        android:text="Type de fer"
+        android:textColor="@color/section_title"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnChoisirType"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_vertical"
+        android:text="Sélectionner un type"
+        android:textAllCaps="false"
+        android:textColor="@color/primary"
+        android:textSize="14sp"
+        app:cornerRadius="12dp"
+        app:strokeColor="@color/input_stroke"
+        app:strokeWidth="1dp"
+        app:icon="@drawable/ic_chevron_down"
+        app:iconGravity="textEnd"
+        app:iconPadding="0dp" />
+
+    <!-- Unité -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="7dp"
+        android:text="Unité"
+        android:textColor="@color/section_title"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnChoisirUnite"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center_vertical"
+        android:text="Sélectionner une unité"
+        android:textAllCaps="false"
+        android:textColor="@color/primary"
+        android:textSize="14sp"
+        app:cornerRadius="12dp"
+        app:strokeColor="@color/input_stroke"
+        app:strokeWidth="1dp"
+        app:icon="@drawable/ic_chevron_down"
+        app:iconGravity="textEnd"
+        app:iconPadding="0dp" />
+
+</LinearLayout>

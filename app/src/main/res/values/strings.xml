@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Fer Pro</string>
+    <string name="app_name" translatable="false">Fer Pro</string>
     <string name="infos_poteaux">Informations des Poteaux</string>
     <string name="nombre_poteaux">Nombre de poteaux</string>
     <string name="longueur_poteaux">Longueur de poteau</string>
@@ -30,15 +30,81 @@
     <string name="parametres_avertissement">Le changement de langue redémarre cet écran : les saisies non enregistrées seront perdues.</string>
 
     <!-- Ajoutez aussi ces chaînes pour les types de barres -->
-    <string name="n6">N6</string>
-    <string name="n8">N8</string>
-    <string name="n10">N10</string>
-    <string name="n12">N12</string>
-    <string name="n14">N14</string>
-    <string name="n16">N16</string>
+    <string name="n6" translatable="false">N6</string>
+    <string name="n8" translatable="false">N8</string>
+    <string name="n10" translatable="false">N10</string>
+    <string name="n12" translatable="false">N12</string>
+    <string name="n14" translatable="false">N14</string>
+    <string name="n16" translatable="false">N16</string>
 
     <!-- Valeurs par défaut -->
     <string name="valeur_un"></string>
     <string name="valeur_six"></string>
     <string name="valeur_zero"></string>
+
+    <!-- Textes des écrans (étape 2) -->
+    <string name="calculer_poteau">Calculer Poteau</string>
+    <string name="calculer_dalle">Calculer Dalle</string>
+    <string name="calculer_semelle">Calculer Semelle</string>
+    <string name="calculer_pre_poteau">Calculer Pré-poteau</string>
+    <string name="calculer_poutre">Calculer Poutre</string>
+    <string name="aucun_calcul_client">Aucun calcul enregistré pour ce client.</string>
+    <string name="ajouter_client">+ Ajouter Client</string>
+    <string name="rechercher_client">Rechercher un client par nom</string>
+    <string name="aucun_client">Aucun client pour l\'instant.</string>
+    <string name="utiliser_stock">Utiliser le stock</string>
+    <string name="utiliser_chutes_desc">Utiliser les chutes disponibles avant d’acheter</string>
+    <string name="synthese_calcul">Synthèse du calcul et optimisation</string>
+    <string name="enregistrer_pour_client">Enregistrer pour ce client</string>
+    <string name="exporter_pdf">Exporter PDF</string>
+    <string name="exporter_excel">Exporter Excel</string>
+    <string name="espace_chantier">VOTRE ESPACE CHANTIER</string>
+    <string name="slogan_barre">Chaque barre compte.</string>
+    <string name="menu_intro">Préparez vos coupes et gardez une vue claire sur votre stock de fer.</string>
+    <string name="calcul_poteaux">Calcul des poteaux</string>
+    <string name="calcul_poteaux_desc">Renseignez vos dimensions et vos armatures pour obtenir le détail des barres nécessaires.</string>
+    <string name="demarrer_calcul">Démarrer un calcul</string>
+    <string name="autres_calculs">Autres calculs</string>
+    <string name="type_pre_poteau">Pré-poteau</string>
+    <string name="disponible">Disponible</string>
+    <string name="type_dalle">Dalle</string>
+    <string name="type_semelle">Semelle</string>
+    <string name="type_poutre">Poutre</string>
+    <string name="votre_stock">Votre stock</string>
+    <string name="valorisez_chutes">Valorisez vos chutes.</string>
+    <string name="stock_desc">Consultez et ajoutez vos barres entières et vos morceaux de fer.</string>
+    <string name="consulter_stock">Consulter le stock</string>
+    <string name="ajouter_fer">Ajouter Fer</string>
+    <string name="historique">Historique</string>
+    <string name="retirer_fer">Retirer Fer</string>
+    <string name="filtrer_type_fer">Filtrer par type de fer</string>
+    <string name="aucun_fer_stock">Aucun fer en stock pour l\'instant.</string>
+    <string name="nom_client_requis">Nom du client *</string>
+    <string name="ville_optionnel">Ville (optionnel)</string>
+    <string name="ajouter_fer_stock">Ajouter du fer au stock</string>
+    <string name="selectionner_type_unite">Sélectionnez le type de fer et l’unité à ajouter.</string>
+    <string name="type_fer">Type de fer</string>
+    <string name="selectionner_type">Sélectionner un type</string>
+    <string name="unite">Unité</string>
+    <string name="selectionner_unite">Sélectionner une unité</string>
+    <string name="aucun_mouvement">Aucun mouvement enregistré pour l\'instant.</string>
+    <string name="nom_calcul_requis">Nom du calcul *</string>
+    <string name="longueur_morceau">Longueur du morceau</string>
+    <string name="longueur_requise">Longueur requise</string>
+    <string name="exemple_longueur">Ex : 5,30</string>
+    <string name="nombre_morceaux_retirer">Nombre de morceaux à retirer</string>
+    <string name="quantite">Quantité</string>
+    <string name="longueur_coupes_m">Longueur des coupes (m)</string>
+    <string name="supprimer">Supprimer</string>
+    <string name="ouvrir">Ouvrir</string>
+    <string name="supprimer_client">Supprimer le client</string>
+    <string name="consulter">Consulter</string>
+    <string name="definir_dimensions">Définissez les dimensions et les armatures</string>
+    <string name="unite_metre">m</string>
+    <string name="ajouter_diametres">Ajoutez les diamètres et indiquez la quantité nécessaire</string>
+    <string name="afficher_detail">Afficher le détail</string>
+    <string name="dechets_au_stock">Déchets au stock</string>
+    <string name="confirmer_utilisation_stock">Confirmer utilisation du stock</string>
+    <string name="resumer">Résumer</string>
+    <string name="historique_stock">Historique du stock</string>
 </resources>

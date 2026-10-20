@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="16dp"
-            android:text="Aucun mouvement enregistré pour l'instant."
+            android:text="@string/aucun_mouvement"
             android:textColor="#444444"
             android:visibility="gone" />
 

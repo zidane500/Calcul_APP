@@ -12,7 +12,7 @@
         android:id="@+id/layoutNomCalcul"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nom du calcul *">
+        android:hint="@string/nom_calcul_requis">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etNomCalcul"

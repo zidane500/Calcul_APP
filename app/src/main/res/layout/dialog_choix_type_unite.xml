@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"
-        android:text="Ajouter du fer au stock"
+        android:text="@string/ajouter_fer_stock"
         android:textColor="@color/primary_dark"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="22dp"
-        android:text="Sélectionnez le type de fer et l’unité à ajouter."
+        android:text="@string/selectionner_type_unite"
         android:textColor="@color/secondary_text"
         android:textSize="13sp" />
 
@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="7dp"
-        android:text="Type de fer"
+        android:text="@string/type_fer"
         android:textColor="@color/section_title"
         android:textSize="13sp"
         android:textStyle="bold" />
@@ -46,7 +46,7 @@
         android:layout_height="52dp"
         android:layout_marginBottom="20dp"
         android:gravity="center_vertical"
-        android:text="Sélectionner un type"
+        android:text="@string/selectionner_type"
         android:textAllCaps="false"
         android:textColor="@color/primary"
         android:textSize="14sp"
@@ -62,7 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="7dp"
-        android:text="Unité"
+        android:text="@string/unite"
         android:textColor="@color/section_title"
         android:textSize="13sp"
         android:textStyle="bold" />
@@ -73,7 +73,7 @@
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:gravity="center_vertical"
-        android:text="Sélectionner une unité"
+        android:text="@string/selectionner_unite"
         android:textAllCaps="false"
         android:textColor="@color/primary"
         android:textSize="14sp"

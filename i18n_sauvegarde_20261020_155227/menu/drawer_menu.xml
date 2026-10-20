@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/groupeNavigation">
+        <item
+            android:id="@+id/navAccueil"
+            android:icon="@drawable/ic_home"
+            android:title="@string/menu_accueil" />
+        <item
+            android:id="@+id/navEspaceClient"
+            android:icon="@drawable/ic_historique"
+            android:title="@string/menu_espace_client" />
+        <item
+            android:id="@+id/navStockDechets"
+            android:icon="@drawable/ic_stock_dechets"
+            android:title="@string/menu_stock_dechets" />
+    </group>
+
+    <group android:id="@+id/groupeReglages">
+        <item
+            android:id="@+id/navParametres"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/menu_parametres" />
+    </group>
+</menu>

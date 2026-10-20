@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:hint="Quantité">
+        android:hint="@string/quantite">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etQuantite"
@@ -41,7 +41,7 @@
         android:id="@+id/layoutLongueur"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Longueur des coupes (m)"
+        android:hint="@string/longueur_coupes_m"
         android:visibility="gone">
 
         <com.google.android.material.textfield.TextInputEditText

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Textes des résultats du calcul (générés par i18n_etape3.py) -->
+    <string name="entete_groupe">%1$s بطول %2$s م (%3$s)</string>
+    <string name="erreur_au_moins_une_barre">"يرجى إدخال نوع واحد على الأقل من القضبان بكمية موجبة.\n\n"</string>
+    <string name="ligne_besoin">"  • %1$s : %2$s لكل %3$s ← %4$s في المجموع\n"</string>
+    <string name="titre_optimise_chantier">=== محسّن على مستوى الورشة كاملة ===</string>
+    <string name="erreur_remplir_champs">%1$s #%2$d : يرجى ملء عدد %3$s والطول</string>
+    <string name="erreur_valeurs_positives">%1$s #%2$d : يجب أن تكون القيم موجبة</string>
+    <string name="erreur_nombres_valides">%1$s #%2$d : يرجى إدخال أرقام صحيحة</string>
+    <string name="barre_deja_selectionnee">%1$s محدد مسبقا</string>
+    <string name="oui">نعم</string>
+    <string name="non">لا</string>
+    <string name="resume_titre_type">"• %1$s :\n"</string>
+    <string name="resume_barres_acheter">"  - قضبان للشراء : %1$d\n"</string>
+    <string name="resume_dechets_aucun">"  - الفضلات : لا شيء"</string>
+    <string name="resume_dechets_nombre">"  - الفضلات : %1$s\n"</string>
+    <string name="resume_chute_unique">"    * فضلة : %1$s م"</string>
+    <string name="resume_optimise">"\n  - محسّن : %1$s"</string>
+    <string name="barre_numero">القضيب %1$d : %2$s</string>
+    <string name="detail_barre">%1$s مع %2$s%3$s</string>
+    <string name="chute_aucune">عدم وجود فضلات</string>
+    <string name="chute_une">فضلة %1$s م</string>
+    <string name="liaison_et">" و"</string>
+    <string name="marqueur_stock">" (من المخزون، الفضلة الأصلية %1$s م)"</string>
+    <string name="resume_barre_une">قضيب واحد : %1$s</string>
+    <string name="segment_info">" (الجزء %1$s)"</string>
+    <string name="coupes_pour_plusieurs">%1$s بطول %2$s م%3$s لأجل %4$s بطول %5$s م</string>
+    <string name="coupes_pour_un">%1$s بطول %2$s م%3$s لأجل %4$s بطول %5$s م</string>
+    <string name="bouton_annuler_stock">إلغاء استعمال المخزون</string>
+    <string name="btn_afficher_detail">عرض التفاصيل</string>
+    <string name="btn_masquer_detail">إخفاء التفاصيل</string>
+    <string name="btn_masquer_resume">إخفاء الملخص</string>
+    <string name="btn_retirer_chutes">سحب الفضلات المرسلة</string>
+    <string name="stock_confirmation_impossible">تعذّر التأكيد : تحقق من المخزون. وقد تكون العملية مسجلة مسبقا أو فشل الحفظ.</string>
+    <string name="stock_utilisation_confirmee">تم تأكيد استعمال المخزون لـ %1$s.</string>
+    <string name="stock_annulation_impossible">تعذّر الإلغاء : ربما تم تعديل المخزون منذ التأكيد، أو فشل الحفظ.</string>
+    <string name="stock_utilisation_annulee">تم إلغاء استعمال المخزون لـ %1$s.</string>
+    <string name="dechets_ajoutes">تمت إضافة فضلات %1$s إلى المخزون.</string>
+    <string name="dechets_retires">تم سحب فضلات %1$s من المخزون.</string>
+    <string name="calculer_d_abord">يرجى حساب النتائج أولا.</string>
+    <string name="erreur_pdf">خطأ أثناء إنشاء ملف PDF : %1$s</string>
+    <string name="erreur_excel">خطأ أثناء إنشاء ملف Excel : %1$s</string>
+    <string name="aucune_app_pdf">لا يوجد تطبيق لفتح ملف PDF. تم حفظ الملف : %1$s</string>
+    <string name="aucune_app_excel">لا يوجد تطبيق لفتح ملف Excel. تم حفظ الملف : %1$s</string>
+    <string name="ouvrir_pdf_avec">فتح ملف PDF باستخدام</string>
+    <string name="ouvrir_excel_avec">فتح ملف Excel باستخدام</string>
+    <string name="btn_enregistrer_modifs">حفظ التعديلات</string>
+    <string name="btn_enregistrer_pour">حفظ لـ %1$s</string>
+    <string name="calculer_avant_enregistrer">احسب أولا قبل الحفظ.</string>
+    <string name="nom_calcul_defaut">حساب بتاريخ %1$s</string>
+    <string name="dialog_titre_enregistrer">حفظ الحساب</string>
+    <string name="dialog_ignorer">تجاهل</string>
+    <string name="dialog_enregistrer">حفظ</string>
+    <string name="nom_calcul_obligatoire">اسم الحساب إلزامي</string>
+    <string name="enregistrement_echoue">فشل الحفظ.</string>
+    <string name="modifs_enregistrees">تم حفظ التعديلات.</string>
+    <string name="calcul_enregistre">تم حفظ الحساب.</string>
+    <string name="impossible_enregistrer">تعذّر حفظ هذا الحساب.</string>
+    <string name="calcul_introuvable">الحساب غير موجود.</string>
+    <string name="calcul_illisible">هذا الحساب المحفوظ غير قابل للقراءة.</string>
+    <string name="calcul_modifie_le">تم التعديل في %1$s</string>
+    <string name="calcul_enregistre_le">تم الحفظ في %1$s</string>
+
+    <plurals name="nb_coupes">
+        <item quantity="zero">%d قطعة</item>
+        <item quantity="one">قطعة واحدة</item>
+        <item quantity="two">قطعتان</item>
+        <item quantity="few">%d قطع</item>
+        <item quantity="many">%d قطعة</item>
+        <item quantity="other">%d قطعة</item>
+    </plurals>
+    <plurals name="nb_chutes">
+        <item quantity="zero">لا فضلات</item>
+        <item quantity="one">فضلة واحدة</item>
+        <item quantity="two">فضلتان</item>
+        <item quantity="few">%d فضلات</item>
+        <item quantity="many">%d فضلة</item>
+        <item quantity="other">%d فضلة</item>
+    </plurals>
+    <plurals name="chutes_de">
+        <item quantity="zero">%1$d فضلة بطول %2$s م</item>
+        <item quantity="one">فضلة واحدة بطول %2$s م</item>
+        <item quantity="two">فضلتين بطول %2$s م</item>
+        <item quantity="few">%1$d فضلات بطول %2$s م</item>
+        <item quantity="many">%1$d فضلة بطول %2$s م</item>
+        <item quantity="other">%1$d فضلة بطول %2$s م</item>
+    </plurals>
+    <plurals name="resume_chutes_multiples">
+        <item quantity="zero">"    * %1$d فضلة : %2$s م"</item>
+        <item quantity="one">"    * فضلة واحدة : %2$s م"</item>
+        <item quantity="two">"    * فضلتان : %2$s م"</item>
+        <item quantity="few">"    * %1$d فضلات : %2$s م"</item>
+        <item quantity="many">"    * %1$d فضلة : %2$s م"</item>
+        <item quantity="other">"    * %1$d فضلة : %2$s م"</item>
+    </plurals>
+    <plurals name="resume_barres_identiques">
+        <item quantity="zero">%1$d قضيب : لكل قضيب، %2$s</item>
+        <item quantity="one">قضيب واحد : لكل قضيب، %2$s</item>
+        <item quantity="two">قضيبان : لكل قضيب، %2$s</item>
+        <item quantity="few">%1$d قضبان : لكل قضيب، %2$s</item>
+        <item quantity="many">%1$d قضيبا : لكل قضيب، %2$s</item>
+        <item quantity="other">%1$d قضيب : لكل قضيب، %2$s</item>
+    </plurals>
+</resources>
