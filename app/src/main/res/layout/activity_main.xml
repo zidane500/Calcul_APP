@@ -207,11 +207,11 @@
                         android:minHeight="0dp"
                         android:text="@string/enregistrer_pour_client"
                         android:textAllCaps="false"
-                        android:textColor="@color/white"
+                        android:textColor="@color/save_brown_text"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:visibility="gone"
-                        app:backgroundTint="@color/primary"
+                        app:backgroundTint="@color/save_brown"
                         app:cornerRadius="12dp"
                         app:elevation="0dp" />
 

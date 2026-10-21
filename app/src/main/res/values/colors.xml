@@ -21,7 +21,9 @@
     <!-- Teinte claire pour bouton tonal (ex: Ajouter un poteau) -->
     <color name="light_primary_tint">#E3F2FD</color>
     <!-- Couleurs des boutons d'export -->
-    <color name="pdf_color">#F9A825</color>
+    <!-- Bouton Enregistrer (calcul client) : brun clair -->
+    <color name="save_brown">#CFA67A</color>
+    <color name="save_brown_text">#4A2E1A</color>    <color name="pdf_color">#F9A825</color>
     <color name="excel_color">#217346</color>
 
     <color name="detail_button_text">#1976D2</color>
