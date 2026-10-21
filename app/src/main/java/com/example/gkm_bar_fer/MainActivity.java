@@ -899,6 +899,12 @@ public class MainActivity extends AppCompatActivity {
         resume.append(getString(R.string.resume_titre_type, typeBarre));
         resume.append(getString(R.string.resume_barres_acheter, resultat.barresNecessaires));
 
+        // Stock activé : quantité prélevée sur le stock, avec le détail des longueurs
+        if (dernierUtiliseStock) {
+            resume.append(getString(R.string.resume_quantite_stock,
+                    formatterQuantiteStock(resultat, this)));
+        }
+
         if (resultat.listeDechets.isEmpty()) {
             resume.append(getString(R.string.resume_dechets_aucun));
         } else {
@@ -1214,6 +1220,9 @@ public class MainActivity extends AppCompatActivity {
             RapportPdf.GroupeBarres groupe = new RapportPdf.GroupeBarres();
             groupe.typeFer = entry.getKey();
             groupe.barresAcheter = resultat.barresNecessaires;
+            if (dernierUtiliseStock) {
+                groupe.quantiteStock = formatterQuantiteStock(resultat, fr);
+            }
 
             for (BarreUtilisee barre : resultat.detailBarres) {
                 RapportPdf.BarreDetail detail = new RapportPdf.BarreDetail();
@@ -1283,6 +1292,11 @@ public class MainActivity extends AppCompatActivity {
             classeur.ajouterLigne(feuille, Arrays.asList(
                     GenerateurXlsx.Cellule.texte("Barres à acheter", true),
                     GenerateurXlsx.Cellule.nombre(resultat.barresNecessaires, false)));
+            if (dernierUtiliseStock) {
+                classeur.ajouterLigne(feuille, Arrays.asList(
+                        GenerateurXlsx.Cellule.texte("Quantité prélevée sur le stock", true),
+                        GenerateurXlsx.Cellule.texte(formatterQuantiteStock(resultat, fr), false)));
+            }
             classeur.ajouterLigne(feuille, Arrays.asList(
                     GenerateurXlsx.Cellule.texte("Optimisé", true),
                     GenerateurXlsx.Cellule.texte(resultat.utilisationOptimisee ? "Oui" : "Non", false)));
@@ -1395,6 +1409,38 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return TextUtils.join(" + ", parts);
+    }
+
+    /**
+     * Quantité prélevée sur le stock, avec le détail des longueurs, dans la langue du Context.
+     * ex : "3 morceaux (2 × 5,00 m + 1 × 3,20 m)" ; "0 morceau" si rien n'a été prélevé.
+     */
+    private String formatterQuantiteStock(ResultatCalcul resultat, Context ctx) {
+        TreeMap<Long, Integer> parLongueur = new TreeMap<>(Collections.reverseOrder()); // cm -> nombre
+        int total = 0;
+
+        for (BarreUtilisee barre : resultat.detailBarres) {
+            if (barre.estDuStock && !barre.coupes.isEmpty()) {
+                total++;
+                long cm = Math.round(barre.longueurOrigineStock * 100.0);
+                Integer n = parLongueur.get(cm);
+                parLongueur.put(cm, n == null ? 1 : n + 1);
+            }
+        }
+
+        String nombre = ctx.getResources().getQuantityString(
+                R.plurals.nb_morceaux_stock, total, total);
+        if (total == 0) {
+            return nombre;
+        }
+
+        List<String> parties = new ArrayList<>();
+        for (Map.Entry<Long, Integer> e : parLongueur.entrySet()) {
+            parties.add(ctx.getString(R.string.stock_morceau_longueur,
+                    e.getValue(),
+                    String.format(Locale.FRANCE, "%.2f", e.getKey() / 100.0)));
+        }
+        return nombre + " (" + TextUtils.join(" + ", parties) + ")";
     }
 
     private String marqueurStock(BarreUtilisee barre, Context ctx) {

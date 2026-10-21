@@ -58,7 +58,9 @@ public final class RapportPdf {
     /** Toutes les barres d'un même type de fer. */
     public static class GroupeBarres {
         public String typeFer = "";
-        public int barresAcheter;                      // barres neuves à acheter
+        public int barresAcheter;
+        // barres neuves à acheter
+        public String quantiteStock = "";   // détail du stock prélevé (vide = stock non utilisé)
         public List<BarreDetail> barres = new ArrayList<>();
     }
 
@@ -508,18 +510,20 @@ public final class RapportPdf {
             for (GroupeBarres g : d.groupes) {
                 double achetee = g.barresAcheter * d.longueurBarreStandard;
                 double affectee = 0;
-                int morceauxStock = 0;
                 for (BarreDetail b : g.barres) {
-                    if (b.depuisStock) {
-                        morceauxStock++;
-                    } else {
+                    if (!b.depuisStock) {
                         for (Double c : b.coupes) {
                             affectee += c;
                         }
                     }
                 }
 
-                float hauteur = morceauxStock > 0 ? 62f : 48f;
+                List<String> lignesStock = g.quantiteStock.isEmpty()
+                        ? Collections.<String>emptyList()
+                        : couper("Quantité prélevée sur le stock : " + g.quantiteStock,
+                        paintDetail, LARGEUR - 2f * MARGE - 95f - 12f);
+
+                float hauteur = 48f + 14f * lignesStock.size();
                 assurerEspace(hauteur + 8f);
 
                 canvas.drawRect(MARGE, y, LARGEUR - MARGE, y + hauteur, remplissage(FOND_CLAIR));
@@ -534,9 +538,8 @@ public final class RapportPdf {
                 canvas.drawText("Longueur achetée : " + fmt(achetee) + " m  |  Longueur affectée aux coupes : "
                         + fmt(affectee) + " m", MARGE + 95f, y + 36f, paintDetail);
 
-                if (morceauxStock > 0) {
-                    canvas.drawText("Morceaux du stock utilisés : " + morceauxStock,
-                            MARGE + 95f, y + 50f, paintDetail);
+                for (int i = 0; i < lignesStock.size(); i++) {
+                    canvas.drawText(lignesStock.get(i), MARGE + 95f, y + 50f + 14f * i, paintDetail);
                 }
                 y += hauteur + 8f;
             }

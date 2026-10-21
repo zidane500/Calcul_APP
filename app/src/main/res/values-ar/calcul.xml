@@ -13,6 +13,8 @@
     <string name="non">لا</string>
     <string name="resume_titre_type">"• %1$s :\n"</string>
     <string name="resume_barres_acheter">"  - قضبان للشراء : %1$d\n"</string>
+    <string name="resume_quantite_stock">"  - الكمية المستهلكة من المخزون : %1$s\n"</string>
+    <string name="stock_morceau_longueur">%1$d × %2$s م</string>
     <string name="resume_dechets_aucun">"  - الفضلات : لا شيء"</string>
     <string name="resume_dechets_nombre">"  - الفضلات : %1$s\n"</string>
     <string name="resume_chute_unique">"    * فضلة : %1$s م"</string>
@@ -64,6 +66,14 @@
 
     <plurals name="nb_coupes">
         <item quantity="zero">%d قطعة</item>
+        <item quantity="one">قطعة واحدة</item>
+        <item quantity="two">قطعتان</item>
+        <item quantity="few">%d قطع</item>
+        <item quantity="many">%d قطعة</item>
+        <item quantity="other">%d قطعة</item>
+    </plurals>
+    <plurals name="nb_morceaux_stock">
+        <item quantity="zero">لا شيء</item>
         <item quantity="one">قطعة واحدة</item>
         <item quantity="two">قطعتان</item>
         <item quantity="few">%d قطع</item>

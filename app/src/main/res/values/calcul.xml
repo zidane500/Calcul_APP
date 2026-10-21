@@ -13,6 +13,8 @@
     <string name="non">Non</string>
     <string name="resume_titre_type">"• %1$s:\n"</string>
     <string name="resume_barres_acheter">"  - Barres à acheter: %1$d\n"</string>
+    <string name="resume_quantite_stock">"  - Quantité prélevée sur le stock: %1$s\n"</string>
+    <string name="stock_morceau_longueur">%1$d × %2$s m</string>
     <string name="resume_dechets_aucun">"  - Déchets: Aucun"</string>
     <string name="resume_dechets_nombre">"  - Déchets: %1$s\n"</string>
     <string name="resume_chute_unique">"    * Chute: %1$s m"</string>
@@ -65,6 +67,10 @@
     <plurals name="nb_coupes">
         <item quantity="one">%d coupe</item>
         <item quantity="other">%d coupes</item>
+    </plurals>
+    <plurals name="nb_morceaux_stock">
+        <item quantity="one">%d morceau</item>
+        <item quantity="other">%d morceaux</item>
     </plurals>
     <plurals name="nb_chutes">
         <item quantity="one">%d chute</item>
