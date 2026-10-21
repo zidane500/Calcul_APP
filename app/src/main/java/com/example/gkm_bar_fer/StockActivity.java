@@ -168,6 +168,11 @@ public class StockActivity extends AppCompatActivity {
                 finish();
                 return true;
             }
+            if (id == R.id.navParametres) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                ParametresDialog.afficher(StockActivity.this);
+                return true;
+            }
 
             return false;
         });

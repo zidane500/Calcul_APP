@@ -144,11 +144,7 @@ public class EspaceClientActivity extends AppCompatActivity {
                 return true;
             }
 
-            if (id == R.id.navParametres) {
-                drawerLayout.closeDrawer(GravityCompat.START);
-                ParametresDialog.afficher(this);
-                return true;
-            }
+
 
             return false;
         });
