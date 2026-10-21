@@ -1,6 +1,7 @@
 package com.example.gkm_bar_fer;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -194,6 +196,19 @@ public class EspaceClientActivity extends AppCompatActivity {
 
             tvNom.setText(client.getNom());
 
+            // Avatar : initiale du nom, couleur stable propre à chaque client
+            TextView tvInitiale = itemView.findViewById(R.id.tvInitialeClient);
+            MaterialCardView cardAvatar = itemView.findViewById(R.id.cardAvatarClient);
+            tvInitiale.setText(initialeDe(client.getNom()));
+            cardAvatar.setCardBackgroundColor(couleurAvatar(client.getId()));
+
+            // Nombre de calculs enregistrés pour ce client
+            TextView tvNbCalculs = itemView.findViewById(R.id.tvNbCalculsClient);
+            int nbCalculs = CalculManager.getInstance(this)
+                    .getCalculsDuClient(client.getId()).size();
+            tvNbCalculs.setText(getResources().getQuantityString(
+                    R.plurals.nb_calculs_client, nbCalculs, nbCalculs));
+
             if (client.getVille().isEmpty()) {
                 tvVille.setVisibility(View.GONE);
             } else {
@@ -209,6 +224,9 @@ public class EspaceClientActivity extends AppCompatActivity {
                 intent.putExtra(CalculsClientActivity.EXTRA_CLIENT_ID, client.getId());
                 startActivity(intent);
             });
+
+            // Toute la carte ouvre le client (le bouton Consulter fait la même chose)
+            itemView.setOnClickListener(v -> btnConsulter.performClick());
 
             btnSupprimer.setOnClickListener(v -> afficherConfirmationSuppression(client));
 
@@ -361,5 +379,25 @@ public class EspaceClientActivity extends AppCompatActivity {
         );
 
         dialogue.show();
+    }
+
+    private static final int[] COULEURS_AVATAR = {
+            Color.parseColor("#173B65"),
+            Color.parseColor("#3E6B63"),
+            Color.parseColor("#5B3E8E"),
+            Color.parseColor("#2E4A62"),
+            Color.parseColor("#54413A")
+    };
+
+    private int couleurAvatar(String clientId) {
+        return COULEURS_AVATAR[Math.abs(clientId.hashCode()) % COULEURS_AVATAR.length];
+    }
+
+    private String initialeDe(String nom) {
+        String propre = nom == null ? "" : nom.trim();
+        if (propre.isEmpty()) {
+            return "?";
+        }
+        return new String(Character.toChars(propre.codePointAt(0))).toUpperCase(Locale.getDefault());
     }
 }

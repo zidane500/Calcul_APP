@@ -891,9 +891,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnDechetsAuStock = itemView.findViewById(R.id.btnDechetsAuStock);
         Button btnConfirmerStock =
                 itemView.findViewById(R.id.btnConfirmerStock);
-        Button btnResumer = itemView.findViewById(R.id.btnResumer);
         TextView tvResumeBarresDetail = itemView.findViewById(R.id.tvResumeBarresDetail);
-        TextView tvDetailBarres = itemView.findViewById(R.id.tvDetailBarres);
 
         StringBuilder resume = new StringBuilder();
         resume.append(getString(R.string.resume_titre_type, typeBarre));
@@ -935,16 +933,7 @@ public class MainActivity extends AppCompatActivity {
                 getString(resultat.utilisationOptimisee ? R.string.oui : R.string.non)));
         tvResumeBarre.setText(resume.toString());
 
-        StringBuilder detail = new StringBuilder();
-        int numeroBarre = 1;
-        for (BarreUtilisee barre : resultat.detailBarres) {
-            if (numeroBarre > 1) {
-                detail.append("\n");
-            }
-            detail.append(getString(R.string.barre_numero, numeroBarre, formatterDetailBarre(barre, this)));
-            numeroBarre++;
-        }
-        tvDetailBarres.setText(detail.toString());
+
         tvResumeBarresDetail.setText(formatterResumeBarres(resultat.detailBarres, this));
 
         final List<BarreUtilisee> barresStockUtilisees = new ArrayList<>();
@@ -1042,25 +1031,18 @@ public class MainActivity extends AppCompatActivity {
         btnAfficherDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean estVisible = tvDetailBarres.getVisibility() == View.VISIBLE;
-                tvDetailBarres.setVisibility(estVisible ? View.GONE : View.VISIBLE);
-                btnResumer.setVisibility(estVisible ? View.GONE : View.VISIBLE);
+                boolean estVisible = tvResumeBarresDetail.getVisibility() == View.VISIBLE;
+                tvResumeBarresDetail.setVisibility(estVisible ? View.GONE : View.VISIBLE);
                 btnAfficherDetail.setText(estVisible ? R.string.btn_afficher_detail : R.string.btn_masquer_detail);
-
-                if (estVisible) {
-                    // On replie aussi le résumé s'il était ouvert
-                    tvResumeBarresDetail.setVisibility(View.GONE);
-                    btnResumer.setText(R.string.resumer);
-                }
             }
         });
 
-        btnResumer.setOnClickListener(new View.OnClickListener() {
+        btnAfficherDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean estVisible = tvResumeBarresDetail.getVisibility() == View.VISIBLE;
                 tvResumeBarresDetail.setVisibility(estVisible ? View.GONE : View.VISIBLE);
-                btnResumer.setText(estVisible ? R.string.resumer : R.string.btn_masquer_resume);
+                btnAfficherDetail.setText(estVisible ? R.string.btn_afficher_detail : R.string.btn_masquer_detail);
             }
         });
 

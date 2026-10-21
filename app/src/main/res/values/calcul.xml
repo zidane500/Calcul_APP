@@ -72,6 +72,10 @@
         <item quantity="one">%d morceau</item>
         <item quantity="other">%d morceaux</item>
     </plurals>
+    <plurals name="nb_calculs_client">
+        <item quantity="one">%d calcul</item>
+        <item quantity="other">%d calculs</item>
+    </plurals>
     <plurals name="nb_chutes">
         <item quantity="one">%d chute</item>
         <item quantity="other">%d chutes</item>

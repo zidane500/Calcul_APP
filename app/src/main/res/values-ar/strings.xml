@@ -81,6 +81,8 @@
 
     <!-- Multi-Calcul -->
     <string name="multi_calcul">حساب متعدد</string>
+    <string name="client_nouveau_calcul">حساب جديد</string>
+    <string name="client_calculs_enregistres">الحسابات المحفوظة</string>
     <string name="multi_choisir_type_titre">اختر نوع العنصر</string>
     <string name="multi_annuler">إلغاء</string>
 

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="#F4F6FA"
     android:orientation="vertical">
 
     <include layout="@layout/layout_header" />
@@ -12,155 +12,205 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
+        android:clipToPadding="false"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="32dp">
 
             <TextView
                 android:id="@+id/tvInfoClient"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:textColor="@color/secondary_text"
+                android:layout_marginBottom="6dp"
+                android:textColor="#526176"
                 android:textSize="14sp" />
 
-            <!-- Ligne 1 : Poteau / Dalle -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:text="@string/client_nouveau_calcul"
+                android:textColor="#17263C"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Poteau : action principale -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCalculerPoteau"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginBottom="12dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/calculer_poteau"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:backgroundTint="#173B65"
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_poteau"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                app:iconSize="28dp"
+                app:iconTint="#FFFFFF" />
+
+            <!-- Ligne 1 : Pré-poteau / Dalle -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btnCalculerPoteau"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="@string/calculer_poteau"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/primary"
-                    app:cornerRadius="14dp"
-                    app:elevation="3dp" />
-
-                <Button
-                    android:id="@+id/btnCalculerDalle"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="@string/calculer_dalle"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/primary"
-                    app:cornerRadius="14dp"
-                    app:elevation="3dp" />
-
-            </LinearLayout>
-
-            <!-- Ligne 2 : Semelle / Pré-poteau -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnCalculerSemelle"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="@string/calculer_semelle"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/primary"
-                    app:cornerRadius="14dp"
-                    app:elevation="3dp" />
-
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCalculerPrePoteau"
                     style="@style/Widget.Material3.Button"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
+                    android:layout_height="96dp"
+                    android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="6dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:maxLines="2"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:text="@string/calculer_pre_poteau"
                     android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    app:backgroundTint="@color/primary"
-                    app:cornerRadius="14dp"
-                    app:elevation="3dp" />
+                    app:backgroundTint="#3E6B63"
+                    app:cornerRadius="18dp"
+                    app:icon="@drawable/ic_pre_poteau"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="28dp"
+                    app:iconTint="#FFFFFF" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCalculerDalle"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="96dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:maxLines="2"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="@string/calculer_dalle"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#251603"
+                    app:cornerRadius="18dp"
+                    app:icon="@drawable/ic_dalle"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="28dp"
+                    app:iconTint="#FFFFFF" />
 
             </LinearLayout>
 
-            <!-- Ligne 3 : Poutre -->
+            <!-- Ligne 2 : Semelle / Poutre -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="12dp"
                 android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCalculerSemelle"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="96dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:maxLines="2"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="@string/calculer_semelle"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#54413A"
+                    app:cornerRadius="18dp"
+                    app:icon="@drawable/ic_semelle"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="28dp"
+                    app:iconTint="#FFFFFF" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCalculerPoutre"
                     style="@style/Widget.Material3.Button"
                     android:layout_width="0dp"
-                    android:layout_height="56dp"
+                    android:layout_height="96dp"
+                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:maxLines="2"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:text="@string/calculer_poutre"
                     android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    app:backgroundTint="@color/primary"
-                    app:cornerRadius="14dp"
-                    app:elevation="3dp" />
-
-                <Button
-                    android:id="@+id/btnCalculerMulti"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="@string/multi_calcul"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="@color/primary"
-                    app:cornerRadius="14dp"
-                    app:elevation="3dp" />
+                    app:backgroundTint="#2E4A62"
+                    app:cornerRadius="18dp"
+                    app:icon="@drawable/ic_poutre"
+                    app:iconGravity="textTop"
+                    app:iconPadding="8dp"
+                    app:iconSize="28dp"
+                    app:iconTint="#FFFFFF" />
 
             </LinearLayout>
+
+            <!-- Multi-Calcul -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCalculerMulti"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/multi_calcul"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="#5B3E8E"
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_calculate"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                app:iconSize="26dp"
+                app:iconTint="#FFFFFF" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="14dp"
+                android:text="@string/client_calculs_enregistres"
+                android:textColor="#17263C"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvAucunCalcul"
@@ -169,7 +219,7 @@
                 android:gravity="center"
                 android:padding="24dp"
                 android:text="@string/aucun_calcul_client"
-                android:textColor="@color/on_surface"
+                android:textColor="#526176"
                 android:textSize="14sp"
                 android:visibility="gone" />
 

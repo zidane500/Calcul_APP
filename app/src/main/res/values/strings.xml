@@ -110,6 +110,8 @@
 
     <!-- Multi-Calcul -->
     <string name="multi_calcul">Multi-Calcul</string>
+    <string name="client_nouveau_calcul">Nouveau calcul</string>
+    <string name="client_calculs_enregistres">Calculs enregistrés</string>
     <string name="multi_choisir_type_titre">Choisir le type d’élément</string>
     <string name="multi_annuler">Annuler</string>
 

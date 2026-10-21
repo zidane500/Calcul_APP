@@ -80,6 +80,14 @@
         <item quantity="many">%d قطعة</item>
         <item quantity="other">%d قطعة</item>
     </plurals>
+    <plurals name="nb_calculs_client">
+        <item quantity="zero">لا حسابات</item>
+        <item quantity="one">حساب واحد</item>
+        <item quantity="two">حسابان</item>
+        <item quantity="few">%d حسابات</item>
+        <item quantity="many">%d حسابًا</item>
+        <item quantity="other">%d حساب</item>
+    </plurals>
     <plurals name="nb_chutes">
         <item quantity="zero">لا فضلات</item>
         <item quantity="one">فضلة واحدة</item>

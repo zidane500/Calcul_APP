@@ -1,6 +1,7 @@
 package com.example.gkm_bar_fer;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,6 +100,25 @@ public class CalculsClientActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /** Couleur du bandeau d'un calcul, identique à celles des boutons de l'accueil. */
+    private int couleurType(CalculEnregistre calcul) {
+        if (calcul.isMulti()) {
+            return Color.parseColor("#5B3E8E");
+        }
+        switch (calcul.getTypeElement()) {
+            case PRE_POTEAU:
+                return Color.parseColor("#3E6B63");
+            case DALLE:
+                return Color.parseColor("#251603");
+            case SEMELLE:
+                return Color.parseColor("#54413A");
+            case POUTRE:
+                return Color.parseColor("#2E4A62");
+            default:
+                return Color.parseColor("#173B65");
+        }
+    }
+
     private void configurerHeader() {
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -134,6 +154,8 @@ public class CalculsClientActivity extends AppCompatActivity {
             Button btnOuvrir = itemView.findViewById(R.id.btnOuvrirCalcul);
 
             tvNom.setText(calcul.getNom());
+            itemView.findViewById(R.id.viewAccentCalcul)
+                    .setBackgroundColor(couleurType(calcul));
             boolean modifie = calcul.getDateModification() - calcul.getDateCreation() > 1000;
             String libelleType = calcul.isMulti()
                     ? getString(R.string.multi_calcul)
