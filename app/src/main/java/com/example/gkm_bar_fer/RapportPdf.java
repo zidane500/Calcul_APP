@@ -42,6 +42,8 @@ public final class RapportPdf {
         public String typeFer = "";   // ex : N35
         public int coupesParElement;  // coupes par élément
         public int totalCoupes;       // nombre * coupesParElement
+        public String typeSingulier = ""; // ex : dalle (vide = celui de Donnees)
+        public String typePluriel = "";   // ex : dalles (vide = celui de Donnees)
     }
 
     /** Une barre utilisée (neuve ou issue du stock) avec ses coupes. */
@@ -347,9 +349,11 @@ public final class RapportPdf {
             LinkedHashMap<String, String> elements = new LinkedHashMap<>();
             List<String> fers = new ArrayList<>();
             for (Besoin b : d.besoins) {
-                String cle = b.nombre + "|" + b.longueur;
+                String cle = b.nombre + "|" + b.longueur + "|" + b.typeSingulier;
                 if (!elements.containsKey(cle)) {
-                    elements.put(cle, b.nombre + " " + (b.nombre > 1 ? d.typePluriel : d.typeSingulier)
+                    String pluriel = b.typePluriel.isEmpty() ? d.typePluriel : b.typePluriel;
+                    String singulier = b.typeSingulier.isEmpty() ? d.typeSingulier : b.typeSingulier;
+                    elements.put(cle, b.nombre + " " + (b.nombre > 1 ? pluriel : singulier)
                             + " de " + fmt(b.longueur) + " m");
                 }
                 if (!fers.contains(b.typeFer)) {
@@ -434,7 +438,7 @@ public final class RapportPdf {
             for (Besoin b : d.besoins) {
                 assurerEspace(26f);
                 String[] cellules = {
-                        majuscule(d.typeSingulier),
+                        majuscule(b.typeSingulier.isEmpty() ? d.typeSingulier : b.typeSingulier),
                         String.valueOf(b.nombre),
                         fmt(b.longueur) + " m",
                         b.typeFer,

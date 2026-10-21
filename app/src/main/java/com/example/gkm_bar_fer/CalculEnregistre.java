@@ -61,4 +61,12 @@ public class CalculEnregistre {
             return TypeElement.POTEAU;
         }
     }
+    /** Vrai si le calcul a été fait en mode Multi-Calcul (plusieurs types d'éléments). */
+    public boolean isMulti() {
+        try {
+            return new JSONObject(donneesJson).optBoolean("multi", false);
+        } catch (JSONException e) {
+            return false;
+        }
+    }
 }

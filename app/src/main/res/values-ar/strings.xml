@@ -78,4 +78,13 @@
     <string name="resultats">النتائج</string>
     <string name="ajouter_poteau">إضافة عمود آخر</string>
     <string name="supprimer_poteau">حذف هذا العمود</string>
+
+    <!-- Multi-Calcul -->
+    <string name="multi_calcul">حساب متعدد</string>
+    <string name="multi_choisir_type_titre">اختر نوع العنصر</string>
+    <string name="multi_annuler">إلغاء</string>
+
+    <string name="multi_ajouter_autre">إضافة عنصر آخر</string>
+
+    <string name="multi_titre_client">حساب متعدد - %1$s</string>
 </resources>

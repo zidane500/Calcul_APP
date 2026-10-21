@@ -70,6 +70,8 @@ public class CalculsClientActivity extends AppCompatActivity {
                 .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.POUTRE));
         findViewById(R.id.btnCalculerPrePoteau)
                 .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.PRE_POTEAU));
+        findViewById(R.id.btnCalculerMulti)
+                .setOnClickListener(v -> ouvrirNouveauCalculMulti());
 
 
         rafraichirAffichage();
@@ -87,6 +89,13 @@ public class CalculsClientActivity extends AppCompatActivity {
         Intent intent = new Intent(CalculsClientActivity.this, MainActivity.class);
         intent.putExtra(MainActivity.EXTRA_CLIENT_ID, clientId);
         intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, type.getCode());
+        startActivity(intent);
+    }
+
+    private void ouvrirNouveauCalculMulti() {
+        Intent intent = new Intent(CalculsClientActivity.this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_CLIENT_ID, clientId);
+        intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, MainActivity.TYPE_MULTI);
         startActivity(intent);
     }
 
@@ -126,7 +135,10 @@ public class CalculsClientActivity extends AppCompatActivity {
 
             tvNom.setText(calcul.getNom());
             boolean modifie = calcul.getDateModification() - calcul.getDateCreation() > 1000;
-            tvDate.setText(calcul.getTypeElement().singulierMajuscule(CalculsClientActivity.this) + " · "
+            String libelleType = calcul.isMulti()
+                    ? getString(R.string.multi_calcul)
+                    : calcul.getTypeElement().singulierMajuscule(CalculsClientActivity.this);
+            tvDate.setText(libelleType + " · "
                     + getString(modifie ? R.string.calcul_modifie_le : R.string.calcul_enregistre_le,
                     format.format(new Date(calcul.getDateModification()))));
 

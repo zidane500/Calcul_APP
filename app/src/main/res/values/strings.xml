@@ -107,4 +107,13 @@
     <string name="confirmer_utilisation_stock">Confirmer utilisation du stock</string>
     <string name="resumer">Résumer</string>
     <string name="historique_stock">Historique du stock</string>
+
+    <!-- Multi-Calcul -->
+    <string name="multi_calcul">Multi-Calcul</string>
+    <string name="multi_choisir_type_titre">Choisir le type d’élément</string>
+    <string name="multi_annuler">Annuler</string>
+
+    <string name="multi_ajouter_autre">Ajouter autre</string>
+
+    <string name="multi_titre_client">Multi-Calcul - %1$s</string>
 </resources>

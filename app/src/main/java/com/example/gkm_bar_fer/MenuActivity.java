@@ -28,6 +28,7 @@ public class MenuActivity extends AppCompatActivity {
         Button btnDalle = findViewById(R.id.btnMenuDalle);
         Button btnPoutre = findViewById(R.id.btnMenuPoutre);
         Button btnPrePoteau = findViewById(R.id.btnMenuPrePoteau);
+        Button btnMulti = findViewById(R.id.btnMenuMulti);
         Button btnStock = findViewById(R.id.btnMenuStock);
 
         btnPoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.POTEAU));
@@ -35,6 +36,7 @@ public class MenuActivity extends AppCompatActivity {
         btnDalle.setOnClickListener(v -> ouvrirCalcul(TypeElement.DALLE));
         btnPoutre.setOnClickListener(v -> ouvrirCalcul(TypeElement.POUTRE));
         btnPrePoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.PRE_POTEAU));
+        btnMulti.setOnClickListener(v -> ouvrirCalculMulti());
 
         btnStock.setOnClickListener(v -> {
             Intent intent = new Intent(
@@ -51,6 +53,15 @@ public class MenuActivity extends AppCompatActivity {
                 MainActivity.class
         );
         intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, type.getCode());
+        startActivity(intent);
+    }
+
+    private void ouvrirCalculMulti() {
+        Intent intent = new Intent(
+                MenuActivity.this,
+                MainActivity.class
+        );
+        intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, MainActivity.TYPE_MULTI);
         startActivity(intent);
     }
 
