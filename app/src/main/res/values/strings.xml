@@ -21,6 +21,7 @@
     <string name="menu_accueil">Accueil</string>
     <string name="menu_espace_client">Espace Client</string>
     <string name="menu_stock_dechets">Stock Déchets</string>
+    <string name="menu_stock_client">Stock client</string>
     <string name="menu_parametres">Paramètres</string>
 
     <!-- Paramètres -->
@@ -53,6 +54,8 @@
     <string name="rechercher_client">Rechercher un client par nom</string>
     <string name="aucun_client">Aucun client pour l\'instant.</string>
     <string name="utiliser_stock">Utiliser le stock</string>
+    <string name="utiliser_stock_client">Utiliser stock client</string>
+    <string name="utiliser_stock_client_desc">Utiliser les chutes du stock de ce client avant d’acheter</string>
     <string name="utiliser_chutes_desc">Utiliser les chutes disponibles avant d’acheter</string>
     <string name="synthese_calcul">Synthèse du calcul et optimisation</string>
     <string name="enregistrer_pour_client">Enregistrer pour ce client</string>
@@ -105,6 +108,7 @@
     <string name="afficher_detail">Afficher le détail</string>
     <string name="dechets_au_stock">Déchets au stock</string>
     <string name="confirmer_utilisation_stock">Confirmer utilisation du stock</string>
+    <string name="confirmer_utilisation_stock_client">Confirmer utilisation du stock client</string>
     <string name="resumer">Résumer</string>
     <string name="historique_stock">Historique du stock</string>
 

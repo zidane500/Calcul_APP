@@ -38,6 +38,9 @@
             android:name=".StockActivity"
             android:exported="false" />
         <activity
+            android:name=".StockClientsActivity"
+            android:exported="false" />
+        <activity
             android:name=".EspaceClientActivity"
             android:exported="false" />
         <activity

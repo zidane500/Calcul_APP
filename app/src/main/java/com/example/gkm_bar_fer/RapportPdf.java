@@ -52,6 +52,7 @@ public final class RapportPdf {
         public List<Double> coupes = new ArrayList<>();
         public double chute;                           // reste après les coupes
         public boolean depuisStock;
+        public boolean depuisStockClient;              // le morceau vient du stock du client
         public String affectation = "";                // texte "2 coupes de ... pour ..."
     }
 
@@ -61,6 +62,7 @@ public final class RapportPdf {
         public int barresAcheter;
         // barres neuves à acheter
         public String quantiteStock = "";   // détail du stock prélevé (vide = stock non utilisé)
+        public String quantiteStockClient = "";   // idem pour le stock du client
         public List<BarreDetail> barres = new ArrayList<>();
     }
 
@@ -518,10 +520,16 @@ public final class RapportPdf {
                     }
                 }
 
-                List<String> lignesStock = g.quantiteStock.isEmpty()
-                        ? Collections.<String>emptyList()
-                        : couper("Quantité prélevée sur le stock : " + g.quantiteStock,
-                        paintDetail, LARGEUR - 2f * MARGE - 95f - 12f);
+                List<String> lignesStock = new ArrayList<>();
+                if (!g.quantiteStock.isEmpty()) {
+                    lignesStock.addAll(couper("Quantité prélevée sur le stock : " + g.quantiteStock,
+                            paintDetail, LARGEUR - 2f * MARGE - 95f - 12f));
+                }
+                if (!g.quantiteStockClient.isEmpty()) {
+                    lignesStock.addAll(couper(
+                            "Quantité prélevée sur le stock client : " + g.quantiteStockClient,
+                            paintDetail, LARGEUR - 2f * MARGE - 95f - 12f));
+                }
 
                 float hauteur = 48f + 14f * lignesStock.size();
                 assurerEspace(hauteur + 8f);
@@ -556,7 +564,8 @@ public final class RapportPdf {
 
         private String signature(BarreDetail b) {
             StringBuilder sb = new StringBuilder();
-            sb.append(b.depuisStock).append('|').append(fmt(b.longueurTotale));
+            sb.append(b.depuisStock).append('|').append(b.depuisStockClient)
+                    .append('|').append(fmt(b.longueurTotale));
             for (Double c : b.coupes) {
                 sb.append('|').append(fmt(c));
             }
@@ -624,7 +633,8 @@ public final class RapportPdf {
                     canvas.drawText(etiquette, MARGE, y + 8f, paintEtiquette);
 
                     String droite = g.typeFer + " | "
-                            + (l.barre.depuisStock ? "stock " : "")
+                            + (l.barre.depuisStockClient ? "stock client "
+                            : l.barre.depuisStock ? "stock " : "")
                             + fmt(l.barre.longueurTotale) + " m";
                     canvas.drawText(droite, LARGEUR - MARGE - paintDroite.measureText(droite), y + 8f, paintDroite);
 

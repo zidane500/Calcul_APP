@@ -13,6 +13,10 @@
             android:id="@+id/navStockDechets"
             android:icon="@drawable/ic_stock_dechets"
             android:title="@string/menu_stock_dechets" />
+        <item
+            android:id="@+id/navStockClient"
+            android:icon="@drawable/ic_client"
+            android:title="@string/menu_stock_client" />
     </group>
 
     <group android:id="@+id/groupeReglages">

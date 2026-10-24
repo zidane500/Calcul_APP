@@ -3,8 +3,7 @@
     <!-- Textes des résultats du calcul (générés par i18n_etape3.py) -->
     <string name="entete_groupe">%1$s بطول %2$s م (%3$s)</string>
     <string name="erreur_au_moins_une_barre">"يرجى إدخال نوع واحد على الأقل من القضبان بكمية موجبة.\n\n"</string>
-    <string name="ligne_besoin">"  • %1$s : %2$s لكل %3$s ← %4$s في المجموع\n"</string>
-    <string name="titre_optimise_chantier">=== محسّن على مستوى الورشة كاملة ===</string>
+    <string name="ligne_besoin">"  • %1$s : %2$s لكل %3$s = %4$s في المجموع\n"</string>    <string name="titre_optimise_chantier">=== محسّن على مستوى الورشة كاملة ===</string>
     <string name="erreur_remplir_champs">%1$s #%2$d : يرجى ملء عدد %3$s والطول</string>
     <string name="erreur_valeurs_positives">%1$s #%2$d : يجب أن تكون القيم موجبة</string>
     <string name="erreur_nombres_valides">%1$s #%2$d : يرجى إدخال أرقام صحيحة</string>
@@ -14,6 +13,7 @@
     <string name="resume_titre_type">"• %1$s :\n"</string>
     <string name="resume_barres_acheter">"  - قضبان للشراء : %1$d\n"</string>
     <string name="resume_quantite_stock">"  - الكمية المستهلكة من المخزون : %1$s\n"</string>
+    <string name="resume_quantite_stock_client">"  - الكمية المستهلكة من مخزون الحريف : %1$s\n"</string>
     <string name="stock_morceau_longueur">%1$d × %2$s م</string>
     <string name="resume_dechets_aucun">"  - الفضلات : لا شيء"</string>
     <string name="resume_dechets_nombre">"  - الفضلات : %1$s\n"</string>
@@ -25,6 +25,7 @@
     <string name="chute_une">فضلة %1$s م</string>
     <string name="liaison_et">" و"</string>
     <string name="marqueur_stock">" (من المخزون، الفضلة الأصلية %1$s م)"</string>
+    <string name="marqueur_stock_client">" (من مخزون الحريف، الفضلة الأصلية %1$s م)"</string>
     <string name="resume_barre_une">قضيب واحد : %1$s</string>
     <string name="segment_info">" (الجزء %1$s)"</string>
     <string name="coupes_pour_plusieurs">%1$s بطول %2$s م%3$s لأجل %4$s بطول %5$s م</string>
@@ -38,8 +39,15 @@
     <string name="stock_utilisation_confirmee">تم تأكيد استعمال المخزون لـ %1$s.</string>
     <string name="stock_annulation_impossible">تعذّر الإلغاء : ربما تم تعديل المخزون منذ التأكيد، أو فشل الحفظ.</string>
     <string name="stock_utilisation_annulee">تم إلغاء استعمال المخزون لـ %1$s.</string>
+    <string name="stock_client_utilisation_confirmee">تم تأكيد استعمال مخزون الحريف لـ %1$s.</string>
+    <string name="stock_client_utilisation_annulee">تم إلغاء استعمال مخزون الحريف لـ %1$s.</string>
+    <string name="bouton_annuler_stock_client">إلغاء استعمال مخزون الحريف</string>
     <string name="dechets_ajoutes">تمت إضافة فضلات %1$s إلى المخزون.</string>
     <string name="dechets_retires">تم سحب فضلات %1$s من المخزون.</string>
+    <string name="envoyer_stock_client">إرسال إلى مخزون الحريف</string>
+    <string name="btn_retirer_chutes_client">سحب الفضلات من مخزون الحريف</string>
+    <string name="dechets_ajoutes_client">تمت إضافة فضلات %1$s إلى مخزون الحريف.</string>
+    <string name="dechets_retires_client">تم سحب فضلات %1$s من مخزون الحريف.</string>
     <string name="calculer_d_abord">يرجى حساب النتائج أولا.</string>
     <string name="erreur_pdf">خطأ أثناء إنشاء ملف PDF : %1$s</string>
     <string name="erreur_excel">خطأ أثناء إنشاء ملف Excel : %1$s</string>

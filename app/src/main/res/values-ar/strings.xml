@@ -12,6 +12,8 @@
     <string name="rechercher_client">البحث عن حريف بالاسم</string>
     <string name="aucun_client">لا يوجد حرفاء حاليا.</string>
     <string name="utiliser_stock">استعمال المخزون</string>
+    <string name="utiliser_stock_client">استعمال مخزون الحريف</string>
+    <string name="utiliser_stock_client_desc">استعمال فضلات مخزون هذا الحريف قبل الشراء</string>
     <string name="utiliser_chutes_desc">استعمال الفضلات المتوفرة قبل الشراء</string>
     <string name="synthese_calcul">ملخص الحساب والتحسين</string>
     <string name="enregistrer_pour_client">حفظ لهذا الحريف</string>
@@ -64,6 +66,7 @@
     <string name="afficher_detail">عرض التفاصيل</string>
     <string name="dechets_au_stock">الفضلات إلى المخزون</string>
     <string name="confirmer_utilisation_stock">تأكيد استعمال المخزون</string>
+    <string name="confirmer_utilisation_stock_client">تأكيد استعمال مخزون الحريف</string>
     <string name="resumer">تلخيص</string>
     <string name="historique_stock">سجل المخزون</string>
     <string name="infos_poteaux">معلومات الأعمدة</string>

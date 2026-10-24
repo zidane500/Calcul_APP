@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,22 +37,47 @@ public class StockManager {
 
     private static StockManager instance;
 
+    // Stocks des clients : un StockManager indépendant par client (idClient -> gestionnaire)
+    private static final String PREFIXE_PREFS_CLIENT = "stock_client_";
+    private static final Map<String, StockManager> instancesClients = new HashMap<>();
+
     private final SharedPreferences preferences;
     private final Map<String, List<MorceauFer>> stock;
     private final List<MouvementStock> historique;
 
-    private StockManager(Context context) {
+    private StockManager(Context context, String nomPrefs) {
         preferences = context.getApplicationContext()
-                .getSharedPreferences(PREFS_NOM, Context.MODE_PRIVATE);
+                .getSharedPreferences(nomPrefs, Context.MODE_PRIVATE);
         stock = chargerDepuisPreferences();
         historique = chargerHistorique();
     }
 
+    /** Stock global (inchangé). */
     public static synchronized StockManager getInstance(Context context) {
         if (instance == null) {
-            instance = new StockManager(context);
+            instance = new StockManager(context, PREFS_NOM);
         }
         return instance;
+    }
+
+    /** Stock propre à un client : séparé du stock global, avec son propre historique. */
+    public static synchronized StockManager getInstanceClient(Context context, String idClient) {
+        StockManager gestionnaire = instancesClients.get(idClient);
+        if (gestionnaire == null) {
+            gestionnaire = new StockManager(context, PREFIXE_PREFS_CLIENT + idClient);
+            instancesClients.put(idClient, gestionnaire);
+        }
+        return gestionnaire;
+    }
+
+    /** Supprime définitivement le stock (et l'historique) d'un client supprimé. */
+    public static synchronized void supprimerStockClient(Context context, String idClient) {
+        instancesClients.remove(idClient);
+        context.getApplicationContext()
+                .getSharedPreferences(PREFIXE_PREFS_CLIENT + idClient, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .commit();
     }
 
     /** Retourne le stock actuel : type de fer -> liste de morceaux (longueur + quantité). */

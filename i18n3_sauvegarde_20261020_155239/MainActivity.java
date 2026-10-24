@@ -759,7 +759,7 @@ public class MainActivity extends AppCompatActivity {
                 int totalCoupesNecessaires = nombreParPoteau * nombrePoteaux;
 
                 detailPoteaux.append("  • ").append(typeBarre).append(": ")
-                        .append(nombreParPoteau).append(" coupes/").append(typeElement.getSingulier()).append(" → ")
+                        .append(nombreParPoteau).append(" coupes/").append(typeElement.getSingulier()).append(" -> ")
                         .append(totalCoupesNecessaires).append(" coupes au total\n");
 
                 // Ajouter ces coupes à la liste globale du type de barre (partagée entre TOUS les poteaux)

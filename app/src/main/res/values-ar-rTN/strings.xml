@@ -5,6 +5,7 @@
     <string name="menu_accueil">الرئيسية</string>
     <string name="menu_espace_client">فضاء الحرفاء</string>
     <string name="menu_stock_dechets">مخزون الفضلات</string>
+    <string name="menu_stock_client">مخزون الحرفاء</string>
     <string name="menu_parametres">الإعدادات</string>
 
     <string name="parametres_titre">الإعدادات</string>

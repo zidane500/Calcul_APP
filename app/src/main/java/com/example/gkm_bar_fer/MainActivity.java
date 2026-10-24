@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     private Button btnAjouterPoteau;
     private Button btnCalculer;
     private MaterialSwitch switchUtiliserStock;
+    private MaterialSwitch switchUtiliserStockClient;
+    private View cardUtiliserStockClient;
     private CardView cardResultats;
     private TextView tvResultats;
 
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnEnregistrerClient;
     private JSONArray dernieresEntrees = null;
     private boolean dernierUtiliseStock = false;
+    private boolean dernierUtiliseStockClient = false;
     // Représente un "type de poteau" : ses infos (nombre/longueur) + les barres qui lui sont associées.
     private static class GroupePoteau {
         View rootView;
@@ -129,6 +132,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Longueur du morceau en stock avant les coupes.
         double longueurOrigineStock;
+
+        // Le morceau vient du stock du client (estDuStock reste alors à true).
+        boolean estDuStockClient;
 
         BarreUtilisee(double resteDisponible) {
             this.resteDisponible = resteDisponible;
@@ -411,6 +417,11 @@ public class MainActivity extends AppCompatActivity {
         boolean stockConfirme = false;
         boolean dechetsEnvoyes = false;
 
+        // Même mécanisme que le stock global, mais pour le stock du client.
+        String operationStockClientId = UUID.randomUUID().toString();
+        boolean stockClientConfirme = false;
+        boolean dechetsClientEnvoyes = false;
+
         ResultatCalcul(int barresNecessaires, List<Double> listeDechets, boolean utilisationOptimisee,
                        List<BarreUtilisee> detailBarres) {
             this.barresNecessaires = barresNecessaires;
@@ -464,6 +475,8 @@ public class MainActivity extends AppCompatActivity {
         btnExporterPdf = findViewById(R.id.btnExporterPdf);
         btnExporterExcel = findViewById(R.id.btnExporterExcel);
         btnEnregistrerClient = findViewById(R.id.btnEnregistrerClient);
+        switchUtiliserStockClient = findViewById(R.id.switchUtiliserStockClient);
+        cardUtiliserStockClient = findViewById(R.id.cardUtiliserStockClient);
 
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
@@ -532,6 +545,8 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 } else if (id == R.id.navStockDechets) {
                     startActivity(new Intent(MainActivity.this, StockActivity.class));
+                } else if (id == R.id.navStockClient) {
+                    startActivity(new Intent(MainActivity.this, StockClientsActivity.class));
                 } else if (id == R.id.navEspaceClient) {
                     startActivity(new Intent(MainActivity.this, EspaceClientActivity.class));
                 } else if (id == R.id.navParametres) {
@@ -742,6 +757,7 @@ public class MainActivity extends AppCompatActivity {
             dernieresEntrees = null;
         }
         dernierUtiliseStock = switchUtiliserStock.isChecked();
+        dernierUtiliseStockClient = clientId != null && switchUtiliserStockClient.isChecked();
 
         // 2) Parcourir tous les groupes pour :
         //    a) afficher le détail des besoins par poteau
@@ -832,10 +848,19 @@ public class MainActivity extends AppCompatActivity {
         layoutResultatsBarres.removeAllViews();
         for (Map.Entry<String, List<CoupeRequise>> entry : coupesParTypeBarre.entrySet()) {
             String typeBarre = entry.getKey();
-            List<MorceauFer> morceauxDisponibles =
-                    switchUtiliserStock.isChecked()
-                            ? StockManager.getInstance(this).obtenirMorceaux(typeBarre)
-                            : new ArrayList<>();
+            // Morceaux disponibles : stock global et/ou stock du client, selon les toggles.
+            List<MorceauFer> morceauxDisponibles = new ArrayList<>();
+            if (switchUtiliserStock.isChecked()) {
+                morceauxDisponibles.addAll(
+                        StockManager.getInstance(this).obtenirMorceaux(typeBarre));
+            }
+            if (dernierUtiliseStockClient) {
+                for (MorceauFer morceau : StockManager.getInstanceClient(this, clientId)
+                        .obtenirMorceaux(typeBarre)) {
+                    morceau.duClient = true;
+                    morceauxDisponibles.add(morceau);
+                }
+            }
 
             ResultatCalcul resultat = calculerBarresNecessaires(
                     entry.getValue(),
@@ -846,6 +871,117 @@ public class MainActivity extends AppCompatActivity {
         }
 
         cardResultats.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Bouton « Confirmer utilisation du stock client » : même fonctionnement que celui du stock
+     * global, mais il agit sur le stock du client et ne concerne que les morceaux qui en viennent.
+     */
+    private void configurerConfirmationStockClient(final Button bouton,
+                                                   final String typeBarre,
+                                                   final ResultatCalcul resultat) {
+        final List<BarreUtilisee> barresClient = new ArrayList<>();
+        for (BarreUtilisee barre : resultat.detailBarres) {
+            if (barre.estDuStock && barre.estDuStockClient && !barre.coupes.isEmpty()) {
+                barresClient.add(barre);
+            }
+        }
+
+        if (clientId == null || barresClient.isEmpty()) {
+            bouton.setVisibility(View.GONE);
+            return;
+        }
+
+        bouton.setVisibility(View.VISIBLE);
+        bouton.setEnabled(true);
+        actualiserBoutonStockClient(bouton, resultat.stockClientConfirme);
+
+        bouton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StockManager manager =
+                        StockManager.getInstanceClient(MainActivity.this, clientId);
+
+                if (!resultat.stockClientConfirme) {
+                    List<Double> origines = new ArrayList<>();
+                    List<Double> restes = new ArrayList<>();
+
+                    for (BarreUtilisee barre : barresClient) {
+                        origines.add(barre.longueurOrigineStock);
+
+                        if (barre.resteDisponible > 1e-9) {
+                            restes.add(barre.resteDisponible);
+                        }
+                    }
+
+                    boolean succes = manager.confirmerUtilisationStock(
+                            resultat.operationStockClientId,
+                            typeBarre,
+                            origines,
+                            restes,
+                            nomClient
+                    );
+
+                    if (!succes) {
+                        Toast.makeText(
+                                MainActivity.this,
+                                MainActivity.this.getString(R.string.stock_confirmation_impossible),
+                                Toast.LENGTH_LONG
+                        ).show();
+                        return;
+                    }
+
+                    resultat.stockClientConfirme = true;
+
+                    Toast.makeText(
+                            MainActivity.this,
+                            MainActivity.this.getString(
+                                    R.string.stock_client_utilisation_confirmee, typeBarre),
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                } else {
+                    boolean succes = manager.annulerUtilisationStock(
+                            resultat.operationStockClientId
+                    );
+
+                    if (!succes) {
+                        Toast.makeText(
+                                MainActivity.this,
+                                MainActivity.this.getString(R.string.stock_annulation_impossible),
+                                Toast.LENGTH_LONG
+                        ).show();
+                        return;
+                    }
+
+                    resultat.stockClientConfirme = false;
+
+                    // L'ancienne opération reste enregistrée comme annulée :
+                    // une nouvelle confirmation utilisera un nouvel identifiant.
+                    resultat.operationStockClientId = UUID.randomUUID().toString();
+
+                    Toast.makeText(
+                            MainActivity.this,
+                            MainActivity.this.getString(
+                                    R.string.stock_client_utilisation_annulee, typeBarre),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+
+                actualiserBoutonStockClient(bouton, resultat.stockClientConfirme);
+            }
+        });
+    }
+
+    private void actualiserBoutonStockClient(Button bouton, boolean confirme) {
+        bouton.setText(confirme
+                ? R.string.bouton_annuler_stock_client
+                : R.string.confirmer_utilisation_stock_client);
+
+        bouton.setTextColor(ContextCompat.getColor(this, R.color.white));
+
+        bouton.setBackgroundTintList(ColorStateList.valueOf(
+                ContextCompat.getColor(this, confirme ? R.color.error : R.color.primary)));
     }
 
     private void actualiserBoutonStock(Button bouton, boolean confirme) {
@@ -891,6 +1027,8 @@ public class MainActivity extends AppCompatActivity {
         Button btnDechetsAuStock = itemView.findViewById(R.id.btnDechetsAuStock);
         Button btnConfirmerStock =
                 itemView.findViewById(R.id.btnConfirmerStock);
+        final Button btnEnvoyerStockClient =
+                itemView.findViewById(R.id.btnEnvoyerStockClient);
         TextView tvResumeBarresDetail = itemView.findViewById(R.id.tvResumeBarresDetail);
 
         StringBuilder resume = new StringBuilder();
@@ -901,6 +1039,12 @@ public class MainActivity extends AppCompatActivity {
         if (dernierUtiliseStock) {
             resume.append(getString(R.string.resume_quantite_stock,
                     formatterQuantiteStock(resultat, this)));
+        }
+
+        // Stock client activé : quantité prélevée sur le stock du client
+        if (dernierUtiliseStockClient) {
+            resume.append(getString(R.string.resume_quantite_stock_client,
+                    formatterQuantiteStock(resultat, this, true)));
         }
 
         if (resultat.listeDechets.isEmpty()) {
@@ -939,7 +1083,7 @@ public class MainActivity extends AppCompatActivity {
         final List<BarreUtilisee> barresStockUtilisees = new ArrayList<>();
 
         for (BarreUtilisee barre : resultat.detailBarres) {
-            if (barre.estDuStock && !barre.coupes.isEmpty()) {
+            if (barre.estDuStock && !barre.estDuStockClient && !barre.coupes.isEmpty()) {
                 barresStockUtilisees.add(barre);
             }
         }
@@ -1028,6 +1172,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        configurerConfirmationStockClient(
+                (Button) itemView.findViewById(R.id.btnConfirmerStockClient),
+                typeBarre,
+                resultat
+        );
+
         btnAfficherDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1082,6 +1232,7 @@ public class MainActivity extends AppCompatActivity {
                     resultat.dechetsEnvoyes = true;
                     Toast.makeText(MainActivity.this,
                             MainActivity.this.getString(R.string.dechets_ajoutes, typeBarre), Toast.LENGTH_SHORT).show();
+                    actualiserExclusionEnvois(btnDechetsAuStock, btnEnvoyerStockClient, resultat);
                 } else {
                     StockManager.getInstance(MainActivity.this)
                             .retirerDechets(typeBarre, dechetsBarresNeuves, nomClient);
@@ -1091,11 +1242,82 @@ public class MainActivity extends AppCompatActivity {
                     resultat.dechetsEnvoyes = false;
                     Toast.makeText(MainActivity.this,
                             MainActivity.this.getString(R.string.dechets_retires, typeBarre), Toast.LENGTH_SHORT).show();
+                    actualiserExclusionEnvois(btnDechetsAuStock, btnEnvoyerStockClient, resultat);
                 }
             }
         });
 
+        configurerEnvoiStockClient(
+                btnEnvoyerStockClient,
+                btnDechetsAuStock,
+                typeBarre,
+                resultat,
+                dechetsBarresNeuves
+        );
+
         layoutResultatsBarres.addView(itemView);
+    }
+
+    /**
+     * Bouton « Envoyer stock client » : envoie les chutes des barres neuves dans le stock du
+     * client (au lieu du stock global). Même fonctionnement que « Déchets au stock ».
+     */
+    private void configurerEnvoiStockClient(final Button bouton,
+                                            final Button boutonGlobal,
+                                            final String typeBarre,
+                                            final ResultatCalcul resultat,
+                                            final List<Double> dechetsBarresNeuves) {
+        if (clientId == null || dechetsBarresNeuves.isEmpty()) {
+            bouton.setVisibility(View.GONE);
+            return;
+        }
+
+        bouton.setVisibility(View.VISIBLE);
+        actualiserBoutonEnvoiStockClient(bouton, resultat.dechetsClientEnvoyes);
+        actualiserExclusionEnvois(boutonGlobal, bouton, resultat);
+
+        bouton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StockManager manager =
+                        StockManager.getInstanceClient(MainActivity.this, clientId);
+
+                if (!resultat.dechetsClientEnvoyes) {
+                    manager.ajouterDechets(typeBarre, dechetsBarresNeuves, nomClient);
+                    resultat.dechetsClientEnvoyes = true;
+                    Toast.makeText(MainActivity.this,
+                            MainActivity.this.getString(R.string.dechets_ajoutes_client, typeBarre),
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    manager.retirerDechets(typeBarre, dechetsBarresNeuves, nomClient);
+                    resultat.dechetsClientEnvoyes = false;
+                    Toast.makeText(MainActivity.this,
+                            MainActivity.this.getString(R.string.dechets_retires_client, typeBarre),
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                actualiserBoutonEnvoiStockClient(bouton, resultat.dechetsClientEnvoyes);
+                actualiserExclusionEnvois(boutonGlobal, bouton, resultat);
+            }
+        });
+    }
+
+    private void actualiserBoutonEnvoiStockClient(Button bouton, boolean envoye) {
+        bouton.setText(envoye
+                ? R.string.btn_retirer_chutes_client
+                : R.string.envoyer_stock_client);
+        bouton.setBackgroundTintList(ColorStateList.valueOf(
+                ContextCompat.getColor(this, envoye ? R.color.error : R.color.success)));
+    }
+
+    /**
+     * Une même chute ne peut pas être dans deux stocks à la fois : tant que les chutes sont
+     * envoyées à l'un, le bouton de l'autre est désactivé (il se réactive après le retrait).
+     */
+    private void actualiserExclusionEnvois(Button boutonGlobal, Button boutonClient,
+                                           ResultatCalcul resultat) {
+        boutonGlobal.setEnabled(!resultat.dechetsClientEnvoyes);
+        boutonClient.setEnabled(!resultat.dechetsEnvoyes);
     }
 
     /**
@@ -1205,10 +1427,14 @@ public class MainActivity extends AppCompatActivity {
             if (dernierUtiliseStock) {
                 groupe.quantiteStock = formatterQuantiteStock(resultat, fr);
             }
+            if (dernierUtiliseStockClient) {
+                groupe.quantiteStockClient = formatterQuantiteStock(resultat, fr, true);
+            }
 
             for (BarreUtilisee barre : resultat.detailBarres) {
                 RapportPdf.BarreDetail detail = new RapportPdf.BarreDetail();
                 detail.depuisStock = barre.estDuStock;
+                detail.depuisStockClient = barre.estDuStockClient;
                 detail.longueurTotale = barre.estDuStock
                         ? barre.longueurOrigineStock
                         : LONGUEUR_BARRE_STANDARD;
@@ -1278,6 +1504,11 @@ public class MainActivity extends AppCompatActivity {
                 classeur.ajouterLigne(feuille, Arrays.asList(
                         GenerateurXlsx.Cellule.texte("Quantité prélevée sur le stock", true),
                         GenerateurXlsx.Cellule.texte(formatterQuantiteStock(resultat, fr), false)));
+            }
+            if (dernierUtiliseStockClient) {
+                classeur.ajouterLigne(feuille, Arrays.asList(
+                        GenerateurXlsx.Cellule.texte("Quantité prélevée sur le stock client", true),
+                        GenerateurXlsx.Cellule.texte(formatterQuantiteStock(resultat, fr, true), false)));
             }
             classeur.ajouterLigne(feuille, Arrays.asList(
                     GenerateurXlsx.Cellule.texte("Optimisé", true),
@@ -1398,11 +1629,16 @@ public class MainActivity extends AppCompatActivity {
      * ex : "3 morceaux (2 × 5,00 m + 1 × 3,20 m)" ; "0 morceau" si rien n'a été prélevé.
      */
     private String formatterQuantiteStock(ResultatCalcul resultat, Context ctx) {
+        return formatterQuantiteStock(resultat, ctx, false);
+    }
+
+    /** client = false : quantité prélevée sur le stock global ; true : sur le stock du client. */
+    private String formatterQuantiteStock(ResultatCalcul resultat, Context ctx, boolean client) {
         TreeMap<Long, Integer> parLongueur = new TreeMap<>(Collections.reverseOrder()); // cm -> nombre
         int total = 0;
 
         for (BarreUtilisee barre : resultat.detailBarres) {
-            if (barre.estDuStock && !barre.coupes.isEmpty()) {
+            if (barre.estDuStock && barre.estDuStockClient == client && !barre.coupes.isEmpty()) {
                 total++;
                 long cm = Math.round(barre.longueurOrigineStock * 100.0);
                 Integer n = parLongueur.get(cm);
@@ -1430,7 +1666,8 @@ public class MainActivity extends AppCompatActivity {
             return "";
         }
 
-        return ctx.getString(R.string.marqueur_stock,
+        return ctx.getString(
+                barre.estDuStockClient ? R.string.marqueur_stock_client : R.string.marqueur_stock,
                 String.format(Locale.FRANCE, "%.2f", barre.longueurOrigineStock));
     }
 
@@ -1506,10 +1743,12 @@ public class MainActivity extends AppCompatActivity {
                     && !Double.isNaN(morceau.longueur)
                     && !Double.isInfinite(morceau.longueur)) {
 
-                stockDisponible.add(new MorceauFer(
+                MorceauFer copie = new MorceauFer(
                         morceau.longueur,
                         morceau.quantite
-                ));
+                );
+                copie.duClient = morceau.duClient;
+                stockDisponible.add(copie);
             }
         }
 
@@ -1575,10 +1814,14 @@ public class MainActivity extends AppCompatActivity {
             MorceauFer meilleurMorceau = null;
 
             for (MorceauFer morceau : stockDisponible) {
+                // Plus petit morceau qui convient, tous stocks confondus.
+                // À longueur égale, on consomme d'abord le stock du client.
                 if (morceau.quantite > 0
                         && morceau.longueur + epsilon >= coupe.longueur
                         && (meilleurMorceau == null
-                        || morceau.longueur < meilleurMorceau.longueur)) {
+                        || morceau.longueur < meilleurMorceau.longueur - epsilon
+                        || (Math.abs(morceau.longueur - meilleurMorceau.longueur) <= epsilon
+                        && morceau.duClient && !meilleurMorceau.duClient))) {
                     meilleurMorceau = morceau;
                 }
             }
@@ -1593,6 +1836,7 @@ public class MainActivity extends AppCompatActivity {
 
                 barreChoisie = new BarreUtilisee(meilleurMorceau.longueur);
                 barreChoisie.estDuStock = true;
+                barreChoisie.estDuStockClient = meilleurMorceau.duClient;
                 barreChoisie.longueurOrigineStock = meilleurMorceau.longueur;
 
                 meilleurMorceau.quantite--;
@@ -1699,6 +1943,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         nomClient = client.getNom();
+
+        // Le toggle « Utiliser stock client » n'existe que dans l'espace d'un client.
+        cardUtiliserStockClient.setVisibility(View.VISIBLE);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(titreCalculClient(client.getNom()));
@@ -1827,6 +2074,9 @@ public class MainActivity extends AppCompatActivity {
         jr.put("operationStockId", resultat.operationStockId);
         jr.put("stockConfirme", resultat.stockConfirme);
         jr.put("dechetsEnvoyes", resultat.dechetsEnvoyes);
+        jr.put("operationStockClientId", resultat.operationStockClientId);
+        jr.put("stockClientConfirme", resultat.stockClientConfirme);
+        jr.put("dechetsClientEnvoyes", resultat.dechetsClientEnvoyes);
 
         JSONArray dechets = new JSONArray();
         for (Double dechet : resultat.listeDechets) {
@@ -1840,6 +2090,7 @@ public class MainActivity extends AppCompatActivity {
             jb.put("resteDisponible", barre.resteDisponible);
             jb.put("estDuStock", barre.estDuStock);
             jb.put("longueurOrigineStock", barre.longueurOrigineStock);
+            jb.put("estDuStockClient", barre.estDuStockClient);
 
             JSONArray coupes = new JSONArray();
             for (CoupeRequise coupe : barre.coupes) {
@@ -1867,6 +2118,7 @@ public class MainActivity extends AppCompatActivity {
         racine.put("typeElement", typeElement.getCode());
         racine.put("multi", modeMulti);
         racine.put("utiliserStock", dernierUtiliseStock);
+        racine.put("utiliserStockClient", dernierUtiliseStockClient);
         racine.put("entrees", dernieresEntrees);
         racine.put("texteResultats", tvResultats.getText().toString());
         racine.put("resumePoteaux", dernierResumePoteaux);
@@ -1921,6 +2173,7 @@ public class MainActivity extends AppCompatActivity {
             }
             restaurerEntrees(racine.optJSONArray("entrees"));
             switchUtiliserStock.setChecked(racine.optBoolean("utiliserStock", false));
+            switchUtiliserStockClient.setChecked(racine.optBoolean("utiliserStockClient", false));
             restaurerResultats(racine);
             nomCalculCharge = calcul.getNom();
         } catch (JSONException e) {
@@ -1971,6 +2224,7 @@ public class MainActivity extends AppCompatActivity {
     private void restaurerResultats(JSONObject racine) throws JSONException {
         dernieresEntrees = racine.optJSONArray("entrees");
         dernierUtiliseStock = racine.optBoolean("utiliserStock", false);
+        dernierUtiliseStockClient = racine.optBoolean("utiliserStockClient", false);
         dernierResumePoteaux = racine.optString("resumePoteaux", "");
 
         derniersGroupesPoteaux = new ArrayList<>();
@@ -2023,6 +2277,7 @@ public class MainActivity extends AppCompatActivity {
                 BarreUtilisee barre = new BarreUtilisee(jb.optDouble("resteDisponible", 0.0));
                 barre.estDuStock = jb.optBoolean("estDuStock", false);
                 barre.longueurOrigineStock = jb.optDouble("longueurOrigineStock", 0.0);
+                barre.estDuStockClient = jb.optBoolean("estDuStockClient", false);
 
                 JSONArray jcs = jb.optJSONArray("coupes");
                 if (jcs != null) {
@@ -2055,6 +2310,10 @@ public class MainActivity extends AppCompatActivity {
         resultat.operationStockId =
                 jr.optString("operationStockId", UUID.randomUUID().toString());
         resultat.stockConfirme = jr.optBoolean("stockConfirme", false);
+        resultat.operationStockClientId =
+                jr.optString("operationStockClientId", UUID.randomUUID().toString());
+        resultat.stockClientConfirme = jr.optBoolean("stockClientConfirme", false);
+        resultat.dechetsClientEnvoyes = jr.optBoolean("dechetsClientEnvoyes", false);
         resultat.dechetsEnvoyes = jr.optBoolean("dechetsEnvoyes", false);
 
         return resultat;

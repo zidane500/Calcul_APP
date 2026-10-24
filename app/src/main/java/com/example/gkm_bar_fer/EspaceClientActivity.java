@@ -135,6 +135,15 @@ public class EspaceClientActivity extends AppCompatActivity {
                 return true;
             }
 
+            if (id == R.id.navStockClient) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                startActivity(new Intent(
+                        EspaceClientActivity.this,
+                        StockClientsActivity.class
+                ));
+                return true;
+            }
+
             if (id == R.id.navEspaceClient) {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
@@ -242,11 +251,13 @@ public class EspaceClientActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Supprimer le client")
                 .setMessage("Voulez-vous vraiment supprimer " + client.getNom()
-                        + " et tous ses calculs enregistrés ? Cette action est définitive.")
+                        + ", tous ses calculs enregistrés et son stock ? Cette action est définitive.")
                 .setNegativeButton("Annuler", null)
                 .setPositiveButton("Supprimer", (dialog, which) -> {
                     CalculManager.getInstance(EspaceClientActivity.this)
                             .supprimerTousDuClient(client.getId());
+                    StockManager.supprimerStockClient(
+                            EspaceClientActivity.this, client.getId());
                     clientManager.supprimer(client.getId());
                     Toast.makeText(
                             EspaceClientActivity.this,

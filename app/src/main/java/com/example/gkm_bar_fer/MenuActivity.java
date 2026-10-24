@@ -108,6 +108,12 @@ public class MenuActivity extends AppCompatActivity {
                 return true;
             }
 
+            if (id == R.id.navStockClient) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                startActivity(new Intent(MenuActivity.this, StockClientsActivity.class));
+                return true;
+            }
+
             if (id == R.id.navEspaceClient) {
                 drawerLayout.closeDrawer(GravityCompat.START);
 

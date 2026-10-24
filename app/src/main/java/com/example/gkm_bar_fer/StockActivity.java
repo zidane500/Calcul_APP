@@ -46,6 +46,10 @@ public class StockActivity extends AppCompatActivity {
     private LinearLayout layoutStock;
     private TextView tvStockVide;
     private StockManager stockManager;
+    // Mode stock client : renseigné quand l'écran est ouvert depuis la liste « Stock client »
+    public static final String EXTRA_CLIENT_ID = "client_id";
+    private String clientId = null;
+    private String nomClientStock = null;
     private String typeFerSelectionne;
 
     // Filtre par type de fer (null = tous les types)
@@ -58,6 +62,16 @@ public class StockActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock);
 
+        clientId = getIntent().getStringExtra(EXTRA_CLIENT_ID);
+        if (clientId != null) {
+            Client client = ClientManager.getInstance(this).trouverParId(clientId);
+            if (client == null) {
+                finish();
+                return;
+            }
+            nomClientStock = client.getNom();
+        }
+
         configurerMenuNavigation();
 
         layoutStock = findViewById(R.id.layoutStock);
@@ -66,7 +80,9 @@ public class StockActivity extends AppCompatActivity {
         chipGroupFiltre = findViewById(R.id.chipGroupFiltre);
         Button btnAjouterFer = findViewById(R.id.btnAjouterFer);
 
-        stockManager = StockManager.getInstance(this);
+        stockManager = (clientId == null)
+                ? StockManager.getInstance(this)
+                : StockManager.getInstanceClient(this, clientId);
 
         Button btnRetirerFer = findViewById(R.id.btnRetirerFer);
         btnRetirerFer.setOnClickListener(new View.OnClickListener() {
@@ -112,7 +128,8 @@ public class StockActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Stock Déchets");
+            getSupportActionBar().setTitle(
+                    clientId == null ? "Stock Déchets" : "Stock - " + nomClientStock);
         }
 
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(
@@ -130,7 +147,8 @@ public class StockActivity extends AppCompatActivity {
         );
 
         drawerToggle.syncState();
-        navigationView.setCheckedItem(R.id.navStockDechets);
+        navigationView.setCheckedItem(
+                clientId == null ? R.id.navStockDechets : R.id.navStockClient);
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -155,6 +173,23 @@ public class StockActivity extends AppCompatActivity {
 
             if (id == R.id.navStockDechets) {
                 drawerLayout.closeDrawer(GravityCompat.START);
+                if (clientId != null) {
+                    // On quitte le stock d'un client pour le stock global
+                    startActivity(new Intent(StockActivity.this, StockActivity.class));
+                    finish();
+                }
+                return true;
+            }
+
+            if (id == R.id.navStockClient) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                if (clientId != null) {
+                    // Retour à la liste des clients
+                    finish();
+                } else {
+                    startActivity(new Intent(StockActivity.this, StockClientsActivity.class));
+                    finish();
+                }
                 return true;
             }
 
@@ -695,7 +730,7 @@ public class StockActivity extends AppCompatActivity {
                     libelle = m.motif;   // ex : « Reste remis en stock »
                 }
 
-                tvLibelle.setText((ajout ? "+ " : "− ") + libelle);
+                tvLibelle.setText((ajout ? "+ " : "- ") + libelle);
                 tvValeur.setText(String.format(Locale.FRANCE, "%.2f m × %d", m.longueur, m.quantite));
 
                 int couleur = ContextCompat.getColor(this, ajout ? R.color.success : R.color.error);
