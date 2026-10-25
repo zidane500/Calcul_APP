@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialSwitch switchUtiliserStockClient;
     private View cardUtiliserStockClient;
     private CardView cardResultats;
+    private ScrollView scrollPrincipal;
     private TextView tvResultats;
 
     private static final double LONGUEUR_BARRE_STANDARD = ConfigurationBarres.LONGUEUR_BARRE_STANDARD;
@@ -470,6 +471,7 @@ public class MainActivity extends AppCompatActivity {
         btnCalculer = findViewById(R.id.btnCalculer);
         switchUtiliserStock = findViewById(R.id.switchUtiliserStock);
         cardResultats = findViewById(R.id.cardResultats);
+        scrollPrincipal = findViewById(R.id.scrollPrincipal);
         tvResultats = findViewById(R.id.tvResultats);
         layoutResultatsBarres = findViewById(R.id.layoutResultatsBarres);
         btnExporterPdf = findViewById(R.id.btnExporterPdf);
@@ -499,7 +501,9 @@ public class MainActivity extends AppCompatActivity {
         btnCalculer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fermerClavier();
                 calculerBarres();
+                defilerVersResultats();
             }
         });
         btnExporterPdf.setOnClickListener(new View.OnClickListener() {
@@ -741,6 +745,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Ferme le clavier s'il est ouvert, pour que les résultats ne soient pas cachés derrière. */
+    private void fermerClavier() {
+        View focus = getCurrentFocus();
+        if (focus != null) {
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
+            }
+            focus.clearFocus();
+        }
+    }
+
+    /**
+     * Fait défiler l'écran jusqu'à la carte « Résultats » après un clic sur « Calculer »
+     * (y compris quand elle affiche un message d'erreur de saisie).
+     */
+    private void defilerVersResultats() {
+        // Petit délai : laisse les résultats se dessiner pour que la position soit exacte.
+        cardResultats.postDelayed(() -> {
+            if (!cardResultats.isAttachedToWindow()
+                    || cardResultats.getVisibility() != View.VISIBLE) {
+                return;
+            }
+
+            Rect zone = new Rect(0, 0, cardResultats.getWidth(), cardResultats.getHeight());
+            scrollPrincipal.offsetDescendantRectToMyCoords(cardResultats, zone);
+
+            int marge = (int) (8 * getResources().getDisplayMetrics().density);
+            scrollPrincipal.smoothScrollTo(0, Math.max(0, zone.top - marge));
+        }, 150);
+    }
+
 
     private void calculerBarres() {
         // 1) Valider tous les groupes avant de calculer quoi que ce soit
@@ -838,8 +875,7 @@ public class MainActivity extends AppCompatActivity {
         //    demandées par TOUS les poteaux de ce type (réutilisation des chutes entre poteaux différents).
         // 3) Un seul calcul d'optimisation par type de barre, sur l'ensemble des coupes
         //    demandées par TOUS les poteaux de ce type (réutilisation des chutes entre poteaux différents).
-        tvResultats.setText(detailPoteaux.toString()
-                + getString(R.string.titre_optimise_chantier));
+        tvResultats.setText(detailPoteaux.toString().trim());
 
         dernierResumePoteaux = detailPoteaux.toString().trim();
         derniersResultatsBarres.clear();
@@ -1073,9 +1109,7 @@ public class MainActivity extends AppCompatActivity {
             resume.append(TextUtils.join("\n", lignesDechets));
             resume.append("\n");
         }
-        resume.append(getString(R.string.resume_optimise,
-                getString(resultat.utilisationOptimisee ? R.string.oui : R.string.non)));
-        tvResumeBarre.setText(resume.toString());
+        tvResumeBarre.setText(resume.toString().trim());
 
 
         tvResumeBarresDetail.setText(formatterResumeBarres(resultat.detailBarres, this));
@@ -2505,11 +2539,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (texte.length() > 0) {
-            texte.append("\n");
-        }
-        texte.append(getString(R.string.titre_optimise_chantier));
-        return texte.toString();
+        return texte.toString().trim();
     }
 
     private int getValeur(TextInputEditText editText) {

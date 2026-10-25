@@ -3,7 +3,7 @@
     <!-- Textes des résultats du calcul (générés par i18n_etape3.py) -->
     <string name="entete_groupe">%1$s بطول %2$s م (%3$s)</string>
     <string name="erreur_au_moins_une_barre">"يرجى إدخال نوع واحد على الأقل من القضبان بكمية موجبة.\n\n"</string>
-    <string name="ligne_besoin">"  • %1$s : %2$s لكل %3$s = %4$s في المجموع\n"</string>    <string name="titre_optimise_chantier">=== محسّن على مستوى الورشة كاملة ===</string>
+    <string name="ligne_besoin">"  • %1$s&#8207; : %2$s لكل %3$s = %4$s في المجموع\n"</string>   <string name="titre_optimise_chantier">=== محسّن على مستوى الورشة كاملة ===</string>
     <string name="erreur_remplir_champs">%1$s #%2$d : يرجى ملء عدد %3$s والطول</string>
     <string name="erreur_valeurs_positives">%1$s #%2$d : يجب أن تكون القيم موجبة</string>
     <string name="erreur_nombres_valides">%1$s #%2$d : يرجى إدخال أرقام صحيحة</string>
