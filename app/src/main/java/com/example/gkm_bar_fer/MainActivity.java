@@ -763,15 +763,19 @@ public class MainActivity extends AppCompatActivity {
      * (y compris quand elle affiche un message d'erreur de saisie).
      */
     private void defilerVersResultats() {
-        // Petit délai : laisse les résultats se dessiner pour que la position soit exacte.
-        cardResultats.postDelayed(() -> {
-            if (!cardResultats.isAttachedToWindow()
-                    || cardResultats.getVisibility() != View.VISIBLE) {
+        defilerVers(cardResultats);
+    }
+
+    /** Fait défiler l'écran en douceur pour amener le haut de la vue indiquée en haut de l'écran. */
+    private void defilerVers(final View cible) {
+        // Petit délai : laisse la vue se dessiner pour que la position soit exacte.
+        cible.postDelayed(() -> {
+            if (!cible.isAttachedToWindow() || cible.getVisibility() != View.VISIBLE) {
                 return;
             }
 
-            Rect zone = new Rect(0, 0, cardResultats.getWidth(), cardResultats.getHeight());
-            scrollPrincipal.offsetDescendantRectToMyCoords(cardResultats, zone);
+            Rect zone = new Rect(0, 0, cible.getWidth(), cible.getHeight());
+            scrollPrincipal.offsetDescendantRectToMyCoords(cible, zone);
 
             int marge = (int) (8 * getResources().getDisplayMetrics().density);
             scrollPrincipal.smoothScrollTo(0, Math.max(0, zone.top - marge));
@@ -1218,15 +1222,11 @@ public class MainActivity extends AppCompatActivity {
                 boolean estVisible = tvResumeBarresDetail.getVisibility() == View.VISIBLE;
                 tvResumeBarresDetail.setVisibility(estVisible ? View.GONE : View.VISIBLE);
                 btnAfficherDetail.setText(estVisible ? R.string.btn_afficher_detail : R.string.btn_masquer_detail);
-            }
-        });
 
-        btnAfficherDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean estVisible = tvResumeBarresDetail.getVisibility() == View.VISIBLE;
-                tvResumeBarresDetail.setVisibility(estVisible ? View.GONE : View.VISIBLE);
-                btnAfficherDetail.setText(estVisible ? R.string.btn_afficher_detail : R.string.btn_masquer_detail);
+                // Détail qui vient de s'ouvrir : on descend automatiquement jusqu'à lui
+                if (!estVisible) {
+                    defilerVers(tvResumeBarresDetail);
+                }
             }
         });
 
