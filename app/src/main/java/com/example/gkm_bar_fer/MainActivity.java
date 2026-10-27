@@ -447,7 +447,14 @@ public class MainActivity extends AppCompatActivity {
         configurerModeClient();
 
 
-// Premier groupe affiché par défaut, sans bouton "Supprimer".
+        // Écran recréé (changement de langue, rotation...) : on reprend exactement où on en était
+        if (restaurerEtatSauvegarde(savedInstanceState)) {
+            return;
+        }
+        layoutGroupesPoteaux.removeAllViews();
+        listeGroupesPoteaux.clear();
+
+        // Premier groupe affiché par défaut, sans bouton "Supprimer".
         // En mode Multi-Calcul, le type est d'abord choisi dans un modal.
         if (modeMulti) {
             afficherChoixTypeMulti();
@@ -457,6 +464,105 @@ public class MainActivity extends AppCompatActivity {
 
         // Si on ouvre un calcul enregistré, on restaure ses saisies et ses résultats
         chargerCalculSiDemande();
+    }
+
+    // ------------------------------------------------------------------
+    // Conservation de l'écran quand Android le recrée (changement de langue, rotation...)
+    // ------------------------------------------------------------------
+
+    private static final String ETAT_JSON = "etat_calcul_json";
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        try {
+            JSONObject etat = new JSONObject();
+            etat.put("typeElement", typeElement.getCode());
+            etat.put("multi", modeMulti);
+            etat.put("calculId", calculId == null ? JSONObject.NULL : calculId);
+            etat.put("nomCalculCharge", nomCalculCharge == null ? JSONObject.NULL : nomCalculCharge);
+            etat.put("switchStock", switchUtiliserStock.isChecked());
+            etat.put("switchStockClient", switchUtiliserStockClient.isChecked());
+            etat.put("scrollY", scrollPrincipal.getScrollY());
+            // Saisies actuelles (même si on n'a pas encore cliqué sur "Calculer")
+            etat.put("saisies", entreesVersJson());
+            // Résultats affichés, avec l'état des boutons de stock
+            if (!derniersResultatsBarres.isEmpty() && dernieresEntrees != null) {
+                etat.put("calcul", new JSONObject(construireJsonCalcul()));
+            }
+
+            String json = etat.toString();
+            if (json.length() < 200000) {   // garde-fou : le Bundle Android est limité à ~1 Mo
+                outState.putString(ETAT_JSON, json);
+            }
+        } catch (JSONException ignore) {
+            // on perd seulement la conservation de l'écran, pas de plantage
+        }
+    }
+
+    /** @return true si l'écran a été reconstruit depuis l'état sauvegardé. */
+    private boolean restaurerEtatSauvegarde(Bundle etatSauvegarde) {
+        if (etatSauvegarde == null) {
+            return false;
+        }
+        String json = etatSauvegarde.getString(ETAT_JSON);
+        if (json == null) {
+            return false;
+        }
+
+        try {
+            JSONObject etat = new JSONObject(json);
+
+            typeElement = TypeElement.depuisCode(etat.optString("typeElement", typeElement.getCode()));
+            modeMulti = etat.optBoolean("multi", modeMulti);
+            calculId = etat.isNull("calculId") ? null : etat.optString("calculId", null);
+            nomCalculCharge = etat.isNull("nomCalculCharge") ? null : etat.optString("nomCalculCharge", null);
+
+            // Textes qui dépendent du mode et de la nouvelle langue
+            btnAjouterPoteau.setText(modeMulti
+                    ? getString(R.string.multi_ajouter_autre)
+                    : typeElement.ajouter(this));
+            if (nomClient != null) {
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(titreCalculClient(nomClient));
+                }
+                btnEnregistrerClient.setText(calculId != null
+                        ? getString(R.string.btn_enregistrer_modifs)
+                        : getString(R.string.btn_enregistrer_pour, nomClient));
+            }
+
+            JSONArray saisies = etat.optJSONArray("saisies");
+            if (saisies == null || saisies.length() == 0) {
+                // Rien n'était encore saisi (ex : le modal de choix du type était ouvert)
+                layoutGroupesPoteaux.removeAllViews();
+                listeGroupesPoteaux.clear();
+                if (modeMulti) {
+                    afficherChoixTypeMulti();
+                } else {
+                    ajouterGroupePoteau(false);
+                }
+            } else {
+                restaurerEntrees(saisies);
+            }
+
+            switchUtiliserStock.setChecked(etat.optBoolean("switchStock", false));
+            if (clientId != null) {
+                switchUtiliserStockClient.setChecked(etat.optBoolean("switchStockClient", false));
+            }
+
+            JSONObject calcul = etat.optJSONObject("calcul");
+            if (calcul != null) {
+                restaurerResultats(calcul);
+            }
+
+            final int scrollY = etat.optInt("scrollY", 0);
+            if (scrollY > 0) {
+                scrollPrincipal.post(() -> scrollPrincipal.scrollTo(0, scrollY));
+            }
+            return true;
+        } catch (JSONException e) {
+            return false;   // on retombe sur le démarrage normal
+        }
     }
 
     private void initTypesBarres() {
@@ -555,7 +661,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, EspaceClientActivity.class));
                 } else if (id == R.id.navParametres) {
                     // Écran de calcul : changer la langue le redémarre, on prévient l'utilisateur.
-                    ParametresDialog.afficher(MainActivity.this, true);
+                    ParametresDialog.afficher(MainActivity.this);
                 }
 
                 return true;
