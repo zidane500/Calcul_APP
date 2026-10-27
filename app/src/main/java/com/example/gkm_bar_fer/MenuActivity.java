@@ -28,6 +28,7 @@ public class MenuActivity extends AppCompatActivity {
         Button btnDalle = findViewById(R.id.btnMenuDalle);
         Button btnPoutre = findViewById(R.id.btnMenuPoutre);
         Button btnPrePoteau = findViewById(R.id.btnMenuPrePoteau);
+        Button btnChainage = findViewById(R.id.btnMenuChainage);
         Button btnMulti = findViewById(R.id.btnMenuMulti);
         Button btnStock = findViewById(R.id.btnMenuStock);
 
@@ -36,6 +37,7 @@ public class MenuActivity extends AppCompatActivity {
         btnDalle.setOnClickListener(v -> ouvrirCalcul(TypeElement.DALLE));
         btnPoutre.setOnClickListener(v -> ouvrirCalcul(TypeElement.POUTRE));
         btnPrePoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.PRE_POTEAU));
+        btnChainage.setOnClickListener(v -> ouvrirCalcul(TypeElement.CHAINAGE));
         btnMulti.setOnClickListener(v -> ouvrirCalculMulti());
 
         btnStock.setOnClickListener(v -> {

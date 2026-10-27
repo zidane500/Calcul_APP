@@ -2375,7 +2375,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final TypeElement[] TYPES_MULTI = {
             TypeElement.POTEAU, TypeElement.POUTRE, TypeElement.DALLE,
-            TypeElement.SEMELLE, TypeElement.PRE_POTEAU
+            TypeElement.SEMELLE, TypeElement.PRE_POTEAU, TypeElement.CHAINAGE
     };
 
     private void afficherChoixTypeMulti() {

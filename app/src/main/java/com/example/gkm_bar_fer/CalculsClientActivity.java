@@ -71,6 +71,8 @@ public class CalculsClientActivity extends AppCompatActivity {
                 .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.POUTRE));
         findViewById(R.id.btnCalculerPrePoteau)
                 .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.PRE_POTEAU));
+        findViewById(R.id.btnCalculerChainage)
+                .setOnClickListener(v -> ouvrirNouveauCalcul(TypeElement.CHAINAGE));
         findViewById(R.id.btnCalculerMulti)
                 .setOnClickListener(v -> ouvrirNouveauCalculMulti());
 
@@ -114,6 +116,8 @@ public class CalculsClientActivity extends AppCompatActivity {
                 return Color.parseColor("#54413A");
             case POUTRE:
                 return Color.parseColor("#2E4A62");
+            case CHAINAGE:
+                return Color.parseColor("#7A2E3A");
             default:
                 return Color.parseColor("#173B65");
         }

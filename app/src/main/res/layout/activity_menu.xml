@@ -246,7 +246,7 @@
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
-                <!-- Multi-Calcul au milieu -->
+                <!-- Chaînage et Multi-Calcul -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -254,16 +254,65 @@
                     android:orientation="horizontal"
                     android:gravity="center">
 
-                    <Space
+                    <!-- Chaînage -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="0.5" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#EBEFF5"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnMenuChainage"
+                                style="@style/Widget.Material3.Button.TextButton"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="true"
+                                android:minWidth="0dp"
+                                android:minHeight="80dp"
+                                android:paddingStart="4dp"
+                                android:paddingEnd="4dp"
+                                android:text="@string/type_chainage"
+                                android:textAllCaps="false"
+                                android:textColor="#FFFFFF"
+                                android:textSize="15sp"
+                                app:backgroundTint="#7A2E3A"
+                                app:cornerRadius="16dp"
+                                app:icon="@drawable/ic_chainage"
+                                app:iconGravity="textTop"
+                                app:iconPadding="10dp"
+                                app:iconSize="28dp"
+                                app:iconTint="#FFFFFF" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:gravity="center"
+                                android:text="@string/disponible"
+                                android:textColor="#59677A"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:layout_marginEnd="6dp"
+
                         android:layout_weight="1"
                         app:cardBackgroundColor="#EBEFF5"
                         app:cardCornerRadius="16dp"
@@ -311,10 +360,7 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="0.5" />
+
 
                 </LinearLayout>
 

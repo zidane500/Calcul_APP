@@ -109,4 +109,23 @@
         <item quantity="other">%d escaliers</item>
     </plurals>
 
+    <!-- Chaînage -->
+    <string name="type_chainage_singulier">chaînage</string>
+    <string name="type_chainage_defini">le chaînage</string>
+    <string name="type_chainage_pluriel_defini">chaînages</string>
+    <string name="type_chainage_infos">Informations des Chaînages</string>
+    <string name="type_chainage_nombre">Nombre de chaînages</string>
+    <string name="type_chainage_longueur">Longueur de chaînage</string>
+    <string name="type_chainage_ajouter">Ajouter un autre chaînage</string>
+    <string name="type_chainage_supprimer">Supprimer ce chaînage</string>
+    <string name="type_chainage_titre_calcul">Calcul chaînage - %1$s</string>
+    <plurals name="nb_chainage">
+        <item quantity="one">%d chaînage</item>
+        <item quantity="other">%d chaînages</item>
+    </plurals>
+    <plurals name="nbg_chainage">
+        <item quantity="one">%d chaînage</item>
+        <item quantity="other">%d chaînages</item>
+    </plurals>
+
 </resources>

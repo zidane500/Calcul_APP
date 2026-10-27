@@ -7,6 +7,7 @@
     <string name="calculer_semelle">حساب الأسس</string>
     <string name="calculer_pre_poteau">حساب الأعمدة المسبقة الصنع</string>
     <string name="calculer_poutre">حساب الروافد</string>
+    <string name="calculer_chainage">حساب السيناج</string>
     <string name="aucun_calcul_client">لا توجد حسابات محفوظة لهذا الحريف.</string>
     <string name="ajouter_client">+ إضافة حريف</string>
     <string name="rechercher_client">البحث عن حريف بالاسم</string>
@@ -31,6 +32,7 @@
     <string name="type_dalle">بلاطة</string>
     <string name="type_semelle">أساس</string>
     <string name="type_poutre">رافدة</string>
+    <string name="type_chainage">سيناج</string>
     <string name="votre_stock">مخزونك</string>
     <string name="valorisez_chutes">ثمّن فضلاتك.</string>
     <string name="stock_desc">اطّلع على قضبانك الكاملة وقطع الحديد وأضفها.</string>

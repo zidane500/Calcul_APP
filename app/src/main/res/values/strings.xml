@@ -49,6 +49,7 @@
     <string name="calculer_semelle">Calculer Semelle</string>
     <string name="calculer_pre_poteau">Calculer Pré-poteau</string>
     <string name="calculer_poutre">Calculer Poutre</string>
+    <string name="calculer_chainage">Calculer Chaînage</string>
     <string name="aucun_calcul_client">Aucun calcul enregistré pour ce client.</string>
     <string name="ajouter_client">+ Ajouter Client</string>
     <string name="rechercher_client">Rechercher un client par nom</string>
@@ -73,6 +74,7 @@
     <string name="type_dalle">Dalle</string>
     <string name="type_semelle">Semelle</string>
     <string name="type_poutre">Poutre</string>
+    <string name="type_chainage">Chaînage</string>
     <string name="votre_stock">Votre stock</string>
     <string name="valorisez_chutes">Valorisez vos chutes.</string>
     <string name="stock_desc">Consultez et ajoutez vos barres entières et vos morceaux de fer.</string>

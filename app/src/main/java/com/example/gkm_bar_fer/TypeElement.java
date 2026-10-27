@@ -36,6 +36,12 @@ public enum TypeElement {
             R.string.type_pre_poteau_infos, R.string.type_pre_poteau_nombre, R.string.type_pre_poteau_longueur,
             R.string.type_pre_poteau_ajouter, R.string.type_pre_poteau_supprimer, R.string.type_pre_poteau_titre_calcul,
             R.plurals.nb_pre_poteau, R.plurals.nbg_pre_poteau),
+
+    CHAINAGE("chaînage", "chaînages", false, "chainage",
+            R.string.type_chainage_singulier, R.string.type_chainage_defini, R.string.type_chainage_pluriel_defini,
+            R.string.type_chainage_infos, R.string.type_chainage_nombre, R.string.type_chainage_longueur,
+            R.string.type_chainage_ajouter, R.string.type_chainage_supprimer, R.string.type_chainage_titre_calcul,
+            R.plurals.nb_chainage, R.plurals.nbg_chainage),
     ESCALIER("escalier", "escaliers", false, "escalier",
             R.string.type_escalier_singulier, R.string.type_escalier_defini, R.string.type_escalier_pluriel_defini,
             R.string.type_escalier_infos, R.string.type_escalier_nombre, R.string.type_escalier_longueur,

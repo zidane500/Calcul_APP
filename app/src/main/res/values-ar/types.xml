@@ -157,4 +157,31 @@
         <item quantity="other">%d درج</item>
     </plurals>
 
+    <!-- Chaînage -->
+    <string name="type_chainage_singulier">سيناج</string>
+    <string name="type_chainage_defini">السيناج</string>
+    <string name="type_chainage_pluriel_defini">السيناجات</string>
+    <string name="type_chainage_infos">معلومات السيناجات</string>
+    <string name="type_chainage_nombre">عدد السيناجات</string>
+    <string name="type_chainage_longueur">طول السيناج</string>
+    <string name="type_chainage_ajouter">إضافة سيناج آخر</string>
+    <string name="type_chainage_supprimer">حذف هذا السيناج</string>
+    <string name="type_chainage_titre_calcul">حساب السيناج - %1$s</string>
+    <plurals name="nb_chainage">
+        <item quantity="zero">%d سيناج</item>
+        <item quantity="one">سيناج واحد</item>
+        <item quantity="two">سيناجان</item>
+        <item quantity="few">%d سيناجات</item>
+        <item quantity="many">%d سيناجا</item>
+        <item quantity="other">%d سيناج</item>
+    </plurals>
+    <plurals name="nbg_chainage">
+        <item quantity="zero">%d سيناج</item>
+        <item quantity="one">سيناج واحد</item>
+        <item quantity="two">سيناجين</item>
+        <item quantity="few">%d سيناجات</item>
+        <item quantity="many">%d سيناجا</item>
+        <item quantity="other">%d سيناج</item>
+    </plurals>
+
 </resources>
