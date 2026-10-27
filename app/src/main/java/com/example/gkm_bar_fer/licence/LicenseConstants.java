@@ -2,7 +2,7 @@ package com.example.gkm_bar_fer.licence;
 
 /**
  * Constantes du système de licence Fer Pro.
- * Aucune clé privée ici : uniquement la clé PUBLIQUE (ajoutée à l'étape 4).
+ * Aucune clé privée ici : uniquement la clé PUBLIQUE (ajoutée à l'étape 5).
  */
 public final class LicenseConstants {
 
@@ -10,8 +10,11 @@ public final class LicenseConstants {
         // Classe utilitaire : pas d'instance.
     }
 
-    /** Identifiant du produit, doit être identique dans le générateur PC. */
+    /** Nom lisible du produit (documentation). */
     public static final String PRODUCT_CODE = "FER_PRO";
+
+    /** Identifiant du produit écrit DANS la licence signée (1 = FER_PRO). */
+    public static final int PRODUCT_ID = 1;
 
     /** Version du format de licence (permet d'évoluer plus tard sans casser les anciennes). */
     public static final int LICENSE_FORMAT_VERSION = 1;
@@ -26,8 +29,18 @@ public final class LicenseConstants {
     public static final String SUPPORT_PHONE = "XX XXX XXX";
 
     /**
-     * Clé publique ECDSA P-256 (X.509, encodée en Base64).
-     * Sera remplie à l'ÉTAPE 4 avec la clé générée sur ton PC.
+     * Tolérance (en jours) si la date de début d'une licence est dans le futur :
+     * évite un refus à cause d'un décalage d'heure ou de fuseau horaire.
      */
-    public static final String PUBLIC_KEY_BASE64 = "";
+    public static final int TOLERANCE_DEBUT_JOURS = 1;
+
+    /** Nombre de caractères par groupe quand un code est affiché (lisibilité). */
+    public static final int TAILLE_GROUPE_CODE = 6;
+
+    /**
+     * Clé publique ECDSA P-256 (format X.509) encodée en Base32.
+     * Elle sera remplie à l'ÉTAPE 5 avec la clé générée sur ton PC.
+     * (C'est la clé PUBLIQUE : elle peut être dans l'APK sans danger.)
+     */
+    public static final String PUBLIC_KEY_BASE32 = "";
 }
