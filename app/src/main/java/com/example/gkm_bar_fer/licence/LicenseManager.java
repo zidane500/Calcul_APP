@@ -9,8 +9,6 @@ import android.content.SharedPreferences;
  *
  * Séparation stricte : cette classe lit/écrit UNIQUEMENT le fichier "license_prefs".
  * Elle ne touche jamais aux clients, calculs, stock, historique ou exports.
- *
- * ÉTAPE 2 : squelette seulement. Rien n'est encore branché dans l'application.
  */
 public class LicenseManager {
 
@@ -31,8 +29,27 @@ public class LicenseManager {
     }
 
     /**
+     * Retourne l'Installation ID de ce téléphone.
+     * Il est créé au premier appel, puis conservé (même après redémarrage ou
+     * expiration de la licence). Il n'est PAS sauvegardé dans le cloud Google.
+     */
+    public synchronized String getInstallationId() {
+        String id = preferences.getString(LicenseConstants.KEY_INSTALLATION_ID, null);
+        if (InstallationId.estValide(id)) {
+            return id;
+        }
+        String nouveau = InstallationId.generer();
+        // commit() (et non apply()) : on veut être sûr que l'ID est écrit sur le disque
+        // avant de l'afficher au client.
+        preferences.edit()
+                .putString(LicenseConstants.KEY_INSTALLATION_ID, nouveau)
+                .commit();
+        return nouveau;
+    }
+
+    /**
      * Calcule l'état actuel de la licence.
-     * Version provisoire (étape 2) : sera complétée aux étapes 3, 4, 7 et 8.
+     * Version provisoire : sera complétée aux étapes 4, 7 et 8.
      */
     public LicenseStatus getStatus() {
         String code = preferences.getString(LicenseConstants.KEY_LICENSE_CODE, null);
