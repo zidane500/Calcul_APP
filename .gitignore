@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Fer Pro : clés privées de licence (NE JAMAIS COMMITER)
+*.pem
+*.key
+*.p12
+license-private*
