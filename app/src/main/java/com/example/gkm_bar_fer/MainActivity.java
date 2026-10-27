@@ -870,7 +870,7 @@ public class MainActivity extends AppCompatActivity {
             derniersResultatsBarres.clear();
             derniersGroupesPoteaux.clear();
             dernierResumePoteaux = "";
-            tvResultats.setText(detailPoteaux.toString().trim());
+            tvResultats.setText(ResultatStyler.appliquer(this, detailPoteaux.toString().trim()));
             cardResultats.setVisibility(View.VISIBLE);
             return;
         }
@@ -879,7 +879,7 @@ public class MainActivity extends AppCompatActivity {
         //    demandées par TOUS les poteaux de ce type (réutilisation des chutes entre poteaux différents).
         // 3) Un seul calcul d'optimisation par type de barre, sur l'ensemble des coupes
         //    demandées par TOUS les poteaux de ce type (réutilisation des chutes entre poteaux différents).
-        tvResultats.setText(detailPoteaux.toString().trim());
+        tvResultats.setText(ResultatStyler.appliquer(this, detailPoteaux.toString().trim()));
 
         dernierResumePoteaux = detailPoteaux.toString().trim();
         derniersResultatsBarres.clear();
@@ -1113,7 +1113,7 @@ public class MainActivity extends AppCompatActivity {
             resume.append(TextUtils.join("\n", lignesDechets));
             resume.append("\n");
         }
-        tvResumeBarre.setText(resume.toString().trim());
+        tvResumeBarre.setText(ResultatStyler.appliquer(this, resume.toString().trim()));
 
 
         tvResumeBarresDetail.setText(formatterResumeBarres(resultat.detailBarres, this));
@@ -2289,7 +2289,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        tvResultats.setText(construireTexteBesoins());
+        tvResultats.setText(ResultatStyler.appliquer(this, construireTexteBesoins()));
         cardResultats.setVisibility(View.VISIBLE);
     }
 
@@ -2436,8 +2436,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean validerGroupe(GroupePoteau groupe, int numeroGroupe) {
         if (TextUtils.isEmpty(groupe.etNombrePoteaux.getText()) ||
                 TextUtils.isEmpty(groupe.etLongueurPoteaux.getText())) {
-            tvResultats.setText(getString(R.string.erreur_remplir_champs,
-                    groupe.type.singulierMajuscule(this), numeroGroupe, groupe.type.plurielDefini(this)));
+            tvResultats.setText(ResultatStyler.erreur(this, getString(R.string.erreur_remplir_champs,
+                    groupe.type.singulierMajuscule(this), numeroGroupe, groupe.type.plurielDefini(this))));
             cardResultats.setVisibility(View.VISIBLE);
             return false;
         }
@@ -2447,14 +2447,14 @@ public class MainActivity extends AppCompatActivity {
             double longueur = Double.parseDouble(groupe.etLongueurPoteaux.getText().toString());
 
             if (nombrePoteaux <= 0 || longueur <= 0) {
-                tvResultats.setText(getString(R.string.erreur_valeurs_positives,
-                        groupe.type.singulierMajuscule(this), numeroGroupe));
+                tvResultats.setText(ResultatStyler.erreur(this, getString(R.string.erreur_valeurs_positives,
+                        groupe.type.singulierMajuscule(this), numeroGroupe)));
                 cardResultats.setVisibility(View.VISIBLE);
                 return false;
             }
         } catch (NumberFormatException e) {
-            tvResultats.setText(getString(R.string.erreur_nombres_valides,
-                    groupe.type.singulierMajuscule(this), numeroGroupe));
+            tvResultats.setText(ResultatStyler.erreur(this, getString(R.string.erreur_nombres_valides,
+                    groupe.type.singulierMajuscule(this), numeroGroupe)));
             cardResultats.setVisibility(View.VISIBLE);
             return false;
         }
