@@ -27,6 +27,11 @@
         </activity>
 
         <activity
+            android:name=".licence.ActivationActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

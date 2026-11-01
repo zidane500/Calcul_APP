@@ -8,6 +8,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.gkm_bar_fer.licence.ActivationActivity;
+import com.example.gkm_bar_fer.licence.LicenseManager;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -50,7 +52,10 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void demarrerActivitePrincipale() {
-        startActivity(new Intent(SplashActivity.this, MenuActivity.class));
+        // Licence valide -> menu principal ; sinon -> écran d'activation.
+        boolean licenceValide = LicenseManager.getInstance(this).getStatus().autoriseAcces();
+        Class<?> destination = licenceValide ? MenuActivity.class : ActivationActivity.class;
+        startActivity(new Intent(SplashActivity.this, destination));
         finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }

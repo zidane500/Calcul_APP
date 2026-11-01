@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!-- TEST UNIQUEMENT : n'existe que dans la version debug. -->
+        <receiver
+            android:name=".licence.DebugClockReceiver"
+            android:exported="true" />
+    </application>
+
+</manifest>

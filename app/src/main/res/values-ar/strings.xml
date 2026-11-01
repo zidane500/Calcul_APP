@@ -94,4 +94,46 @@
     <string name="multi_ajouter_autre">إضافة عنصر آخر</string>
 
     <string name="multi_titre_client">حساب متعدد - %1$s</string>
+
+
+    <!-- الرخصة: شاشة التفعيل -->
+    <string name="licence_titre_activation">تفعيل الرخصة</string>
+    <string name="licence_installation_id">معرّف التثبيت (Installation ID)</string>
+    <string name="licence_communiquer_id">يرجى إرسال هذا المعرّف إلى المزوّد.</string>
+    <string name="licence_copier">نسخ</string>
+    <string name="licence_partager">مشاركة</string>
+    <string name="licence_coller">لصق الرمز</string>
+    <string name="licence_code_activation">رمز التفعيل</string>
+    <string name="licence_activer">تفعيل</string>
+    <string name="licence_id_copie">تم نسخ معرّف التثبيت</string>
+    <string name="licence_partage_texte">معرّف التثبيت الخاص بي في Fer Pro: %1$s</string>
+    <string name="licence_partager_titre">مشاركة معرّف التثبيت</string>
+    <string name="licence_presse_papiers_vide">الحافظة فارغة.</string>
+    <string name="licence_erreur_vide">أدخل رمز التفعيل.</string>
+    <string name="licence_erreur_invalide">رمز التفعيل غير صالح. تأكد من أنه كامل وبدون أخطاء.</string>
+    <string name="licence_erreur_appareil">هذا الرمز مخصص لهاتف آخر. اطلب رمزًا لمعرّف التثبيت المعروض أعلاه.</string>
+    <string name="licence_erreur_expiree">انتهت صلاحية هذا الرمز. اطلب رمزًا جديدًا.</string>
+    <string name="licence_erreur_pas_encore">هذا الرمز غير ساري بعد (يبدأ في %1$s). تحقق من تاريخ هاتفك.</string>
+    <string name="licence_erreur_produit">هذا الرمز غير مخصص لتطبيق Fer Pro.</string>
+    <string name="licence_erreur_config">التطبيق غير مهيأ بشكل صحيح: مفتاح الرخصة مفقود. تواصل مع المزوّد.</string>
+    <string name="licence_erreur_stockage">تعذر حفظ الرخصة على هذا الهاتف. أعد المحاولة.</string>
+    <string name="licence_succes_limitee">تم تفعيل الرخصة. صالحة حتى %1$s.</string>
+    <string name="licence_succes_vie">تم تفعيل الرخصة (بدون تاريخ انتهاء).</string>
+    <string name="licence_contact">للحصول على رمز، تواصل معنا: %1$s</string>
+
+
+    <!-- الرخصة: انتهاء الصلاحية والتجديد -->
+    <string name="licence_titre_expiree">انتهت صلاحية الرخصة</string>
+    <string name="licence_expiree_message">انتهت صلاحية رخصة Fer Pro الخاصة بك بتاريخ %1$s.</string>
+    <string name="licence_donnees_conservees">بياناتك (الحرفاء، الحسابات، المخزون، السجل) محفوظة.</string>
+    <string name="licence_nouveau_code">رمز تفعيل جديد</string>
+    <string name="licence_renouveler">تجديد</string>
+    <string name="licence_contact_renouveler">لتجديد رخصتك، يرجى التواصل معنا: %1$s</string>
+    <string name="licence_renouvelee_limitee">تم تجديد الرخصة. صالحة حتى %1$s.</string>
+    <string name="licence_renouvelee_vie">تم تجديد الرخصة (بدون تاريخ انتهاء).</string>
+    <string name="licence_titre_invalide">رخصة غير صالحة</string>
+    <string name="licence_invalide_message">الرخصة المسجلة على هذا الهاتف غير صالحة. أدخل رمز تفعيل جديد.</string>
+    <string name="licence_titre_date">تاريخ الهاتف غير صحيح</string>
+    <string name="licence_date_message">يبدو أن تاريخ هذا الهاتف غير صحيح (سابق لآخر تاريخ سجّله التطبيق). اضبط التاريخ والوقت تلقائيًا ثم أعد فتح التطبيق. وإذا استمرت المشكلة، تواصل معنا.</string>
 </resources>
+

@@ -13,8 +13,25 @@
 .externalNativeBuild
 .cxx
 local.properties
+
 # Fer Pro : clés privées de licence (NE JAMAIS COMMITER)
 *.pem
 *.key
 *.p12
 license-private*
+
+# Fer Pro : fichiers générés du License Generator
+/tools/license-generator/out/
+/tools/license-generator/*.jar
+
+# Fer Pro : secrets et fichiers générés (NE JAMAIS COMMITER)
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+keystore.properties
+/tools/license-generator/out/
+/tools/license-generator/*.jar
+/app/release/
+/i18n*_sauvegarde_*/

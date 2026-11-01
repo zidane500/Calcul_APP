@@ -124,4 +124,45 @@
     <string name="multi_ajouter_autre">Ajouter autre</string>
 
     <string name="multi_titre_client">Multi-Calcul - %1$s</string>
+
+
+    <!-- Licence : écran d'activation -->
+    <string name="licence_titre_activation">Activation de votre licence</string>
+    <string name="licence_installation_id">Installation ID</string>
+    <string name="licence_communiquer_id">Veuillez communiquer cet identifiant au fournisseur.</string>
+    <string name="licence_copier">Copier</string>
+    <string name="licence_partager">Partager</string>
+    <string name="licence_coller">Coller le code</string>
+    <string name="licence_code_activation">Code d\'activation</string>
+    <string name="licence_activer">ACTIVER</string>
+    <string name="licence_id_copie">Installation ID copié</string>
+    <string name="licence_partage_texte">Mon Installation ID Fer Pro : %1$s</string>
+    <string name="licence_partager_titre">Partager l\'Installation ID</string>
+    <string name="licence_presse_papiers_vide">Le presse-papiers est vide.</string>
+    <string name="licence_erreur_vide">Saisissez le code d\'activation.</string>
+    <string name="licence_erreur_invalide">Code d\'activation invalide. Vérifiez qu\'il est complet et sans erreur.</string>
+    <string name="licence_erreur_appareil">Ce code est destiné à un autre téléphone. Demandez un code pour l\'Installation ID affiché ci-dessus.</string>
+    <string name="licence_erreur_expiree">Ce code est expiré. Demandez un nouveau code.</string>
+    <string name="licence_erreur_pas_encore">Ce code n\'est pas encore valable (début : %1$s). Vérifiez la date de votre téléphone.</string>
+    <string name="licence_erreur_produit">Ce code n\'est pas destiné à Fer Pro.</string>
+    <string name="licence_erreur_config">Application mal configurée : clé de licence absente. Contactez le fournisseur.</string>
+    <string name="licence_erreur_stockage">Impossible d\'enregistrer la licence sur ce téléphone. Réessayez.</string>
+    <string name="licence_succes_limitee">Licence activée. Valable jusqu\'au %1$s.</string>
+    <string name="licence_succes_vie">Licence activée (sans date d\'expiration).</string>
+    <string name="licence_contact">Pour obtenir un code, contactez-nous : %1$s</string>
+
+
+    <!-- Licence : expiration et renouvellement -->
+    <string name="licence_titre_expiree">Licence expirée</string>
+    <string name="licence_expiree_message">Votre licence Fer Pro a expiré le %1$s.</string>
+    <string name="licence_donnees_conservees">Vos données (clients, calculs, stock, historique) sont conservées.</string>
+    <string name="licence_nouveau_code">Nouveau code d\'activation</string>
+    <string name="licence_renouveler">RENOUVELER</string>
+    <string name="licence_contact_renouveler">Pour renouveler votre licence, veuillez nous contacter : %1$s</string>
+    <string name="licence_renouvelee_limitee">Licence renouvelée. Valable jusqu\'au %1$s.</string>
+    <string name="licence_renouvelee_vie">Licence renouvelée (sans date d\'expiration).</string>
+    <string name="licence_titre_invalide">Licence invalide</string>
+    <string name="licence_invalide_message">La licence enregistrée sur ce téléphone n\'est pas valide. Entrez un nouveau code d\'activation.</string>
+    <string name="licence_titre_date">Date du téléphone incorrecte</string>
+    <string name="licence_date_message">La date de ce téléphone semble incorrecte (elle est antérieure à la dernière date enregistrée par l\'application). Réglez la date et l\'heure automatiquement, puis rouvrez l\'application. Si le problème persiste, contactez-nous.</string>
 </resources>
