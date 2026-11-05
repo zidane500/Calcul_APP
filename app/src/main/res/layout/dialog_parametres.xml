@@ -71,4 +71,53 @@
         app:backgroundTint="@color/primary"
         app:cornerRadius="14dp" />
 
+    <!-- Licence : état, Installation ID et saisie d'un nouveau code (renouvellement anticipé) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/divider" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/licence_section_titre"
+        android:textColor="@color/section_title"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvLicenceEtat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/primary_dark"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvLicenceId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/secondary_text"
+        android:textDirection="ltr"
+        android:textIsSelectable="true"
+        android:textSize="13sp" />
+
+    <Button
+        android:id="@+id/btnNouveauCode"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/licence_saisir_nouveau_code"
+        android:textAllCaps="false"
+        android:textColor="@color/add_poteau_text"
+        app:backgroundTint="@color/add_poteau_background"
+        app:cornerRadius="12dp"
+        app:strokeColor="@color/add_poteau_stroke" />
+
 </LinearLayout>

@@ -46,6 +46,11 @@ import android.graphics.Rect;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout layoutGroupesPoteaux;
@@ -1221,8 +1226,8 @@ public class MainActivity extends AppCompatActivity {
         }
         tvResumeBarre.setText(ResultatStyler.appliquer(this, resume.toString().trim()));
 
-
-        tvResumeBarresDetail.setText(formatterResumeBarres(resultat.detailBarres, this));
+        tvResumeBarresDetail.setText(mettreBarresEnGras(
+                formatterResumeBarres(resultat.detailBarres, this)));
 
         final List<BarreUtilisee> barresStockUtilisees = new ArrayList<>();
 
@@ -1846,6 +1851,25 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return TextUtils.join("\n", lignes);
+    }
+
+    /** Met en gras le début de chaque ligne du détail, jusqu'à " :" (ex : "40 Barres"). */
+    private CharSequence mettreBarresEnGras(String texte) {
+        SpannableString spannable = new SpannableString(texte);
+        int debut = 0;
+        while (debut < texte.length()) {
+            int finLigne = texte.indexOf('\n', debut);
+            if (finLigne == -1) {
+                finLigne = texte.length();
+            }
+            int deuxPoints = texte.indexOf(" :", debut);
+            if (deuxPoints > debut && deuxPoints < finLigne) {
+                spannable.setSpan(new StyleSpan(Typeface.BOLD),
+                        debut, deuxPoints, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            debut = finLigne + 1;
+        }
+        return spannable;
     }
 
     private String formatterChute(List<Double> chutes, Context ctx) {

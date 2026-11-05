@@ -158,11 +158,23 @@
     <string name="licence_donnees_conservees">Vos données (clients, calculs, stock, historique) sont conservées.</string>
     <string name="licence_nouveau_code">Nouveau code d\'activation</string>
     <string name="licence_renouveler">RENOUVELER</string>
-    <string name="licence_contact_renouveler">Pour renouveler votre licence, veuillez nous contacter : %1$s</string>
+    <string name="licence_contact_renouveler">Veuillez nous contacter : %1$s</string>
     <string name="licence_renouvelee_limitee">Licence renouvelée. Valable jusqu\'au %1$s.</string>
     <string name="licence_renouvelee_vie">Licence renouvelée (sans date d\'expiration).</string>
     <string name="licence_titre_invalide">Licence invalide</string>
     <string name="licence_invalide_message">La licence enregistrée sur ce téléphone n\'est pas valide. Entrez un nouveau code d\'activation.</string>
     <string name="licence_titre_date">Date du téléphone incorrecte</string>
     <string name="licence_date_message">La date de ce téléphone semble incorrecte (elle est antérieure à la dernière date enregistrée par l\'application). Réglez la date et l\'heure automatiquement, puis rouvrez l\'application. Si le problème persiste, contactez-nous.</string>
+
+
+    <!-- Licence : section Paramètres et renouvellement anticipé -->
+    <string name="licence_section_titre">Licence</string>
+    <string name="licence_etat_vie">Licence à vie (sans date d\'expiration)</string>
+    <string name="licence_etat_limitee">Valable jusqu\'au %1$s\nJours restants : %2$d</string>
+    <string name="licence_etat_aucune">Aucune licence active</string>
+    <string name="licence_id_ligne">Installation ID : %1$s</string>
+    <string name="licence_saisir_nouveau_code">Saisir un nouveau code</string>
+    <string name="licence_titre_prolonger">Prolonger votre licence</string>
+    <string name="licence_erreur_non_prolongee">Ce code ne prolonge pas votre licence actuelle (valable jusqu\'au %1$s). Il n\'a pas été appliqué.</string>
+    <string name="licence_erreur_deja_a_vie">Votre licence est déjà à vie : ce code n\'a pas été appliqué.</string>
 </resources>

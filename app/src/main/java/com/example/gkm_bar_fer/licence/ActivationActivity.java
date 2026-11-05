@@ -33,17 +33,22 @@ import com.google.android.material.textfield.TextInputLayout;
  */
 public class ActivationActivity extends AppCompatActivity {
 
+    /** Extra : ouvert depuis Paramètres par un client dont la licence est encore valide. */
+    public static final String EXTRA_DEPUIS_PARAMETRES = "depuis_parametres";
+
     private LicenseManager licenseManager;
     private String installationId;
     private TextInputLayout layoutCode;
     private TextInputEditText etCode;
-    private boolean renouvellement; // true quand la licence a expiré
+    private boolean renouvellement; // true quand on renouvelle (licence expirée ou prolongée)
+    private boolean depuisParametres; // true : l'application est utilisable, on prolonge
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activation);
 
+        depuisParametres = getIntent().getBooleanExtra(EXTRA_DEPUIS_PARAMETRES, false);
         licenseManager = LicenseManager.getInstance(this);
         installationId = licenseManager.getInstallationId();
 
@@ -75,11 +80,16 @@ public class ActivationActivity extends AppCompatActivity {
         findViewById(R.id.btnColler).setOnClickListener(v -> collerCode());
         findViewById(R.id.btnActiver).setOnClickListener(v -> activer());
 
-        // Retour : on quitte l'application (impossible d'entrer sans licence valide).
+        // Retour : depuis Paramètres on revient à l'écran précédent ; sinon on quitte
+        // l'application (impossible d'entrer sans licence valide).
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                finishAffinity();
+                if (depuisParametres) {
+                    finish();
+                } else {
+                    finishAffinity();
+                }
             }
         });
     }
@@ -88,7 +98,7 @@ public class ActivationActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Exemple : la date du téléphone vient d'être corrigée -> la licence redevient valide.
-        if (licenseManager.getStatus().autoriseAcces()) {
+        if (!depuisParametres && licenseManager.getStatus().autoriseAcces()) {
             ouvrirApplication();
         }
     }
@@ -107,7 +117,14 @@ public class ActivationActivity extends AppCompatActivity {
         tvContact.setText(getString(R.string.licence_contact, telephone));
 
         LicensePayload licence = licenseManager.getLicence();
-        if (statut == LicenseStatus.EXPIRED && licence != null) {
+        if (depuisParametres && statut == LicenseStatus.VALID) {
+            // Licence encore valide : le client prolonge avant l'expiration.
+            renouvellement = true;
+            tvTitre.setText(R.string.licence_titre_prolonger);
+            tvLabelCode.setText(R.string.licence_nouveau_code);
+            btnActiver.setText(R.string.licence_renouveler);
+            tvContact.setText(getString(R.string.licence_contact_renouveler, telephone));
+        } else if (statut == LicenseStatus.EXPIRED && licence != null) {
             renouvellement = true;
             tvTitre.setText(R.string.licence_titre_expiree);
             tvStatut.setText(getString(R.string.licence_expiree_message,
@@ -182,7 +199,11 @@ public class ActivationActivity extends AppCompatActivity {
                         LicenseDates.formater(licence.getJourFin()));
             }
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-            ouvrirApplication();
+            if (depuisParametres) {
+                finish(); // retour à l'écran d'où l'on vient (rien n'est perdu)
+            } else {
+                ouvrirApplication();
+            }
         } else {
             layoutCode.setError(messageErreur(resultat));
         }
@@ -196,6 +217,12 @@ public class ActivationActivity extends AppCompatActivity {
                 return getString(R.string.licence_erreur_stockage);
             case DATE_INCORRECTE:
                 return getString(R.string.licence_date_message);
+            case NON_PROLONGEE:
+                LicensePayload actuelle = resultat.getLicence();
+                return actuelle != null && !actuelle.estAVie()
+                        ? getString(R.string.licence_erreur_non_prolongee,
+                        LicenseDates.formater(actuelle.getJourFin()))
+                        : getString(R.string.licence_erreur_deja_a_vie);
             default:
                 break;
         }

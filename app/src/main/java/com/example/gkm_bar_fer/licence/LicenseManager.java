@@ -31,7 +31,9 @@ public class LicenseManager {
             /** Code valide mais impossible de l'écrire sur le téléphone. */
             ERREUR_STOCKAGE,
             /** Code valide, mais la date du téléphone est incohérente (retour en arrière). */
-            DATE_INCORRECTE
+            DATE_INCORRECTE,
+            /** Code valide, mais il ne prolonge pas la licence actuelle : il n'a pas été appliqué. */
+            NON_PROLONGEE
         }
 
         private final Etat etat;
@@ -163,6 +165,18 @@ public class LicenseManager {
     }
 
     /**
+     * Nombre de jours restants avant l'expiration (0 = dernier jour), ou -1 s'il n'y a pas
+     * de licence ou si elle est à vie.
+     */
+    public synchronized int getJoursRestants() {
+        LicensePayload licence = getLicence();
+        if (licence == null || licence.estAVie()) {
+            return -1;
+        }
+        return Math.max(0, licence.getJourFin() - jourActuel());
+    }
+
+    /**
      * Active (ou renouvelle) la licence avec un code saisi par le client.
      * Si le code est valide pour CE téléphone, il remplace l'ancien. Sinon rien ne change.
      * Les données métier ne sont jamais touchées.
@@ -177,8 +191,22 @@ public class LicenseManager {
             return new ActivationResult(ActivationResult.Etat.REFUSE, v.getResultat(), v.getLicence());
         }
         LicensePayload ancienne = getLicence(); // licence actuelle, avant remplacement
+        String codeCanonique = formeCanonique(codeSaisi);
+
+        // Garde-fou : tant que la licence actuelle est valide, un code qui ne la PROLONGE pas
+        // (par exemple un ancien code collé par erreur) ne doit pas la remplacer.
+        if (ancienne != null && getStatus() == LicenseStatus.VALID) {
+            if (codeCanonique.equals(codeStocke())) {
+                return new ActivationResult(ActivationResult.Etat.SUCCES, v.getResultat(), v.getLicence());
+            }
+            if (!prolonge(v.getLicence(), ancienne)) {
+                return new ActivationResult(ActivationResult.Etat.NON_PROLONGEE,
+                        v.getResultat(), ancienne);
+            }
+        }
+
         boolean ecrit = preferences.edit()
-                .putString(LicenseConstants.KEY_LICENSE_CODE, formeCanonique(codeSaisi))
+                .putString(LicenseConstants.KEY_LICENSE_CODE, codeCanonique)
                 .commit();
         if (!ecrit) {
             return new ActivationResult(ActivationResult.Etat.ERREUR_STOCKAGE, v.getResultat(), v.getLicence());
@@ -193,6 +221,14 @@ public class LicenseManager {
             return new ActivationResult(ActivationResult.Etat.DATE_INCORRECTE, v.getResultat(), v.getLicence());
         }
         return new ActivationResult(ActivationResult.Etat.SUCCES, v.getResultat(), v.getLicence());
+    }
+
+    /** Prolonge = se termine plus tard, ou devient une licence à vie. */
+    private static boolean prolonge(LicensePayload nouvelle, LicensePayload ancienne) {
+        if (ancienne.estAVie()) {
+            return false;
+        }
+        return nouvelle.estAVie() || nouvelle.getJourFin() > ancienne.getJourFin();
     }
 
     /** Une licence est "plus récente" si elle commence plus tard ou se termine plus tard. */

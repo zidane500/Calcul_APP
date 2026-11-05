@@ -135,5 +135,17 @@
     <string name="licence_invalide_message">الرخصة المسجلة على هذا الهاتف غير صالحة. أدخل رمز تفعيل جديد.</string>
     <string name="licence_titre_date">تاريخ الهاتف غير صحيح</string>
     <string name="licence_date_message">يبدو أن تاريخ هذا الهاتف غير صحيح (سابق لآخر تاريخ سجّله التطبيق). اضبط التاريخ والوقت تلقائيًا ثم أعد فتح التطبيق. وإذا استمرت المشكلة، تواصل معنا.</string>
+
+
+    <!-- الرخصة: قسم الإعدادات والتجديد المسبق -->
+    <string name="licence_section_titre">الرخصة</string>
+    <string name="licence_etat_vie">رخصة مدى الحياة (بدون تاريخ انتهاء)</string>
+    <string name="licence_etat_limitee">صالحة حتى %1$s (الأيام المتبقية: %2$d)</string>
+    <string name="licence_etat_aucune">لا توجد رخصة فعّالة</string>
+    <string name="licence_id_ligne">معرّف التثبيت: %1$s</string>
+    <string name="licence_saisir_nouveau_code">إدخال رمز جديد</string>
+    <string name="licence_titre_prolonger">تمديد رخصتك</string>
+    <string name="licence_erreur_non_prolongee">هذا الرمز لا يمدّد رخصتك الحالية (صالحة حتى %1$s). لم يتم تطبيقه.</string>
+    <string name="licence_erreur_deja_a_vie">رخصتك مدى الحياة بالفعل: لم يتم تطبيق هذا الرمز.</string>
 </resources>
 

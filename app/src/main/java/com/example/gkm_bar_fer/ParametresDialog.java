@@ -8,6 +8,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.gkm_bar_fer.licence.SectionLicence;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
@@ -62,6 +63,8 @@ public final class ParametresDialog {
                 .setTitle(R.string.parametres_titre)
                 .setView(vue)
                 .create();
+
+        SectionLicence.lier(activite, vue, dialogue::dismiss);
 
         btnConfirmer.setOnClickListener(v -> {
             String code = LANGUES[choix[0]][0];
