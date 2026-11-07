@@ -1,5 +1,6 @@
 package com.example.gkm_bar_fer;
 
+import com.example.gkm_bar_fer.sauvegarde.NomsPrefs;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -27,18 +28,18 @@ import java.util.UUID;
  */
 public class StockManager {
 
-    private static final String PREFS_NOM = "stock_dechets_prefs";
-    private static final String CLE_STOCK = "stock_json";
+    private static final String PREFS_NOM = NomsPrefs.STOCK_GLOBAL;
+    private static final String CLE_STOCK = NomsPrefs.CLE_STOCK;
 
-    private static final String CLE_VERSION = "stock_version";
-    private static final String PREFIXE_OPERATION = "stock_operation_";
-    private static final String CLE_HISTORIQUE = "historique_json";
+    private static final String CLE_VERSION = NomsPrefs.CLE_VERSION;
+    private static final String PREFIXE_OPERATION = NomsPrefs.PREFIXE_OPERATION;
+    private static final String CLE_HISTORIQUE = NomsPrefs.CLE_HISTORIQUE;
     private static final int MAX_MOUVEMENTS = 500;
 
     private static StockManager instance;
 
     // Stocks des clients : un StockManager indépendant par client (idClient -> gestionnaire)
-    private static final String PREFIXE_PREFS_CLIENT = "stock_client_";
+    private static final String PREFIXE_PREFS_CLIENT = NomsPrefs.PREFIXE_STOCK_CLIENT;
     private static final Map<String, StockManager> instancesClients = new HashMap<>();
 
     private final SharedPreferences preferences;

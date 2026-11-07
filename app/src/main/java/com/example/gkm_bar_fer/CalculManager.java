@@ -1,5 +1,7 @@
 package com.example.gkm_bar_fer;
 
+import com.example.gkm_bar_fer.sauvegarde.NomsPrefs;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -18,8 +20,8 @@ import java.util.UUID;
  */
 public class CalculManager {
 
-    private static final String PREFS_NOM = "calculs_clients_prefs";
-    private static final String CLE_CALCULS = "calculs_json";
+    private static final String PREFS_NOM = NomsPrefs.CALCULS;
+    private static final String CLE_CALCULS = NomsPrefs.CLE_CALCULS;
 
     private static CalculManager instance;
 
@@ -27,6 +29,7 @@ public class CalculManager {
     private final List<CalculEnregistre> calculs;
 
     private CalculManager(Context context) {
+
         preferences = context.getApplicationContext()
                 .getSharedPreferences(PREFS_NOM, Context.MODE_PRIVATE);
         calculs = charger();

@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.gkm_bar_fer.licence.LicenseGuard;
+import com.example.gkm_bar_fer.sauvegarde.SauvegardeAuto;
 
 public class GkmApplication extends Application {
     @Override
@@ -14,5 +15,8 @@ public class GkmApplication extends Application {
 
         // Licence : contrôle automatique sur TOUS les écrans de l'application.
         registerActivityLifecycleCallbacks(new LicenseGuard());
+
+        // Sauvegarde automatique des données dans Documents/FerPro.
+        SauvegardeAuto.demarrer(this);
     }
 }

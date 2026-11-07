@@ -1,5 +1,8 @@
 package com.example.gkm_bar_fer;
 
+import com.example.gkm_bar_fer.sauvegarde.NomsPrefs;
+
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -11,14 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 /**
  * Gère la liste des clients.
  * Persistance : SharedPreferences sérialisé en JSON (même principe que StockManager).
  */
 public class ClientManager {
 
-    private static final String PREFS_NOM = "clients_prefs";
-    private static final String CLE_CLIENTS = "clients_json";
+    private static final String PREFS_NOM = NomsPrefs.CLIENTS;
+    private static final String CLE_CLIENTS = NomsPrefs.CLE_CLIENTS;
 
     private static ClientManager instance;
 

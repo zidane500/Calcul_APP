@@ -2,4 +2,6 @@
 <full-backup-content>
     <!-- La licence ne doit JAMAIS être restaurée sur un autre téléphone. -->
     <exclude domain="sharedpref" path="license_prefs.xml" />
+    <!-- Mémoire de la sauvegarde automatique : liée à CETTE installation. -->
+    <exclude domain="sharedpref" path="sauvegarde_auto_prefs.xml" />
 </full-backup-content>

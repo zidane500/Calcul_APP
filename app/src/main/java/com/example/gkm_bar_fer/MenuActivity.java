@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.gkm_bar_fer.sauvegarde.SauvegardeAuto;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -22,6 +23,10 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         configurerMenuNavigation();
+
+
+        // Android 7 à 9 : demande une seule fois l'autorisation d'écrire la sauvegarde.
+        SauvegardeAuto.demanderPermissionSiNecessaire(this);
 
         Button btnPoteau = findViewById(R.id.btnMenuPoteau);
         Button btnSemelle = findViewById(R.id.btnMenuSemelle);
