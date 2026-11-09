@@ -197,6 +197,26 @@ public class MoteurSauvegardeTest {
     }
 
     @Test
+    public void memeMinute_laSauvegardeRecenteRemplaceLAncienne() throws Exception {
+        assertEquals(Resultat.REUSSIE, sauvegarder(donnees(2), T0));
+        assertEquals(Resultat.REUSSIE, sauvegarder(donnees(3), T0 + 20_000L));   // même minute
+
+        assertEquals(1, dossier.fichiers.size());
+        SauvegardeCodec.Contenu relu = SauvegardeCodec.lire(
+                dossier.fichiers.get(SauvegardeCodec.nomFichier(T0)));
+        assertEquals(3, relu.apercu.nbCalculs);
+    }
+
+    @Test
+    public void memeNomQuUnFichierEtranger_neLEcrasePas() {
+        String nomEtranger = SauvegardeCodec.nomFichier(T0);
+        dossier.fichiers.put(nomEtranger, new byte[]{9});
+
+        assertEquals(Resultat.ECHEC, sauvegarder(donnees(2), T0));
+        assertEquals(1, dossier.fichiers.get(nomEtranger).length);          // intact
+    }
+
+    @Test
     public void donneesModifiees_creentUneNouvelleVersion() {
         assertEquals(Resultat.REUSSIE, sauvegarder(donnees(2), T0));
         assertEquals(Resultat.REUSSIE, sauvegarder(donnees(3), T0 + 2 * MINUTE));

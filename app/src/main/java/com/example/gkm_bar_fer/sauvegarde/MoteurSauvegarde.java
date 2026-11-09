@@ -52,14 +52,21 @@ public final class MoteurSauvegarde {
 
     private final Destination destination;
     private final Memoire memoire;
+    private volatile String derniereErreur = null;
 
     public MoteurSauvegarde(Destination destination, Memoire memoire) {
         this.destination = destination;
         this.memoire = memoire;
     }
 
+    /** Cause du dernier ECHEC (null si le dernier passage n'a pas échoué). Sert au diagnostic. */
+    public String derniereErreur() {
+        return derniereErreur;
+    }
+
     public Resultat executer(Map<String, ? extends Map<String, ?>> instantane,
                              String versionApp, long maintenantMs) {
+        derniereErreur = null;
         try {
             byte[] octets = SauvegardeCodec.ecrire(instantane, versionApp, maintenantMs);
 
@@ -70,17 +77,32 @@ public final class MoteurSauvegarde {
             }
 
             String empreinte = SauvegardeCodec.empreinte(instantane);
+            List<Destination.Entree> existantes = destination.lister();
             if (empreinte.equals(memoire.empreinte())
-                    && contientNom(destination.lister(), memoire.dernierNom())) {
+                    && contientNom(existantes, memoire.dernierNom())) {
                 return Resultat.INCHANGEE;
             }
 
-            Destination.Entree nouvelle =
-                    destination.creer(SauvegardeCodec.nomFichier(maintenantMs), octets);
+            // Deux sauvegardes dans la même minute portent le même nom : la plus récente
+            // remplace l'ancienne (créée par cette installation), jamais un fichier étranger.
+            String nom = SauvegardeCodec.nomFichier(maintenantMs);
+            if (contientNom(existantes, nom)) {
+                if (!memoire.aCree(nom)) {
+                    derniereErreur = "ce nom est deja pris par un fichier d'une autre installation";
+                    return Resultat.ECHEC;
+                }
+                supprimerNom(existantes, nom);
+                memoire.oublier(nom);
+            }
+
+            Destination.Entree nouvelle = destination.creer(nom, octets);
 
             // Vérification sur le disque : on relit le fichier écrit et on compare le contenu.
             if (!relectureIdentique(nouvelle, empreinte)) {
                 supprimerSansErreur(nouvelle);
+                if (derniereErreur == null) {
+                    derniereErreur = "le fichier relu est different des donnees";
+                }
                 return Resultat.ECHEC;
             }
 
@@ -89,6 +111,7 @@ public final class MoteurSauvegarde {
             return Resultat.REUSSIE;
 
         } catch (IOException | SauvegardeCodec.InvalideException | RuntimeException e) {
+            derniereErreur = e.getClass().getSimpleName() + " : " + e.getMessage();
             return Resultat.ECHEC;
         }
     }
@@ -98,6 +121,7 @@ public final class MoteurSauvegarde {
             SauvegardeCodec.Contenu relu = SauvegardeCodec.lire(flux);
             return empreinteAttendue.equals(SauvegardeCodec.empreinte(relu.prefs));
         } catch (IOException | SauvegardeCodec.InvalideException | RuntimeException e) {
+            derniereErreur = "relecture : " + e.getClass().getSimpleName() + " : " + e.getMessage();
             return false;
         }
     }
@@ -140,6 +164,15 @@ public final class MoteurSauvegarde {
             }
         }
         return false;
+    }
+
+    private void supprimerNom(List<Destination.Entree> entrees, String nom) throws IOException {
+        for (Destination.Entree entree : entrees) {
+            if (nom.equals(entree.nom)) {
+                destination.supprimer(entree);
+                return;
+            }
+        }
     }
 
     private void supprimerSansErreur(Destination.Entree entree) {

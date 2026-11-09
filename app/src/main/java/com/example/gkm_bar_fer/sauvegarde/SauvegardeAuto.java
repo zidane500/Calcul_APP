@@ -28,9 +28,9 @@ import java.util.concurrent.Executors;
  * Elle se déclenche toute seule :
  *  - au démarrage de l'app ;
  *  - après chaque modification des clients, des calculs ou du stock global ;
- *  - quand l'app passe en arrière-plan (couvre aussi les stocks des clients).
+ *  - tout de suite quand l'app passe en arrière-plan (couvre aussi les stocks des clients).
  *
- * Les déclenchements rapprochés sont regroupés (voir SauvegardeRegles) et le travail se fait sur
+ * Les modifications rapprochées sont regroupées (voir SauvegardeRegles) et le travail se fait sur
  * un thread à part : l'écran n'est jamais ralenti. Une erreur ne fait jamais planter l'app.
  *
  * Mise en route : SauvegardeAuto.demarrer(this) dans GkmApplication.onCreate().
@@ -58,6 +58,7 @@ public final class SauvegardeAuto {
             TRAVAIL.execute(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "Sauvegarde automatique : declenchee (modification)");
                     executer();
                 }
             });
@@ -86,11 +87,13 @@ public final class SauvegardeAuto {
         derniereEcritureMs = new MemoirePrefs(
                 contexte.getSharedPreferences(PREFS_MEMOIRE, Context.MODE_PRIVATE)).derniereDate();
 
-        // Passage en arrière-plan (ou changement d'écran) : on planifie une sauvegarde.
         application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
             public void onActivityStopped(Activity activity) {
-                planifier();
+                // L'app part en arrière-plan : Android peut figer le processus quelques secondes
+                // plus tard, et une tâche différée ne s'exécuterait alors jamais. On sauvegarde
+                // donc tout de suite (sans attendre).
+                sauvegarderMaintenant("arriere-plan");
             }
 
             @Override
@@ -133,6 +136,7 @@ public final class SauvegardeAuto {
             ECOUTEURS.add(ecouteur);
         }
 
+        Log.d(TAG, "Sauvegarde automatique demarree");
         planifier();   // premier lancement, ou lancement après une pause
     }
 
@@ -157,6 +161,18 @@ public final class SauvegardeAuto {
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CODE_PERMISSION);
     }
 
+    /** Lance tout de suite une sauvegarde (thread de travail) : rien n'est écrit si rien n'a changé. */
+    private static void sauvegarderMaintenant(final String raison) {
+        HANDLER.removeCallbacks(TACHE);          // la tâche différée devient inutile
+        TRAVAIL.execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Sauvegarde automatique : declenchee (" + raison + ")");
+                executer();
+            }
+        });
+    }
+
     private static void planifier() {
         long delai = SauvegardeRegles.delai(System.currentTimeMillis(), derniereEcritureMs);
         HANDLER.removeCallbacks(TACHE);
@@ -169,13 +185,15 @@ public final class SauvegardeAuto {
             Context ctx = contexte;
             Destination destination = creerDestination(ctx);
             if (destination == null) {
+                Log.d(TAG, "Sauvegarde automatique : autorisation de stockage manquante");
                 return;   // pas d'autorisation (Android 7 à 9) : on réessaiera plus tard
             }
 
             MemoirePrefs memoire = new MemoirePrefs(
                     ctx.getSharedPreferences(PREFS_MEMOIRE, Context.MODE_PRIVATE));
 
-            MoteurSauvegarde.Resultat resultat = new MoteurSauvegarde(destination, memoire).executer(
+            MoteurSauvegarde moteur = new MoteurSauvegarde(destination, memoire);
+            MoteurSauvegarde.Resultat resultat = moteur.executer(
                     SauvegardeDonnees.instantane(ctx),
                     SauvegardeDonnees.versionApp(ctx),
                     System.currentTimeMillis());
@@ -184,6 +202,9 @@ public final class SauvegardeAuto {
                 derniereEcritureMs = memoire.derniereDate();
             }
             Log.d(TAG, "Sauvegarde automatique : " + resultat);
+            if (resultat == MoteurSauvegarde.Resultat.ECHEC) {
+                Log.w(TAG, "Cause de l'echec : " + moteur.derniereErreur());
+            }
         } catch (Throwable erreur) {
             Log.w(TAG, "Sauvegarde automatique impossible", erreur);
         }
