@@ -37,6 +37,11 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".sauvegarde.RestaurationActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

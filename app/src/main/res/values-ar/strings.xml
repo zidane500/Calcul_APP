@@ -183,5 +183,6 @@
     <string name="restauration_err_securite">تعذّر تأمين بياناتك الحالية: تم إلغاء الاستعادة. لم يتم تغيير أي شيء.</string>
     <string name="restauration_err_annulee">فشلت الاستعادة. تمت إعادة بياناتك السابقة.</string>
     <string name="restauration_err_incomplete">فشلت الاستعادة وتعذّرت إعادة بياناتك السابقة. أغلق التطبيق وتواصل مع الدعم.</string>
+
 </resources>
 
