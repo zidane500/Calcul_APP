@@ -71,6 +71,12 @@ public class StockManager {
         return gestionnaire;
     }
 
+    /** Après une restauration : oublie les copies en mémoire (stock global et stocks clients). */
+    public static synchronized void reinitialiser() {
+        instance = null;
+        instancesClients.clear();
+    }
+
     /** Supprime définitivement le stock (et l'historique) d'un client supprimé. */
     public static synchronized void supprimerStockClient(Context context, String idClient) {
         instancesClients.remove(idClient);

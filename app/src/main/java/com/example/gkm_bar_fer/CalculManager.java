@@ -42,6 +42,11 @@ public class CalculManager {
         return instance;
     }
 
+    /** Après une restauration : oublie la copie en mémoire (rechargée au prochain getInstance). */
+    public static synchronized void reinitialiser() {
+        instance = null;
+    }
+
     /** Calculs d'un client, le plus récent en premier. */
     /** Calculs d'un client, le plus récemment modifié en premier. */
     public List<CalculEnregistre> getCalculsDuClient(String clientId) {

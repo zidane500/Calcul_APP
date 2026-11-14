@@ -50,8 +50,8 @@ public final class SauvegardeAuto {
 
     private static final int CODE_PERMISSION = 4210;
 
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-    private static final ExecutorService TRAVAIL = Executors.newSingleThreadExecutor();
+    static final Handler HANDLER = new Handler(Looper.getMainLooper());
+    static final ExecutorService TRAVAIL = Executors.newSingleThreadExecutor();
     private static final Runnable TACHE = new Runnable() {
         @Override
         public void run() {
@@ -180,13 +180,17 @@ public final class SauvegardeAuto {
     }
 
     /** Exécutée sur le thread de travail. */
-    private static void executer() {
+    /**
+     * Exécutée sur le thread de travail.
+     * @return le résultat, ou null si l'autorisation de stockage manque (Android 7 à 9)
+     */
+    static MoteurSauvegarde.Resultat executer() {
         try {
             Context ctx = contexte;
             Destination destination = creerDestination(ctx);
             if (destination == null) {
                 Log.d(TAG, "Sauvegarde automatique : autorisation de stockage manquante");
-                return;   // pas d'autorisation (Android 7 à 9) : on réessaiera plus tard
+                return null;
             }
 
             MemoirePrefs memoire = new MemoirePrefs(
@@ -205,12 +209,14 @@ public final class SauvegardeAuto {
             if (resultat == MoteurSauvegarde.Resultat.ECHEC) {
                 Log.w(TAG, "Cause de l'echec : " + moteur.derniereErreur());
             }
+            return resultat;
         } catch (Throwable erreur) {
             Log.w(TAG, "Sauvegarde automatique impossible", erreur);
+            return MoteurSauvegarde.Resultat.ECHEC;
         }
     }
 
-    private static Destination creerDestination(Context ctx) {
+    static Destination creerDestination(Context ctx) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return new DestinationMediaStore(ctx);
         }

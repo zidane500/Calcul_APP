@@ -13,6 +13,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
 
+import com.example.gkm_bar_fer.sauvegarde.SectionSauvegarde;
+
 /**
  * Fenêtre "Paramètres" : choix de la langue de l'application, validé par un bouton "Confirmer".
  *
@@ -65,7 +67,7 @@ public final class ParametresDialog {
                 .create();
 
         SectionLicence.lier(activite, vue, dialogue::dismiss);
-
+        SectionSauvegarde.lier(activite, vue, dialogue::dismiss);
         btnConfirmer.setOnClickListener(v -> {
             String code = LANGUES[choix[0]][0];
             dialogue.dismiss();

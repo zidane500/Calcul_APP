@@ -42,6 +42,11 @@ public class ClientManager {
         return instance;
     }
 
+    /** Après une restauration : oublie la copie en mémoire (rechargée au prochain getInstance). */
+    public static synchronized void reinitialiser() {
+        instance = null;
+    }
+
     /** Retourne une copie de la liste (le plus récent en premier). */
     public List<Client> getClients() {
         return new ArrayList<>(clients);

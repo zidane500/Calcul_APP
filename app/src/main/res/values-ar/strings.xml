@@ -147,5 +147,41 @@
     <string name="licence_titre_prolonger">تمديد رخصتك</string>
     <string name="licence_erreur_non_prolongee">هذا الرمز لا يمدّد رخصتك الحالية (صالحة حتى %1$s). لم يتم تطبيقه.</string>
     <string name="licence_erreur_deja_a_vie">رخصتك مدى الحياة بالفعل: لم يتم تطبيق هذا الرمز.</string>
+
+    <string name="sauvegarde_titre">النسخ الاحتياطي للبيانات</string>
+    <string name="sauvegarde_info">تُحفظ نسخة من بياناتك تلقائيًا في Documents/FerPro.</string>
+    <string name="sauvegarde_derniere">آخر نسخة احتياطية: %1$s</string>
+    <string name="sauvegarde_aucune">لا توجد نسخة احتياطية حتى الآن</string>
+    <string name="sauvegarde_maintenant">حفظ نسخة الآن</string>
+    <string name="sauvegarde_envoyer">إرسال نسخة</string>
+    <string name="sauvegarde_ok">تم إنشاء النسخة الاحتياطية.</string>
+    <string name="sauvegarde_inchangee">بياناتك محفوظة بالفعل (لا توجد تغييرات).</string>
+    <string name="sauvegarde_vide">لا توجد بيانات لحفظها حاليًا.</string>
+    <string name="sauvegarde_echec">فشل النسخ الاحتياطي. حاول مرة أخرى.</string>
+    <string name="sauvegarde_permission">إذن التخزين غير متوفر: تعذّر النسخ الاحتياطي.</string>
+    <string name="sauvegarde_partage_titre">إرسال النسخة الاحتياطية</string>
+    <string name="sauvegarde_envoi_impossible">تعذّر إرسال الملف.</string>
+
+    <string name="sauvegarde_restaurer">استعادة نسخة احتياطية</string>
+    <string name="restauration_titre">استعادة نسخة احتياطية</string>
+    <string name="restauration_explication">اختر ملف نسخة احتياطية لـ Fer Pro (.ferpro): الملف الموجود في مجلد Documents/FerPro في هذا الهاتف، أو نسخة وصلتك عبر واتساب أو البريد أو Drive. لن يتم تغيير أي شيء قبل تأكيدك.</string>
+    <string name="restauration_choisir">اختيار ملف النسخة الاحتياطية</string>
+    <string name="restauration_apercu_titre">محتوى النسخة الاحتياطية</string>
+    <string name="restauration_apercu">نسخة بتاريخ %1$s\nالعملاء: %2$d\nالحسابات المحفوظة: %3$d\nأنواع المخزون (العام): %4$d\nمخزون العملاء: %5$d</string>
+    <string name="restauration_restaurer">استعادة هذه البيانات</string>
+    <string name="restauration_confirm_titre">استعادة هذه النسخة؟</string>
+    <string name="restauration_confirm_message">سيتم استبدال بياناتك الحالية ببيانات النسخة الاحتياطية. يتم إنشاء نسخة أمان من بياناتك الحالية قبل ذلك. رخصتك لن تتغير.</string>
+    <string name="restauration_confirm_oui">استعادة</string>
+    <string name="restauration_confirm_non">إلغاء</string>
+    <string name="restauration_ok">تمت استعادة البيانات.</string>
+    <string name="restauration_err_illisible">هذا الملف غير قابل للقراءة أو ليس نسخة احتياطية لـ Fer Pro.</string>
+    <string name="restauration_err_format">هذا الملف ليس نسخة احتياطية لـ Fer Pro.</string>
+    <string name="restauration_err_version">هذه النسخة من إصدار أحدث من Fer Pro. قم بتحديث التطبيق.</string>
+    <string name="restauration_err_taille">هذا الملف كبير جدًا ليكون نسخة احتياطية لـ Fer Pro.</string>
+    <string name="restauration_err_abime">هذا الملف تالف أو تم تعديله. استخدم نسخة أخرى.</string>
+    <string name="restauration_err_contenu">محتوى هذا الملف غير صالح.</string>
+    <string name="restauration_err_securite">تعذّر تأمين بياناتك الحالية: تم إلغاء الاستعادة. لم يتم تغيير أي شيء.</string>
+    <string name="restauration_err_annulee">فشلت الاستعادة. تمت إعادة بياناتك السابقة.</string>
+    <string name="restauration_err_incomplete">فشلت الاستعادة وتعذّرت إعادة بياناتك السابقة. أغلق التطبيق وتواصل مع الدعم.</string>
 </resources>
 

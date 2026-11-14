@@ -177,4 +177,40 @@
     <string name="licence_titre_prolonger">Prolonger votre licence</string>
     <string name="licence_erreur_non_prolongee">Ce code ne prolonge pas votre licence actuelle (valable jusqu\'au %1$s). Il n\'a pas été appliqué.</string>
     <string name="licence_erreur_deja_a_vie">Votre licence est déjà à vie : ce code n\'a pas été appliqué.</string>
+
+    <string name="sauvegarde_titre">Sauvegarde des données</string>
+    <string name="sauvegarde_info">Une copie de vos données est enregistrée automatiquement dans Documents/FerPro.</string>
+    <string name="sauvegarde_derniere">Dernière sauvegarde : %1$s</string>
+    <string name="sauvegarde_aucune">Aucune sauvegarde pour le moment</string>
+    <string name="sauvegarde_maintenant">Sauvegarder maintenant</string>
+    <string name="sauvegarde_envoyer">Envoyer une copie</string>
+    <string name="sauvegarde_ok">Sauvegarde effectuée.</string>
+    <string name="sauvegarde_inchangee">Vos données sont déjà sauvegardées (aucun changement).</string>
+    <string name="sauvegarde_vide">Aucune donnée à sauvegarder pour le moment.</string>
+    <string name="sauvegarde_echec">La sauvegarde a échoué. Réessayez.</string>
+    <string name="sauvegarde_permission">Autorisation de stockage manquante : sauvegarde impossible.</string>
+    <string name="sauvegarde_partage_titre">Envoyer la sauvegarde</string>
+    <string name="sauvegarde_envoi_impossible">Impossible d\'envoyer le fichier.</string>
+
+    <string name="sauvegarde_restaurer">Restaurer une sauvegarde</string>
+    <string name="restauration_titre">Restaurer une sauvegarde</string>
+    <string name="restauration_explication">Choisissez un fichier de sauvegarde Fer Pro (.ferpro) : celui du dossier Documents/FerPro de ce téléphone, ou une copie reçue par WhatsApp, e-mail ou Drive. Rien n\'est modifié avant votre confirmation.</string>
+    <string name="restauration_choisir">Choisir le fichier de sauvegarde</string>
+    <string name="restauration_apercu_titre">Contenu de la sauvegarde</string>
+    <string name="restauration_apercu">Sauvegarde du %1$s\nClients : %2$d\nCalculs enregistrés : %3$d\nTypes de stock (global) : %4$d\nStocks par client : %5$d</string>
+    <string name="restauration_restaurer">Restaurer ces données</string>
+    <string name="restauration_confirm_titre">Restaurer cette sauvegarde ?</string>
+    <string name="restauration_confirm_message">Vos données actuelles seront remplacées par celles de la sauvegarde. Une copie de sécurité de vos données actuelles est faite avant. Votre licence n\'est pas modifiée.</string>
+    <string name="restauration_confirm_oui">Restaurer</string>
+    <string name="restauration_confirm_non">Annuler</string>
+    <string name="restauration_ok">Données restaurées.</string>
+    <string name="restauration_err_illisible">Ce fichier est illisible ou n\'est pas une sauvegarde Fer Pro.</string>
+    <string name="restauration_err_format">Ce fichier n\'est pas une sauvegarde Fer Pro.</string>
+    <string name="restauration_err_version">Cette sauvegarde vient d\'une version plus récente de Fer Pro. Mettez l\'application à jour.</string>
+    <string name="restauration_err_taille">Ce fichier est trop volumineux pour être une sauvegarde Fer Pro.</string>
+    <string name="restauration_err_abime">Ce fichier est abîmé ou a été modifié. Utilisez une autre sauvegarde.</string>
+    <string name="restauration_err_contenu">Le contenu de ce fichier n\'est pas valide.</string>
+    <string name="restauration_err_securite">Impossible de sécuriser vos données actuelles : restauration annulée. Rien n\'a été modifié.</string>
+    <string name="restauration_err_annulee">La restauration a échoué. Vos données d\'avant ont été remises en place.</string>
+    <string name="restauration_err_incomplete">La restauration a échoué et vos données n\'ont pas pu être remises en place. Fermez l\'application et contactez le support.</string>
 </resources>
