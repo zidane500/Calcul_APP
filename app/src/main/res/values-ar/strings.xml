@@ -164,9 +164,8 @@
 
     <string name="sauvegarde_restaurer">استعادة نسخة احتياطية</string>
     <string name="restauration_titre">استعادة نسخة احتياطية</string>
-    <string name="restauration_explication">اختر ملف نسخة احتياطية لـ Fer Pro (.ferpro): الملف الموجود في مجلد Documents/FerPro في هذا الهاتف، أو نسخة وصلتك عبر واتساب أو البريد أو Drive. لن يتم تغيير أي شيء قبل تأكيدك.</string>
-    <string name="restauration_choisir">اختيار ملف النسخة الاحتياطية</string>
-    <string name="restauration_apercu_titre">محتوى النسخة الاحتياطية</string>
+    <string name="restauration_explication">اختر ملفًا أو عدة ملفات نسخ احتياطي لـ Fer Pro (.ferpro): الملفات الموجودة في مجلد Documents/FerPro في هذا الهاتف، أو نسخًا وصلتك عبر واتساب أو البريد أو Drive. عند اختيار عدة ملفات يتم دمج البيانات. لن يتم تغيير أي شيء قبل تأكيدك.</string>
+    <string name="restauration_choisir">اختيار ملف أو عدة ملفات</string>    <string name="restauration_apercu_titre">محتوى النسخة الاحتياطية</string>
     <string name="restauration_apercu">نسخة بتاريخ %1$s\nالعملاء: %2$d\nالحسابات المحفوظة: %3$d\nأنواع المخزون (العام): %4$d\nمخزون العملاء: %5$d</string>
     <string name="restauration_restaurer">استعادة هذه البيانات</string>
     <string name="restauration_confirm_titre">استعادة هذه النسخة؟</string>
@@ -183,6 +182,12 @@
     <string name="restauration_err_securite">تعذّر تأمين بياناتك الحالية: تم إلغاء الاستعادة. لم يتم تغيير أي شيء.</string>
     <string name="restauration_err_annulee">فشلت الاستعادة. تمت إعادة بياناتك السابقة.</string>
     <string name="restauration_err_incomplete">فشلت الاستعادة وتعذّرت إعادة بياناتك السابقة. أغلق التطبيق وتواصل مع الدعم.</string>
+
+    <string name="restauration_apercu_fusion">دمج %1$d نسخ احتياطية\nأقدم نسخة: %2$s\nأحدث نسخة: %3$s\nالعملاء: %4$d\nالحسابات المحفوظة: %5$d\nأنواع المخزون (العام): %6$d\nمخزون العملاء: %7$d</string>
+    <string name="restauration_confirm_message_fusion">سيتم دمج النسخ المختارة: يتم الاحتفاظ بجميع العملاء وجميع الحسابات، وبالنسبة للمخزون تُستخدم أحدث نسخة. سيتم استبدال بياناتك الحالية بهذه النتيجة. يتم إنشاء نسخة أمان من بياناتك الحالية قبل ذلك. رخصتك لن تتغير.</string>
+    <string name="restauration_err_trop">عدد الملفات المختارة كبير جدًا (الحد الأقصى %1$d).</string>
+    <string name="restauration_err_fusion">تعذّر دمج هذه النسخ: إحداها تحتوي على بيانات غير صالحة. جرّب استعادتها واحدة تلو الأخرى.</string>
+    <string name="restauration_info_ignores">تم تجاهل %1$d ملف(ات): غير قابلة للقراءة أو تالفة أو ليست نسخًا احتياطية لـ Fer Pro.</string>
 
 </resources>
 

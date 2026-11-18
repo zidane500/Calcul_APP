@@ -21,22 +21,31 @@ import com.example.gkm_bar_fer.MenuActivity;
 import com.example.gkm_bar_fer.R;
 import com.example.gkm_bar_fer.StockManager;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
- * Restauration : le client choisit un fichier .ferpro, voit ce qu'il contient, confirme,
- * puis ses données sont remplacées par celles de la sauvegarde.
+ * Restauration : le client choisit UN ou PLUSIEURS fichiers .ferpro, voit ce qu'ils contiennent,
+ * confirme, puis ses données sont remplacées.
+ *  - 1 fichier   : restauration simple.
+ *  - 2 fichiers ou plus : fusion (MoteurFusion), puis restauration du résultat.
  *
- * Sécurités : le fichier est entièrement vérifié AVANT toute écriture (SauvegardeCodec),
- * une copie de sécurité des données actuelles est faite avant de remplacer, et en cas de
- * problème pendant l'écriture les données d'avant sont remises en place (MoteurRestauration).
- * La licence n'est jamais touchée.
+ * Sécurités : chaque fichier est entièrement vérifié AVANT toute écriture (SauvegardeCodec), le
+ * résultat de la fusion repasse par la même vérification, une copie de sécurité des données
+ * actuelles est faite avant de remplacer, et en cas de problème pendant l'écriture les données
+ * d'avant sont remises en place (MoteurRestauration). La licence n'est jamais touchée.
  */
 public class RestaurationActivity extends AppCompatActivity {
+
+    /** Au-delà, on refuse : évite de charger trop de données en mémoire. */
+    private static final int MAX_FICHIERS = 20;
 
     private TextView tvMessage;
     private TextView tvApercu;
@@ -45,11 +54,14 @@ public class RestaurationActivity extends AppCompatActivity {
     private Button btnRestaurer;
     private ProgressBar progression;
 
-    /** Contenu vérifié du fichier choisi (null tant qu'aucun fichier valide n'est choisi). */
+    /** Données prêtes à restaurer (un fichier, ou le résultat de la fusion). null = rien de choisi. */
     private SauvegardeCodec.Contenu contenuLu;
+    /** Nombre de sauvegardes derrière contenuLu (1 = restauration simple, 2+ = fusion). */
+    private int nbSauvegardes;
 
     private final ActivityResultLauncher<String[]> selecteur =
-            registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::fichierChoisi);
+            registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(),
+                    this::fichiersChoisis);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,46 +80,115 @@ public class RestaurationActivity extends AppCompatActivity {
     }
 
     // ------------------------------------------------------------------
-    // 1. Choix et vérification du fichier
+    // 1. Choix et vérification des fichiers
     // ------------------------------------------------------------------
 
-    private void fichierChoisi(final Uri uri) {
-        if (uri == null) {
+    private void fichiersChoisis(final List<Uri> uris) {
+        if (uris == null || uris.isEmpty()) {
             return;                                   // le client a annulé
         }
         contenuLu = null;
+        nbSauvegardes = 0;
         carteApercu.setVisibility(View.GONE);
         tvMessage.setVisibility(View.GONE);
+
+        if (uris.size() > MAX_FICHIERS) {
+            afficherMessage(getString(R.string.restauration_err_trop, MAX_FICHIERS));
+            return;
+        }
         occupe(true);
 
         final Context app = getApplicationContext();
         SauvegardeAuto.TRAVAIL.execute(() -> {
-            SauvegardeCodec.Contenu lu = null;
-            int erreur = 0;
-            try (InputStream flux = app.getContentResolver().openInputStream(uri)) {
-                if (flux == null) {
-                    erreur = R.string.restauration_err_illisible;
-                } else {
-                    lu = SauvegardeCodec.lire(flux);
+            List<SauvegardeCodec.Contenu> valides = new ArrayList<>();
+            int ignores = 0;
+            int premiereErreur = 0;
+
+            for (Uri uri : uris) {
+                try (InputStream flux = app.getContentResolver().openInputStream(uri)) {
+                    if (flux == null) {
+                        throw new IOException("flux null");
+                    }
+                    valides.add(SauvegardeCodec.lire(flux));
+                } catch (SauvegardeCodec.InvalideException e) {
+                    ignores++;
+                    if (premiereErreur == 0) {
+                        premiereErreur = messagePour(e.motif);
+                    }
+                } catch (IOException | RuntimeException e) {
+                    ignores++;
+                    if (premiereErreur == 0) {
+                        premiereErreur = R.string.restauration_err_illisible;
+                    }
                 }
-            } catch (SauvegardeCodec.InvalideException e) {
-                erreur = messagePour(e.motif);
-            } catch (IOException | RuntimeException e) {
+            }
+
+            // Un seul fichier valide : restauration simple. Plusieurs : fusion.
+            SauvegardeCodec.Contenu pret = null;
+            int erreur = premiereErreur;
+            if (valides.size() == 1) {
+                pret = valides.get(0);
+            } else if (valides.size() > 1) {
+                try {
+                    pret = fusionner(valides);
+                } catch (JSONException | SauvegardeCodec.InvalideException | RuntimeException e) {
+                    erreur = R.string.restauration_err_fusion;
+                }
+            }
+            if (pret == null && erreur == 0) {
                 erreur = R.string.restauration_err_illisible;
             }
 
-            final SauvegardeCodec.Contenu resultat = lu;
+            final SauvegardeCodec.Contenu resultat = pret;
+            final int nb = valides.size();
+            final int nbIgnores = ignores;
             final int texteErreur = erreur;
+            final long plusAncienne = plusAncienneDate(valides);
+            final long plusRecente = plusRecenteDate(valides);
+
             runOnUiThread(() -> {
                 occupe(false);
                 if (resultat == null) {
-                    afficherMessage(texteErreur);
+                    afficherMessage(getString(texteErreur));
                     return;
                 }
                 contenuLu = resultat;
-                afficherApercu(resultat.apercu);
+                nbSauvegardes = nb;
+                afficherApercu(resultat.apercu, nb, plusAncienne, plusRecente);
+                if (nbIgnores > 0) {
+                    afficherMessage(getString(R.string.restauration_info_ignores, nbIgnores));
+                }
             });
         });
+    }
+
+    /** Fusionne puis refait passer le résultat par la vérification complète du codec. */
+    private static SauvegardeCodec.Contenu fusionner(List<SauvegardeCodec.Contenu> valides)
+            throws JSONException, SauvegardeCodec.InvalideException {
+        java.util.Map<String, java.util.Map<String, Object>> fusion = MoteurFusion.fusionner(valides);
+        SauvegardeCodec.Apercu recent = valides.get(0).apercu;
+        for (SauvegardeCodec.Contenu c : valides) {
+            if (c.apercu.dateMs > recent.dateMs) {
+                recent = c.apercu;
+            }
+        }
+        return SauvegardeCodec.lire(SauvegardeCodec.ecrire(fusion, recent.versionApp, recent.dateMs));
+    }
+
+    private static long plusAncienneDate(List<SauvegardeCodec.Contenu> liste) {
+        long min = Long.MAX_VALUE;
+        for (SauvegardeCodec.Contenu c : liste) {
+            min = Math.min(min, c.apercu.dateMs);
+        }
+        return liste.isEmpty() ? 0L : min;
+    }
+
+    private static long plusRecenteDate(List<SauvegardeCodec.Contenu> liste) {
+        long max = 0L;
+        for (SauvegardeCodec.Contenu c : liste) {
+            max = Math.max(max, c.apercu.dateMs);
+        }
+        return max;
     }
 
     private static int messagePour(SauvegardeCodec.Motif motif) {
@@ -128,14 +209,24 @@ public class RestaurationActivity extends AppCompatActivity {
         }
     }
 
-    private void afficherApercu(SauvegardeCodec.Apercu apercu) {
+    private String formaterDate(long dateMs) {
+        if (dateMs <= 0) {
+            return "?";
+        }
         Locale langue = getResources().getConfiguration().getLocales().get(0);
-        String date = apercu.dateMs > 0
-                ? DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, langue)
-                .format(new Date(apercu.dateMs))
-                : "?";
-        tvApercu.setText(getString(R.string.restauration_apercu, date,
-                apercu.nbClients, apercu.nbCalculs, apercu.nbTypesStock, apercu.nbStocksClients));
+        return DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, langue)
+                .format(new Date(dateMs));
+    }
+
+    private void afficherApercu(SauvegardeCodec.Apercu apercu, int nb, long plusAncienne, long plusRecente) {
+        if (nb > 1) {
+            tvApercu.setText(getString(R.string.restauration_apercu_fusion, nb,
+                    formaterDate(plusAncienne), formaterDate(plusRecente),
+                    apercu.nbClients, apercu.nbCalculs, apercu.nbTypesStock, apercu.nbStocksClients));
+        } else {
+            tvApercu.setText(getString(R.string.restauration_apercu, formaterDate(apercu.dateMs),
+                    apercu.nbClients, apercu.nbCalculs, apercu.nbTypesStock, apercu.nbStocksClients));
+        }
         carteApercu.setVisibility(View.VISIBLE);
     }
 
@@ -149,7 +240,9 @@ public class RestaurationActivity extends AppCompatActivity {
         }
         new AlertDialog.Builder(this)
                 .setTitle(R.string.restauration_confirm_titre)
-                .setMessage(R.string.restauration_confirm_message)
+                .setMessage(nbSauvegardes > 1
+                        ? R.string.restauration_confirm_message_fusion
+                        : R.string.restauration_confirm_message)
                 .setPositiveButton(R.string.restauration_confirm_oui, (d, w) -> restaurer())
                 .setNegativeButton(R.string.restauration_confirm_non, null)
                 .show();
@@ -182,13 +275,13 @@ public class RestaurationActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 occupe(false);
                 if (!copieOk) {
-                    afficherMessage(R.string.restauration_err_securite);
+                    afficherMessage(getString(R.string.restauration_err_securite));
                 } else if (fin == MoteurRestauration.Resultat.RESTAUREE) {
                     termine();
                 } else if (fin == MoteurRestauration.Resultat.ECHEC_ANNULEE) {
-                    afficherMessage(R.string.restauration_err_annulee);
+                    afficherMessage(getString(R.string.restauration_err_annulee));
                 } else {
-                    afficherMessage(R.string.restauration_err_incomplete);
+                    afficherMessage(getString(R.string.restauration_err_incomplete));
                 }
             });
         });
@@ -217,7 +310,7 @@ public class RestaurationActivity extends AppCompatActivity {
         btnRestaurer.setEnabled(!enCours);
     }
 
-    private void afficherMessage(int texte) {
+    private void afficherMessage(String texte) {
         tvMessage.setText(texte);
         tvMessage.setVisibility(View.VISIBLE);
     }
