@@ -25,6 +25,9 @@ public final class LicenseConstants {
     public static final String KEY_INSTALLATION_ID = "installation_id";
     public static final String KEY_LICENSE_CODE = "license_code";
 
+    /** Sel de dérivation de l'Installation ID. NE JAMAIS le modifier après la première vente. */
+    public static final String INSTALLATION_ID_SALT = "FERPRO|ID|v1|k7Qm2xW9tZpR4vLb8nHs";
+
     /** Téléphone affiché sur l'écran de renouvellement. À remplacer par ton vrai numéro. */
     public static final String SUPPORT_PHONE = "52 827 067";
 

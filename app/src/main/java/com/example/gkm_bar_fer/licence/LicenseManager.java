@@ -66,12 +66,18 @@ public class LicenseManager {
         }
     }
 
+    /** Source de l'identifiant du téléphone (ANDROID_ID). Null dans les tests. */
+    interface SourceAppareil {
+        String idAppareil();
+    }
+
     private static LicenseManager instance;
 
     private final SharedPreferences preferences;
     private final LicenseVerifier verifier;
     private final Horloge horloge;
     private final ClockGuard clockGuard;
+    private SourceAppareil sourceAppareil; // null = ID aléatoire (tests)
 
     /** Sans signature Keystore (utilisé par les tests). */
     LicenseManager(SharedPreferences preferences, LicenseVerifier verifier, Horloge horloge) {
@@ -99,6 +105,14 @@ public class LicenseManager {
                     return DebugClock.maintenantMs(appContext);
                 }
             }, new KeystoreMac());
+            instance.sourceAppareil = new SourceAppareil() {
+                @Override
+                public String idAppareil() {
+                    return android.provider.Settings.Secure.getString(
+                            appContext.getContentResolver(),
+                            android.provider.Settings.Secure.ANDROID_ID);
+                }
+            };
         }
         return instance;
     }
@@ -110,12 +124,22 @@ public class LicenseManager {
      */
     public synchronized String getInstallationId() {
         String id = preferences.getString(LicenseConstants.KEY_INSTALLATION_ID, null);
+
+        String idAppareil = sourceAppareil != null ? sourceAppareil.idAppareil() : null;
+        if (InstallationId.idAppareilUtilisable(idAppareil)) {
+            String derive = InstallationId.deriver(idAppareil, LicenseConstants.INSTALLATION_ID_SALT);
+            if (!derive.equals(id)) {
+                preferences.edit()
+                        .putString(LicenseConstants.KEY_INSTALLATION_ID, derive)
+                        .commit();
+            }
+            return derive;
+        }
+
         if (InstallationId.estValide(id)) {
             return id;
         }
         String nouveau = InstallationId.generer();
-        // commit() (et non apply()) : on veut être sûr que l'ID est écrit sur le disque
-        // avant de l'afficher au client.
         preferences.edit()
                 .putString(LicenseConstants.KEY_INSTALLATION_ID, nouveau)
                 .commit();

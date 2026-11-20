@@ -1,5 +1,7 @@
 package com.example.gkm_bar_fer.licence;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -38,6 +40,30 @@ public final class InstallationId {
             }
         }
         return sb.toString();
+    }
+
+    public static String deriver(String idAppareil, String sel) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] h = md.digest((idAppareil + "|" + sel).getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(PREFIXE);
+            int pos = 0;
+            for (int g = 0; g < NB_GROUPES; g++) {
+                sb.append('-');
+                for (int i = 0; i < TAILLE_GROUPE; i++) {
+                    sb.append(ALPHABET.charAt((h[pos++] & 0xFF) % ALPHABET.length()));
+                }
+            }
+            return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /** true si l'ANDROID_ID est exploitable (non vide, pas la valeur bogue connue). */
+    public static boolean idAppareilUtilisable(String idAppareil) {
+        return idAppareil != null && !idAppareil.trim().isEmpty()
+                && !"9774d56d682e549c".equalsIgnoreCase(idAppareil.trim());
     }
 
     /** @return true si la chaîne respecte exactement le format FP-XXXX-XXXX-XXXX. */

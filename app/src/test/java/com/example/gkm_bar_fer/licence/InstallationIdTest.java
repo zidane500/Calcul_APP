@@ -47,4 +47,26 @@ public class InstallationIdTest {
     public void estValide_refuseNull() {
         assertFalse(InstallationId.estValide(null));
     }
+
+    @Test
+    public void deriver_estStablePourLeMemeTelephone() {
+        String a = InstallationId.deriver("abc123def4567890", "SEL");
+        assertEquals(a, InstallationId.deriver("abc123def4567890", "SEL"));
+        assertTrue(InstallationId.estValide(a));
+    }
+
+    @Test
+    public void deriver_differeSelonLeTelephoneEtLeSel() {
+        String a = InstallationId.deriver("abc123def4567890", "SEL");
+        assertFalse(a.equals(InstallationId.deriver("0123456789abcdef", "SEL")));
+        assertFalse(a.equals(InstallationId.deriver("abc123def4567890", "AUTRE")));
+    }
+
+    @Test
+    public void idAppareilUtilisable_refuseLesValeursInutilisables() {
+        assertFalse(InstallationId.idAppareilUtilisable(null));
+        assertFalse(InstallationId.idAppareilUtilisable("  "));
+        assertFalse(InstallationId.idAppareilUtilisable("9774d56d682e549c"));
+        assertTrue(InstallationId.idAppareilUtilisable("abc123def4567890"));
+    }
 }
