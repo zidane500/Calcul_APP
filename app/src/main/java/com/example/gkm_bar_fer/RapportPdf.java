@@ -299,7 +299,7 @@ public final class RapportPdf {
 
         private String titreRapport() {
             boolean client = d.nomClient != null && !d.nomClient.trim().isEmpty();
-            return client ? "Résultat de calcul de " + d.nomClient.trim() : "Résultat de calcul";
+            return (client ? "Résultat de Calcul FER de " + d.nomClient.trim() : "Résultat de calcul") + ".";
         }
 
         private void enTete() {
@@ -386,32 +386,47 @@ public final class RapportPdf {
         private void chiffresCles() {
             int barresAcheter = 0;
             int coupes = 0;
-            double chutes = 0;
+            TreeMap<Long, Integer> dechets = DechetsResume.nouveau();   // centimètres -> nombre de chutes
             for (GroupeBarres g : d.groupes) {
                 barresAcheter += g.barresAcheter;
                 for (BarreDetail b : g.barres) {
                     coupes += b.coupes.size();
                     if (b.chute > 1e-9) {
-                        chutes += b.chute;
+                        DechetsResume.ajouter(dechets, b.chute);
                     }
                 }
             }
+            List<String> lignesDechets = DechetsResume.lignes(dechets);
 
-            String[] valeurs = {String.valueOf(barresAcheter), String.valueOf(coupes), fmt(chutes) + " m"};
-            String[] libelles = {"BARRES À ACHETER", "COUPES À RÉALISER", "CHUTES TOTALES"};
+            String[] valeurs = {String.valueOf(barresAcheter), String.valueOf(coupes)};
+            String[] libelles = {"BARRES À ACHETER", "COUPES À RÉALISER", "DÉCHETS"};
 
             float ecart = 12f;
             float largeurCase = (LARGEUR_UTILE - 2f * ecart) / 3f;
-            float hauteurCase = 56f;
+
+            // Le bloc « Déchets » a une ligne par longueur : sa hauteur s'adapte (les 3 cases restent alignées).
+            int n = lignesDechets.size();
+            float yLibelleDechets = Math.max(46f, 18f + 13f * (n - 1) + 15f);
+            float hauteurCase = Math.max(56f, yLibelleDechets + 10f);
 
             Paint paintValeur = texte(21f, BLEU, true);
+            Paint paintDechets = texte(10f, BLEU, true);
             Paint paintLibelle = texte(7.5f, GRIS_TEXTE, true);
 
             for (int i = 0; i < 3; i++) {
                 float x = MARGE + i * (largeurCase + ecart);
                 canvas.drawRect(x, y, x + largeurCase, y + hauteurCase, remplissage(FOND_CLAIR));
-                canvas.drawText(valeurs[i], x + 14f, y + 28f, paintValeur);
-                canvas.drawText(libelles[i], x + 14f, y + 46f, paintLibelle);
+                if (i < 2) {
+                    canvas.drawText(valeurs[i], x + 14f, y + 28f, paintValeur);
+                    canvas.drawText(libelles[i], x + 14f, y + 46f, paintLibelle);
+                } else {
+                    float yLigne = n == 1 ? y + 28f : y + 18f;
+                    for (String ligne : lignesDechets) {
+                        canvas.drawText(ligne, x + 14f, yLigne, paintDechets);
+                        yLigne += 13f;
+                    }
+                    canvas.drawText(libelles[i], x + 14f, y + yLibelleDechets, paintLibelle);
+                }
             }
             y += hauteurCase + 26f;
         }

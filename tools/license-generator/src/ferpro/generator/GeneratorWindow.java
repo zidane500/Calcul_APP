@@ -18,6 +18,7 @@ import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,6 +42,8 @@ public final class GeneratorWindow extends JFrame {
             new JComboBox<>(LicenseService.Duree.values());
     private final JTextField champDebut = new JTextField();
     private final JTextField champFin = new JTextField();
+    private final JCheckBox caseStock = new JCheckBox(
+            "Utiliser les fonctionnalités du stock (stock déchets + stock client)", true);
     private final JTextArea zoneCode = new JTextArea(6, 40);
     private final JLabel etiquetteStatut = new JLabel(" ");
 
@@ -76,15 +79,27 @@ public final class GeneratorWindow extends JFrame {
         a.gridwidth = 2;
         formulaire.add(aide, a);
 
+        GridBagConstraints cs = base(7);
+        cs.gridwidth = 2;
+        cs.insets = new Insets(8, 0, 2, 0);
+        formulaire.add(caseStock, cs);
+
+        JLabel noteStock = new JLabel("<html><i>Décoché : le stock est caché dans l'application "
+                + "(il reste la gestion des clients). Ce code ne fonctionne qu'avec la version de "
+                + "l'application qui contient cette fonction.</i></html>");
+        GridBagConstraints ns = base(8);
+        ns.gridwidth = 2;
+        formulaire.add(noteStock, ns);
+
         JButton boutonGenerer = new JButton("GÉNÉRER");
         boutonGenerer.setFont(boutonGenerer.getFont().deriveFont(Font.BOLD, 14f));
-        GridBagConstraints g = base(7);
+        GridBagConstraints g = base(9);
         g.gridwidth = 2;
         g.insets = new Insets(14, 0, 8, 0);
         formulaire.add(boutonGenerer, g);
 
         JLabel titreCode = new JLabel("Licence générée :");
-        GridBagConstraints tc = base(8);
+        GridBagConstraints tc = base(10);
         tc.gridwidth = 2;
         formulaire.add(titreCode, tc);
 
@@ -92,13 +107,13 @@ public final class GeneratorWindow extends JFrame {
         zoneCode.setWrapStyleWord(false);
         zoneCode.setEditable(false);
         zoneCode.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
-        GridBagConstraints z = base(9);
+        GridBagConstraints z = base(11);
         z.gridwidth = 2;
         z.fill = GridBagConstraints.BOTH;
         z.weighty = 1;
         formulaire.add(new JScrollPane(zoneCode), z);
 
-        GridBagConstraints s = base(10);
+        GridBagConstraints s = base(12);
         s.gridwidth = 2;
         formulaire.add(etiquetteStatut, s);
 
@@ -202,14 +217,16 @@ public final class GeneratorWindow extends JFrame {
                 return;
             }
 
+            boolean droitStock = caseStock.isSelected();
             LicenseService.Resultat r = LicenseService.generer(
-                    cles.privee, cles.publique, champId.getText(), duree, debut, fin);
+                    cles.privee, cles.publique, champId.getText(), duree, debut, fin, droitStock);
 
             zoneCode.setText(r.code);
             zoneCode.setCaretPosition(0);
             etiquetteStatut.setText("<html>\u2714 Licence <b>" + duree + "</b> pour <b>"
                     + r.licence.getInstallationId() + "</b>, "
-                    + LicenseService.resumePeriode(r.licence) + " (auto-vérifiée)</html>");
+                    + LicenseService.resumePeriode(r.licence) + ", <b>"
+                    + LicenseService.resumeDroits(r.licence) + "</b> (auto-vérifiée)</html>");
             champId.setText(r.licence.getInstallationId());
 
             try {

@@ -4,8 +4,13 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.example.gkm_bar_fer.MenuActivity;
+import com.example.gkm_bar_fer.R;
 import com.example.gkm_bar_fer.SplashActivity;
+import com.example.gkm_bar_fer.StockActivity;
+import com.example.gkm_bar_fer.StockClientsActivity;
 
 /**
  * Garde de licence : contrôle la licence à CHAQUE fois qu'un écran de l'application
@@ -26,6 +31,12 @@ public final class LicenseGuard implements Application.ActivityLifecycleCallback
                 || activity instanceof ActivationActivity;
     }
 
+    /** Écrans du stock : réservés aux licences qui donnent le droit « stock ». */
+    private static boolean estEcranStock(Activity activity) {
+        return activity instanceof StockActivity
+                || activity instanceof StockClientsActivity;
+    }
+
     /** Écran à afficher quand la licence ne permet pas d'utiliser l'application. */
     static Class<? extends Activity> ecranPour(LicenseStatus statut) {
         // Étapes 8 et 9 : écran "Licence expirée" dédié. Pour l'instant : écran d'activation.
@@ -37,8 +48,18 @@ public final class LicenseGuard implements Application.ActivityLifecycleCallback
         if (estExempte(activity)) {
             return;
         }
-        LicenseStatus statut = LicenseManager.getInstance(activity).getStatus();
+        LicenseManager manager = LicenseManager.getInstance(activity);
+        LicenseStatus statut = manager.getStatus();
         if (statut.autoriseAcces()) {
+            // Licence valide mais sans le droit « stock » : les écrans du stock sont fermés
+            // (ils ne sont normalement même pas affichés dans les menus).
+            if (estEcranStock(activity) && !manager.peutUtiliserStock()) {
+                Toast.makeText(activity, R.string.stock_non_inclus, Toast.LENGTH_LONG).show();
+                Intent accueil = new Intent(activity, MenuActivity.class);
+                accueil.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                activity.startActivity(accueil);
+                activity.finish();
+            }
             return;
         }
         // Licence absente, expirée ou invalide : retour à l'écran de licence, et on vide

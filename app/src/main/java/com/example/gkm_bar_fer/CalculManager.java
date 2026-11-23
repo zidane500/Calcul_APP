@@ -114,6 +114,27 @@ public class CalculManager {
         return calcul;
     }
 
+    /**
+     * Supprime un calcul enregistré.
+     *
+     * @return true si le calcul existait et que la suppression est bien sauvegardée ;
+     *         false sinon (dans ce cas le calcul est conservé)
+     */
+    public boolean supprimer(String idCalcul) {
+        for (int i = 0; i < calculs.size(); i++) {
+            CalculEnregistre calcul = calculs.get(i);
+            if (calcul.getId().equals(idCalcul)) {
+                calculs.remove(i);
+                if (!sauvegarder()) {
+                    calculs.add(i, calcul);
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Supprime tous les calculs d'un client (utilisé quand le client est supprimé). */
     public void supprimerTousDuClient(String clientId) {
         boolean modifie = false;

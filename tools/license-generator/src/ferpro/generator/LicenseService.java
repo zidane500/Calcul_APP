@@ -123,14 +123,27 @@ public final class LicenseService {
     public static Resultat generer(PrivateKey clePrivee, PublicKey clePublique,
                                    String installationIdSaisi, Duree duree,
                                    int jourDebut, int jourFin) {
+        return generer(clePrivee, clePublique, installationIdSaisi, duree, jourDebut, jourFin, true);
+    }
+
+    /**
+     * Même chose, avec le droit « utiliser les fonctionnalités du stock ».
+     *
+     * @param droitStock true = stock autorisé (code identique aux anciens codes, compatible avec
+     *                   toutes les versions de l'application) ; false = stock masqué dans
+     *                   l'application (code nouveau format : l'application doit être à jour).
+     */
+    public static Resultat generer(PrivateKey clePrivee, PublicKey clePublique,
+                                   String installationIdSaisi, Duree duree,
+                                   int jourDebut, int jourFin, boolean droitStock) {
         String id = InstallationId.normaliser(installationIdSaisi);
         if (id == null) {
             throw new IllegalArgumentException("Installation ID invalide.\n"
                     + "Format attendu : FP-XXXX-XXXX-XXXX (les caractères 0, O, 1, I, L n'existent pas).");
         }
         LicensePayload licence = duree.estAVie()
-                ? LicensePayload.aVie(id, jourDebut)
-                : LicensePayload.limitee(id, jourDebut, jourFin);
+                ? LicensePayload.aVie(id, jourDebut, droitStock)
+                : LicensePayload.limitee(id, jourDebut, jourFin, droitStock);
 
         try {
             byte[] contenu = licence.toBytes();
@@ -150,6 +163,9 @@ public final class LicenseService {
             if (!v.estOk()) {
                 throw new IllegalStateException("Auto-vérification échouée : " + v.getResultat());
             }
+            if (v.getLicence().donneDroitStock() != droitStock) {
+                throw new IllegalStateException("Auto-vérification échouée : droit stock incorrect.");
+            }
             return new Resultat(code, licence);
         } catch (GeneralSecurityException e) {
             throw new IllegalStateException("Erreur de signature : " + e.getMessage(), e);
@@ -166,7 +182,7 @@ public final class LicenseService {
         StringBuilder sb = new StringBuilder();
         if (nouveau) {
             sb.append('\uFEFF'); // BOM UTF-8 : Excel lit correctement les accents
-            sb.append("Date génération;Client;Installation ID;Type;Début;Expiration\r\n");
+            sb.append("Date génération;Client;Installation ID;Type;Début;Expiration;Stock\r\n");
         }
         sb.append(LicenseDates.formater(jourGeneration)).append(';')
                 .append(proteger(client)).append(';')
@@ -174,7 +190,8 @@ public final class LicenseService {
                 .append(licence.estAVie() ? "Lifetime" : "Limitée").append(';')
                 .append(LicenseDates.formater(licence.getJourDebut())).append(';')
                 .append(licence.estAVie() ? "Sans expiration"
-                        : LicenseDates.formater(licence.getJourFin()))
+                        : LicenseDates.formater(licence.getJourFin())).append(';')
+                .append(licence.donneDroitStock() ? "Avec stock" : "Sans stock")
                 .append("\r\n");
         Files.write(journal, sb.toString().getBytes(StandardCharsets.UTF_8),
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND);
@@ -186,6 +203,11 @@ public final class LicenseService {
             t = "'" + t; // évite qu'Excel interprète le texte comme une formule
         }
         return t.contains(";") || t.contains("\"") || t.contains("\n") ? "\"" + t + "\"" : t;
+    }
+
+    /** « Avec stock » / « Sans stock » : à afficher à côté de la période. */
+    public static String resumeDroits(LicensePayload l) {
+        return l.donneDroitStock() ? "avec stock" : "sans stock";
     }
 
     /** Résumé lisible : « du 18/10/2026 au 18/10/2027 ». */

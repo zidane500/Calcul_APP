@@ -19,6 +19,13 @@ public final class LicenseConstants {
     /** Version du format de licence (permet d'évoluer plus tard sans casser les anciennes). */
     public static final int LICENSE_FORMAT_VERSION = 1;
 
+    /**
+     * Version 2 du format : identique à la version 1 + 1 octet de « droits d'accès »
+     * (voir LicensePayload.DROIT_STOCK). Une licence version 1 (anciens codes déjà vendus)
+     * reste valable et donne implicitement tous les droits d'avant (stock inclus).
+     */
+    public static final int LICENSE_FORMAT_VERSION_2 = 2;
+
     /** Fichier SharedPreferences dédié à la licence (séparé des données métier). */
     public static final String PREFS_NAME = "license_prefs";
 

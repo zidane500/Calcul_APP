@@ -23,6 +23,7 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         configurerMenuNavigation();
+        appliquerDroitStock();
 
 
         // Android 7 à 9 : demande une seule fois l'autorisation d'écrire la sauvegarde.
@@ -70,6 +71,22 @@ public class MenuActivity extends AppCompatActivity {
         );
         intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, MainActivity.TYPE_MULTI);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // La licence a pu changer (nouveau code saisi depuis Paramètres).
+        appliquerDroitStock();
+    }
+
+    /** Sans le droit « stock » : on cache l'accès au stock (menu latéral + bloc « Votre stock »). */
+    private void appliquerDroitStock() {
+        boolean autorise = AccesStock.autorise(this);
+        AccesStock.appliquerAuTiroir((NavigationView) findViewById(R.id.navigationView), autorise);
+        int visibilite = autorise ? View.VISIBLE : View.GONE;
+        findViewById(R.id.tvTitreStock).setVisibility(visibilite);
+        findViewById(R.id.cardStockAcces).setVisibility(visibilite);
     }
 
     private void configurerMenuNavigation() {

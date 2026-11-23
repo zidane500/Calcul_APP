@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * Vérifie un code de licence avec la clé PUBLIQUE (ECDSA P-256 + SHA-256).
  *
- * Le code est : Base32( contenu de 19 octets + signature DER ).
+ * Le code est : Base32( contenu de 19 octets (format v1) ou 20 octets (format v2) + signature DER ).
  * Ordre des contrôles (important pour la sécurité) :
  *   1. format du code, 2. SIGNATURE (avant de faire confiance au contenu),
  *   3. produit, 4. Installation ID, 5. dates.
@@ -100,12 +100,19 @@ public final class LicenseVerifier {
      */
     public Verification verifier(String code, String installationIdLocal, int jourActuel) {
         byte[] tout = Base32.decode(code);
-        if (tout == null || tout.length < LicensePayload.TAILLE + SIGNATURE_MIN
-                || tout.length > LicensePayload.TAILLE + SIGNATURE_MAX) {
+        if (tout == null || tout.length == 0) {
             return new Verification(Resultat.FORMAT_INVALIDE, null);
         }
-        byte[] contenu = Arrays.copyOfRange(tout, 0, LicensePayload.TAILLE);
-        byte[] signature = Arrays.copyOfRange(tout, LicensePayload.TAILLE, tout.length);
+        // Le 1er octet donne la version du format, donc la taille du contenu (19 ou 20 octets).
+        // Il n'est pas encore digne de confiance : la signature ci-dessous porte sur les octets
+        // exacts, une version falsifiée fait échouer la signature.
+        int tailleContenu = LicensePayload.tailleContenuPourVersion(tout[0] & 0xFF);
+        if (tailleContenu < 0 || tout.length < tailleContenu + SIGNATURE_MIN
+                || tout.length > tailleContenu + SIGNATURE_MAX) {
+            return new Verification(Resultat.FORMAT_INVALIDE, null);
+        }
+        byte[] contenu = Arrays.copyOfRange(tout, 0, tailleContenu);
+        byte[] signature = Arrays.copyOfRange(tout, tailleContenu, tout.length);
 
         if (!signatureValide(contenu, signature)) {
             return new Verification(Resultat.SIGNATURE_INVALIDE, null);

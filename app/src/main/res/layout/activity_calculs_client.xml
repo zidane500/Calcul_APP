@@ -41,23 +41,23 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <!-- Poteau : action principale -->
+            <!-- Multi-Calcul : action principale -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCalculerPoteau"
+                android:id="@+id/btnCalculerMulti"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
                 android:layout_height="72dp"
                 android:layout_marginBottom="12dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="@string/calculer_poteau"
+                android:text="@string/multi_calcul"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:backgroundTint="#173B65"
                 app:cornerRadius="18dp"
-                app:icon="@drawable/ic_poteau"
+                app:icon="@drawable/ic_calculate"
                 app:iconGravity="textStart"
                 app:iconPadding="12dp"
                 app:iconSize="28dp"
@@ -181,7 +181,7 @@
 
             </LinearLayout>
 
-            <!-- Ligne 3 : Chaînage / Multi-Calcul -->
+            <!-- Ligne 3 : Chaînage / Poteau -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -213,7 +213,7 @@
                     app:iconTint="#FFFFFF" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCalculerMulti"
+                    android:id="@+id/btnCalculerPoteau"
                     style="@style/Widget.Material3.Button"
                     android:layout_width="0dp"
                     android:layout_height="96dp"
@@ -224,14 +224,14 @@
                     android:maxLines="2"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
-                    android:text="@string/multi_calcul"
+                    android:text="@string/calculer_poteau"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:backgroundTint="#5B3E8E"
                     app:cornerRadius="18dp"
-                    app:icon="@drawable/ic_calculate"
+                    app:icon="@drawable/ic_poteau"
                     app:iconGravity="textTop"
                     app:iconPadding="8dp"
                     app:iconSize="28dp"

@@ -59,7 +59,7 @@
                     android:textColor="#526176"
                     android:textSize="15sp" />
 
-                <!-- Calcul des poteaux -->
+                <!-- Multi-Calcul (carte principale) -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -79,14 +79,14 @@
                             android:layout_width="36dp"
                             android:layout_height="36dp"
                             android:importantForAccessibility="no"
-                            android:src="@drawable/ic_poteau"
+                            android:src="@drawable/ic_calculate"
                             app:tint="#FFFFFF" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="18dp"
-                            android:text="@string/calcul_poteaux"
+                            android:text="@string/multi_calcul"
                             android:textColor="#FFFFFF"
                             android:textSize="22sp"
                             android:textStyle="bold" />
@@ -96,12 +96,12 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:lineSpacingExtra="4dp"
-                            android:text="@string/calcul_poteaux_desc"
+                            android:text="@string/multi_calcul_desc"
                             android:textColor="#DCE7F5"
                             android:textSize="14sp" />
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnMenuPoteau"
+                            android:id="@+id/btnMenuMulti"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp"
@@ -326,7 +326,7 @@
                             android:padding="12dp">
 
                             <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnMenuMulti"
+                                android:id="@+id/btnMenuPoteau"
                                 style="@style/Widget.Material3.Button.TextButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -335,13 +335,13 @@
                                 android:minHeight="80dp"
                                 android:paddingStart="4dp"
                                 android:paddingEnd="4dp"
-                                android:text="@string/multi_calcul"
+                                android:text="@string/type_poteau"
                                 android:textAllCaps="false"
                                 android:textColor="#FFFFFF"
                                 android:textSize="15sp"
                                 app:backgroundTint="#5B3E8E"
                                 app:cornerRadius="16dp"
-                                app:icon="@drawable/ic_calculate"
+                                app:icon="@drawable/ic_poteau"
                                 app:iconGravity="textTop"
                                 app:iconPadding="10dp"
                                 app:iconSize="28dp"
@@ -479,6 +479,7 @@
 
                 <!-- Accès direct au stock -->
                 <TextView
+                    android:id="@+id/tvTitreStock"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="28dp"
@@ -489,6 +490,7 @@
                     android:textStyle="bold" />
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardStockAcces"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="#FFFFFF"

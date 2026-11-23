@@ -67,6 +67,8 @@ public class StockClientsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        AccesStock.appliquerAuTiroir(
+                (NavigationView) findViewById(R.id.navigationView), AccesStock.autorise(this));
         // Le stock d'un client a pu changer pendant qu'on était dans son écran.
         rafraichirAffichage();
     }

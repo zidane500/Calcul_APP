@@ -13,37 +13,31 @@
     <string name="resultats">Résultats</string>
     <string name="ajouter_poteau">Ajouter un autre poteau</string>
     <string name="supprimer_poteau">Supprimer ce poteau</string>
-
-    <!-- Tiroir de navigation -->
+    <!--  Tiroir de navigation  -->
     <string name="drawer_open">Ouvrir le menu</string>
     <string name="drawer_close">Fermer le menu</string>
-
     <string name="menu_accueil">Accueil</string>
     <string name="menu_espace_client">Espace Client</string>
     <string name="menu_stock_dechets">Stock Déchets</string>
     <string name="menu_stock_client">Stock client</string>
     <string name="menu_parametres">Paramètres</string>
-
-    <!-- Paramètres -->
+    <!--  Paramètres  -->
     <string name="parametres_titre">Paramètres</string>
     <string name="parametres_langue">Langue</string>
     <string name="parametres_confirmer">Confirmer</string>
     <string name="parametres_avertissement">Le changement de langue redémarre cet écran : les saisies non enregistrées seront perdues.</string>
-
-    <!-- Ajoutez aussi ces chaînes pour les types de barres -->
+    <!--  Ajoutez aussi ces chaînes pour les types de barres  -->
     <string name="n6" translatable="false">N6</string>
     <string name="n8" translatable="false">N8</string>
     <string name="n10" translatable="false">N10</string>
     <string name="n12" translatable="false">N12</string>
     <string name="n14" translatable="false">N14</string>
     <string name="n16" translatable="false">N16</string>
-
-    <!-- Valeurs par défaut -->
-    <string name="valeur_un"></string>
-    <string name="valeur_six"></string>
-    <string name="valeur_zero"></string>
-
-    <!-- Textes des écrans (étape 2) -->
+    <!--  Valeurs par défaut  -->
+    <string name="valeur_un"/>
+    <string name="valeur_six"/>
+    <string name="valeur_zero"/>
+    <!--  Textes des écrans (étape 2)  -->
     <string name="calculer_poteau">Calculer Poteau</string>
     <string name="calculer_dalle">Calculer Dalle</string>
     <string name="calculer_semelle">Calculer Semelle</string>
@@ -103,6 +97,10 @@
     <string name="supprimer">Supprimer</string>
     <string name="ouvrir">Ouvrir</string>
     <string name="supprimer_client">Supprimer le client</string>
+    <string name="supprimer_calcul">Supprimer ce calcul</string>
+    <string name="supprimer_calcul_message">Voulez-vous vraiment supprimer « %1$s » ? Cette action est définitive.</string>
+    <string name="calcul_supprime">Calcul supprimé</string>
+    <string name="calcul_suppression_echec">Impossible de supprimer le calcul.</string>
     <string name="consulter">Consulter</string>
     <string name="definir_dimensions">Définissez les dimensions et les armatures</string>
     <string name="unite_metre">m</string>
@@ -113,20 +111,17 @@
     <string name="confirmer_utilisation_stock_client">Confirmer utilisation du stock client</string>
     <string name="resumer">Résumer</string>
     <string name="historique_stock">Historique du stock</string>
-
-    <!-- Multi-Calcul -->
+    <!--  Multi-Calcul  -->
+    <string name="type_poteau">Poteau</string>
+    <string name="multi_calcul_desc">Renseignez vos dimensions et vos types d’éléments pour calculer plusieurs éléments dans un seul calcul.</string>
     <string name="multi_calcul">Multi-Calcul</string>
     <string name="client_nouveau_calcul">Nouveau calcul</string>
     <string name="client_calculs_enregistres">Calculs enregistrés</string>
     <string name="multi_choisir_type_titre">Choisir le type d’élément</string>
     <string name="multi_annuler">Annuler</string>
-
     <string name="multi_ajouter_autre">Ajouter autre</string>
-
     <string name="multi_titre_client">Multi-Calcul - %1$s</string>
-
-
-    <!-- Licence : écran d'activation -->
+    <!--  Licence : écran d'activation  -->
     <string name="licence_titre_activation">Activation de votre licence</string>
     <string name="licence_installation_id">Installation ID</string>
     <string name="licence_communiquer_id">Veuillez communiquer cet identifiant au fournisseur.</string>
@@ -150,9 +145,7 @@
     <string name="licence_succes_limitee">Licence activée. Valable jusqu\'au %1$s.</string>
     <string name="licence_succes_vie">Licence activée (sans date d\'expiration).</string>
     <string name="licence_contact">Pour obtenir un code, contactez-nous : %1$s</string>
-
-
-    <!-- Licence : expiration et renouvellement -->
+    <!--  Licence : expiration et renouvellement  -->
     <string name="licence_titre_expiree">Licence expirée</string>
     <string name="licence_expiree_message">Votre licence Fer Pro a expiré le %1$s.</string>
     <string name="licence_donnees_conservees">Vos données (clients, calculs, stock, historique) sont conservées.</string>
@@ -165,19 +158,19 @@
     <string name="licence_invalide_message">La licence enregistrée sur ce téléphone n\'est pas valide. Entrez un nouveau code d\'activation.</string>
     <string name="licence_titre_date">Date du téléphone incorrecte</string>
     <string name="licence_date_message">La date de ce téléphone semble incorrecte (elle est antérieure à la dernière date enregistrée par l\'application). Réglez la date et l\'heure automatiquement, puis rouvrez l\'application. Si le problème persiste, contactez-nous.</string>
-
-
-    <!-- Licence : section Paramètres et renouvellement anticipé -->
+    <!--  Licence : section Paramètres et renouvellement anticipé  -->
     <string name="licence_section_titre">Licence</string>
     <string name="licence_etat_vie">Licence à vie (sans date d\'expiration)</string>
     <string name="licence_etat_limitee">Valable jusqu\'au %1$s\nJours restants : %2$d</string>
     <string name="licence_etat_aucune">Aucune licence active</string>
+    <string name="licence_stock_inclus">Fonctionnalités du stock : incluses</string>
+    <string name="licence_stock_non_inclus">Fonctionnalités du stock : non incluses</string>
+    <string name="stock_non_inclus">Cette fonction n\'est pas incluse dans votre licence.</string>
     <string name="licence_id_ligne">Installation ID : %1$s</string>
     <string name="licence_saisir_nouveau_code">Saisir un nouveau code</string>
     <string name="licence_titre_prolonger">Prolonger votre licence</string>
     <string name="licence_erreur_non_prolongee">Ce code ne prolonge pas votre licence actuelle (valable jusqu\'au %1$s). Il n\'a pas été appliqué.</string>
     <string name="licence_erreur_deja_a_vie">Votre licence est déjà à vie : ce code n\'a pas été appliqué.</string>
-
     <string name="sauvegarde_titre">Sauvegarde des données</string>
     <string name="sauvegarde_info">Une copie de vos données est enregistrée automatiquement dans Documents/FerPro.</string>
     <string name="sauvegarde_derniere">Dernière sauvegarde : %1$s</string>
@@ -191,7 +184,6 @@
     <string name="sauvegarde_permission">Autorisation de stockage manquante : sauvegarde impossible.</string>
     <string name="sauvegarde_partage_titre">Envoyer la sauvegarde</string>
     <string name="sauvegarde_envoi_impossible">Impossible d\'envoyer le fichier.</string>
-
     <string name="sauvegarde_restaurer">Restaurer une sauvegarde</string>
     <string name="restauration_titre">Restaurer une sauvegarde</string>
     <string name="restauration_explication">Choisissez un ou plusieurs fichiers de sauvegarde Fer Pro (.ferpro) : ceux du dossier Documents/FerPro de ce téléphone, ou des copies reçues par WhatsApp, e-mail ou Drive. Avec plusieurs fichiers, les données sont fusionnées. Rien n\'est modifié avant votre confirmation.</string>
@@ -213,7 +205,6 @@
     <string name="restauration_err_securite">Impossible de sécuriser vos données actuelles : restauration annulée. Rien n\'a été modifié.</string>
     <string name="restauration_err_annulee">La restauration a échoué. Vos données d\'avant ont été remises en place.</string>
     <string name="restauration_err_incomplete">La restauration a échoué et vos données n\'ont pas pu être remises en place. Fermez l\'application et contactez le support.</string>
-
     <string name="restauration_apercu_fusion">Fusion de %1$d sauvegardes\nLa plus ancienne : %2$s\nLa plus récente : %3$s\nClients : %4$d\nCalculs enregistrés : %5$d\nTypes de stock (global) : %6$d\nStocks par client : %7$d</string>
     <string name="restauration_confirm_message_fusion">Les sauvegardes choisies seront fusionnées : tous les clients et tous les calculs sont conservés, et pour le stock la version la plus récente est utilisée. Vos données actuelles seront remplacées par ce résultat. Une copie de sécurité de vos données actuelles est faite avant. Votre licence n\'est pas modifiée.</string>
     <string name="restauration_err_trop">Trop de fichiers choisis (maximum %1$d).</string>

@@ -49,6 +49,9 @@ public final class SectionLicence {
                     tvEtat.setTextColor(ContextCompat.getColor(activite, R.color.retirer_text));
                 }
             }
+            tvEtat.append("\n" + activite.getString(licence.donneDroitStock()
+                    ? R.string.licence_stock_inclus
+                    : R.string.licence_stock_non_inclus));
         } else {
             tvEtat.setText(R.string.licence_etat_aucune);
         }

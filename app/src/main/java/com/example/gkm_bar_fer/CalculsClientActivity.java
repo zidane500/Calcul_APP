@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -155,7 +158,7 @@ public class CalculsClientActivity extends AppCompatActivity {
 
             TextView tvNom = itemView.findViewById(R.id.tvNomCalcul);
             TextView tvDate = itemView.findViewById(R.id.tvDateCalcul);
-            Button btnOuvrir = itemView.findViewById(R.id.btnOuvrirCalcul);
+            ImageButton btnSupprimer = itemView.findViewById(R.id.btnSupprimerCalcul);
 
             tvNom.setText(calcul.getNom());
             itemView.findViewById(R.id.viewAccentCalcul)
@@ -168,15 +171,41 @@ public class CalculsClientActivity extends AppCompatActivity {
                     + getString(modifie ? R.string.calcul_modifie_le : R.string.calcul_enregistre_le,
                     format.format(new Date(calcul.getDateModification()))));
 
-            btnOuvrir.setOnClickListener(v -> {
+            // Clic sur le bloc : ouvre le calcul. Clic sur la corbeille : suppression (avec confirmation).
+            itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(CalculsClientActivity.this, MainActivity.class);
                 intent.putExtra(MainActivity.EXTRA_CLIENT_ID, clientId);
                 intent.putExtra(MainActivity.EXTRA_CALCUL_ID, calcul.getId());
                 intent.putExtra(MainActivity.EXTRA_TYPE_ELEMENT, calcul.getTypeElement().getCode());
                 startActivity(intent);
             });
+            btnSupprimer.setOnClickListener(v -> afficherConfirmationSuppression(calcul));
 
             layoutCalculs.addView(itemView);
         }
+    }
+
+    // ------------------------------------------------------------------
+    // Suppression d'un calcul (avec confirmation)
+    // ------------------------------------------------------------------
+
+    private void afficherConfirmationSuppression(final CalculEnregistre calcul) {
+        final AlertDialog dialogue = new AlertDialog.Builder(this)
+                .setTitle(R.string.supprimer_calcul)
+                .setMessage(getString(R.string.supprimer_calcul_message, calcul.getNom()))
+                .setNegativeButton(R.string.dialog_ignorer, null)
+                .setPositiveButton(R.string.supprimer, (d, which) -> {
+                    boolean supprime = CalculManager.getInstance(CalculsClientActivity.this)
+                            .supprimer(calcul.getId());
+                    Toast.makeText(CalculsClientActivity.this,
+                            supprime ? R.string.calcul_supprime : R.string.calcul_suppression_echec,
+                            Toast.LENGTH_SHORT).show();
+                    rafraichirAffichage();
+                })
+                .create();
+        dialogue.show();
+        // « Supprimer » en rouge, pour bien distinguer l'action définitive de « Ignorer ».
+        dialogue.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextColor(ContextCompat.getColor(this, R.color.retirer_text));
     }
 }

@@ -7,9 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
-    <!-- Couleurs modernes -->
+    <!--  Couleurs modernes  -->
     <color name="primary">#2196F3</color>
+    <!--  Fond de l'écran de démarrage : même bleu marine que le logo  -->
+    <color name="splash_fond">#011E3C</color>
     <color name="primary_dark">#1976D2</color>
     <color name="accent">#FF4081</color>
     <color name="background">#F5F5F5</color>
@@ -18,52 +19,42 @@
     <color name="success">#4CAF50</color>
     <color name="warning">#FF9800</color>
     <color name="error">#F44336</color>
-    <!-- Teinte claire pour bouton tonal (ex: Ajouter un poteau) -->
+    <!--  Teinte claire pour bouton tonal (ex: Ajouter un poteau)  -->
     <color name="light_primary_tint">#E3F2FD</color>
-    <!-- Couleurs des boutons d'export -->
-    <!-- Bouton Enregistrer (calcul client) : brun clair -->
+    <!--  Couleurs des boutons d'export  -->
+    <!--  Bouton Enregistrer (calcul client) : brun clair  -->
     <color name="save_brown">#CFA67A</color>
-    <color name="save_brown_text">#4A2E1A</color>    <color name="pdf_color">#F9A825</color>
+    <color name="save_brown_text">#4A2E1A</color>
+    <color name="pdf_color">#F9A825</color>
     <color name="excel_color">#217346</color>
-
     <color name="detail_button_text">#1976D2</color>
     <color name="detail_button_background">#EEF6FF</color>
     <color name="detail_button_stroke">#B9D8F7</color>
-
     <color name="add_poteau_text">#1976D2</color>
     <color name="add_poteau_background">#F3F8FE</color>
     <color name="add_poteau_stroke">#B9D8F7</color>
-
-
-    <!-- Interface poteau / barres -->
-
-
+    <!--  Interface poteau / barres  -->
     <color name="secondary_text">#6B7280</color>
     <color name="section_title">#374151</color>
     <color name="divider">#E5E7EB</color>
-
-    <!-- Élément barre -->
+    <!--  Élément barre  -->
     <color name="barre_item_background">#F8FAFC</color>
     <color name="barre_type_text">#1F2937</color>
     <color name="barre_secondary_text">#6B7280</color>
     <color name="barre_input_stroke">#CBD5E1</color>
     <color name="barre_input_text">#111827</color>
     <color name="barre_delete">#DC3545</color>
-
-    <!-- Bouton Retirer Fer (action sensible) -->
+    <!--  Bouton Retirer Fer (action sensible)  -->
     <color name="retirer_text">#C62828</color>
     <color name="retirer_background">#FDF3F2</color>
     <color name="retirer_stroke">#F4C7C3</color>
-
-    <!-- État vide -->
+    <!--  État vide  -->
     <color name="empty_barres_icon">#1976D2</color>
-
-    <!-- Historique du stock -->
+    <!--  Historique du stock  -->
     <color name="historique_fond">#E9ECEF</color>
     <color name="historique_titre_fond">#FFF200</color>
     <color name="historique_titre_texte">#1F2937</color>
-
-    <!-- Interface Ajouter au stock -->
+    <!--  Interface Ajouter au stock  -->
     <color name="input_stroke">#D1D5DB</color>
     <color name="input_background">#F8FAFC</color>
     <color name="input_text">#1F2937</color>

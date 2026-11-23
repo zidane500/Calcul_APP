@@ -201,6 +201,20 @@ public class LicenseManager {
     }
 
     /**
+     * Droit « utiliser les fonctionnalités du stock » (stock déchets, stock client,
+     * chutes réutilisées). Vrai uniquement si la licence est VALIDE (authentique, pas expirée,
+     * horloge cohérente) ET accorde ce droit. Dans tous les autres cas : faux.
+     * Les anciennes licences (format 1) donnent ce droit : rien ne change pour les clients actuels.
+     */
+    public synchronized boolean peutUtiliserStock() {
+        if (getStatus() != LicenseStatus.VALID) {
+            return false;
+        }
+        LicensePayload licence = getLicence();
+        return licence != null && licence.donneDroitStock();
+    }
+
+    /**
      * Active (ou renouvelle) la licence avec un code saisi par le client.
      * Si le code est valide pour CE téléphone, il remplace l'ancien. Sinon rien ne change.
      * Les données métier ne sont jamais touchées.
@@ -223,7 +237,8 @@ public class LicenseManager {
             if (codeCanonique.equals(codeStocke())) {
                 return new ActivationResult(ActivationResult.Etat.SUCCES, v.getResultat(), v.getLicence());
             }
-            if (!prolonge(v.getLicence(), ancienne)) {
+            if (!prolonge(v.getLicence(), ancienne)
+                    && !ajouteLeDroitStock(v.getLicence(), ancienne)) {
                 return new ActivationResult(ActivationResult.Etat.NON_PROLONGEE,
                         v.getResultat(), ancienne);
             }
@@ -253,6 +268,22 @@ public class LicenseManager {
             return false;
         }
         return nouvelle.estAVie() || nouvelle.getJourFin() > ancienne.getJourFin();
+    }
+
+    /**
+     * Amélioration de licence : le nouveau code ajoute le droit stock que l'ancien n'avait pas,
+     * sans raccourcir la période (même date de fin ou plus tard, ou à vie).
+     * Sans cette règle, passer un client « sans stock » à « avec stock » serait refusé
+     * tant que la date d'expiration ne change pas.
+     */
+    private static boolean ajouteLeDroitStock(LicensePayload nouvelle, LicensePayload ancienne) {
+        if (!nouvelle.donneDroitStock() || ancienne.donneDroitStock()) {
+            return false;
+        }
+        if (nouvelle.estAVie()) {
+            return true;
+        }
+        return !ancienne.estAVie() && nouvelle.getJourFin() >= ancienne.getJourFin();
     }
 
     /** Une licence est "plus récente" si elle commence plus tard ou se termine plus tard. */

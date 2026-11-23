@@ -59,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
     private MaterialSwitch switchUtiliserStock;
     private MaterialSwitch switchUtiliserStockClient;
     private View cardUtiliserStockClient;
+
+    // Droit « utiliser les fonctionnalités du stock » de la licence (voir AccesStock).
+    // Faux = aucune option ni bouton de stock, et le stock n'est jamais utilisé dans un calcul.
+    private boolean droitStock = false;
     private CardView cardResultats;
     private ScrollView scrollPrincipal;
     private TextView tvResultats;
@@ -450,6 +454,7 @@ public class MainActivity extends AppCompatActivity {
         setupListeners();
         configurerTiroirNavigation();
         configurerModeClient();
+        appliquerDroitStock();
 
 
         // Écran recréé (changement de langue, rotation...) : on reprend exactement où on en était
@@ -469,6 +474,34 @@ public class MainActivity extends AppCompatActivity {
 
         // Si on ouvre un calcul enregistré, on restaure ses saisies et ses résultats
         chargerCalculSiDemande();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // La licence a pu changer (nouveau code saisi depuis Paramètres).
+        appliquerDroitStock();
+    }
+
+    /**
+     * Applique le droit « stock » de la licence à l'écran de calcul : sans ce droit, les options
+     * « Utiliser le stock » (global et client) et l'entrée « stock » du menu latéral sont cachées.
+     */
+    private void appliquerDroitStock() {
+        droitStock = AccesStock.autorise(this);
+        AccesStock.appliquerAuTiroir(navigationView, droitStock);
+
+        View carteStock = findViewById(R.id.cardUtiliserStock);
+        if (droitStock) {
+            carteStock.setVisibility(View.VISIBLE);
+            // L'option « stock client » n'existe que dans l'espace d'un client.
+            cardUtiliserStockClient.setVisibility(clientId != null ? View.VISIBLE : View.GONE);
+        } else {
+            carteStock.setVisibility(View.GONE);
+            cardUtiliserStockClient.setVisibility(View.GONE);
+            switchUtiliserStock.setChecked(false);
+            switchUtiliserStockClient.setChecked(false);
+        }
     }
 
     // ------------------------------------------------------------------
@@ -908,8 +941,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             dernieresEntrees = null;
         }
-        dernierUtiliseStock = switchUtiliserStock.isChecked();
-        dernierUtiliseStockClient = clientId != null && switchUtiliserStockClient.isChecked();
+        dernierUtiliseStock = droitStock && switchUtiliserStock.isChecked();
+        dernierUtiliseStockClient = droitStock && clientId != null
+                && switchUtiliserStockClient.isChecked();
 
         // 2) Parcourir tous les groupes pour :
         //    a) afficher le détail des besoins par poteau
@@ -1001,7 +1035,7 @@ public class MainActivity extends AppCompatActivity {
             String typeBarre = entry.getKey();
             // Morceaux disponibles : stock global et/ou stock du client, selon les toggles.
             List<MorceauFer> morceauxDisponibles = new ArrayList<>();
-            if (switchUtiliserStock.isChecked()) {
+            if (dernierUtiliseStock) {
                 morceauxDisponibles.addAll(
                         StockManager.getInstance(this).obtenirMorceaux(typeBarre));
             }
@@ -1399,6 +1433,14 @@ public class MainActivity extends AppCompatActivity {
                 resultat,
                 dechetsBarresNeuves
         );
+
+        // Sans le droit « stock » (licence) : aucun bouton lié au stock dans les résultats.
+        if (!droitStock) {
+            btnDechetsAuStock.setVisibility(View.GONE);
+            btnConfirmerStock.setVisibility(View.GONE);
+            btnEnvoyerStockClient.setVisibility(View.GONE);
+            itemView.findViewById(R.id.btnConfirmerStockClient).setVisibility(View.GONE);
+        }
 
         layoutResultatsBarres.addView(itemView);
     }
@@ -2108,8 +2150,9 @@ public class MainActivity extends AppCompatActivity {
         }
         nomClient = client.getNom();
 
-        // Le toggle « Utiliser stock client » n'existe que dans l'espace d'un client.
-        cardUtiliserStockClient.setVisibility(View.VISIBLE);
+        // Le toggle « Utiliser stock client » n'existe que dans l'espace d'un client
+        // (et seulement si la licence donne le droit « stock » : voir appliquerDroitStock()).
+        cardUtiliserStockClient.setVisibility(droitStock ? View.VISIBLE : View.GONE);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(titreCalculClient(client.getNom()));

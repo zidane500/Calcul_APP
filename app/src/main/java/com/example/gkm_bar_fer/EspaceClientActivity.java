@@ -70,6 +70,8 @@ public class EspaceClientActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        AccesStock.appliquerAuTiroir(
+                (NavigationView) findViewById(R.id.navigationView), AccesStock.autorise(this));
         rafraichirAffichage();
     }
 
