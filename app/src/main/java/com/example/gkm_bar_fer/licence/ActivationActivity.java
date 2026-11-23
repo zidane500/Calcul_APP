@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -79,6 +80,7 @@ public class ActivationActivity extends AppCompatActivity {
         findViewById(R.id.btnPartagerId).setOnClickListener(v -> partagerInstallationId());
         findViewById(R.id.btnColler).setOnClickListener(v -> collerCode());
         findViewById(R.id.btnActiver).setOnClickListener(v -> activer());
+        findViewById(R.id.btnWhatsApp).setOnClickListener(v -> ouvrirWhatsApp());
 
         // Retour : depuis Paramètres on revient à l'écran précédent ; sinon on quitte
         // l'application (impossible d'entrer sans licence valide).
@@ -259,6 +261,21 @@ public class ActivationActivity extends AppCompatActivity {
         View focus = getCurrentFocus();
         if (clavier != null && focus != null) {
             clavier.hideSoftInputFromWindow(focus.getWindowToken(), 0);
+        }
+    }
+
+    private void ouvrirWhatsApp() {
+        String numero = LicenseConstants.SUPPORT_PHONE.replaceAll("[^0-9]", "");
+        if (!numero.startsWith("216") && numero.length() == 8) {
+            numero = "216" + numero;
+        }
+        String message = "Bonjour, je souhaite activer / renouveler ma licence Fer Pro. Mon Installation ID est : " + installationId;
+        String url = "https://wa.me/" + numero + "?text=" + Uri.encode(message);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "WhatsApp n'est pas installé", Toast.LENGTH_SHORT).show();
         }
     }
 }

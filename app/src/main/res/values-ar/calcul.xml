@@ -59,6 +59,9 @@
     <string name="btn_enregistrer_pour">حفظ لـ %1$s</string>
     <string name="calculer_avant_enregistrer">احسب أولا قبل الحفظ.</string>
     <string name="nom_calcul_defaut">حساب بتاريخ %1$s</string>
+    <string name="nom_client_save_hint">اسم الحريف (اختر أو أدخل)</string>
+    <string name="mes_calculs_enregistres">الحسابات المحفوظة</string>
+    <string name="rechercher_calcul">البحث عن حساب بالاسم</string>
     <string name="dialog_titre_enregistrer">حفظ الحساب</string>
     <string name="dialog_ignorer">تجاهل</string>
     <string name="dialog_enregistrer">حفظ</string>

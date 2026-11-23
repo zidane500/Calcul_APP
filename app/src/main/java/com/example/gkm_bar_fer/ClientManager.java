@@ -33,6 +33,22 @@ public class ClientManager {
         preferences = context.getApplicationContext()
                 .getSharedPreferences(PREFS_NOM, Context.MODE_PRIVATE);
         clients = charger();
+        nettoyerClientsFictifs();
+    }
+
+    /** Supprime les éventuels clients fictifs ("Général" ou "accueil_general"). */
+    public void nettoyerClientsFictifs() {
+        boolean modifie = false;
+        for (int i = clients.size() - 1; i >= 0; i--) {
+            Client c = clients.get(i);
+            if ("Général".equalsIgnoreCase(c.getNom()) || "accueil_general".equalsIgnoreCase(c.getId())) {
+                clients.remove(i);
+                modifie = true;
+            }
+        }
+        if (modifie) {
+            sauvegarder();
+        }
     }
 
     public static synchronized ClientManager getInstance(Context context) {

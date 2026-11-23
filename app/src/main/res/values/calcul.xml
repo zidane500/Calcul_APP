@@ -60,6 +60,9 @@
     <string name="btn_enregistrer_pour">Enregistrer pour %1$s</string>
     <string name="calculer_avant_enregistrer">Calculez d\'abord avant d\'enregistrer.</string>
     <string name="nom_calcul_defaut">Calcul du %1$s</string>
+    <string name="nom_client_save_hint">Nom du client (sélectionner ou saisir)</string>
+    <string name="mes_calculs_enregistres">Calculs enregistrés</string>
+    <string name="rechercher_calcul">Rechercher un calcul par nom</string>
     <string name="dialog_titre_enregistrer">Enregistrer le calcul</string>
     <string name="dialog_ignorer">Ignorer</string>
     <string name="dialog_enregistrer">Enregistrer</string>

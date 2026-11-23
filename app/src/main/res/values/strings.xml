@@ -145,6 +145,7 @@
     <string name="licence_succes_limitee">Licence activée. Valable jusqu\'au %1$s.</string>
     <string name="licence_succes_vie">Licence activée (sans date d\'expiration).</string>
     <string name="licence_contact">Pour obtenir un code, contactez-nous : %1$s</string>
+    <string name="licence_contacter_whatsapp">Contacter via WhatsApp</string>
     <!--  Licence : expiration et renouvellement  -->
     <string name="licence_titre_expiree">Licence expirée</string>
     <string name="licence_expiree_message">Votre licence Fer Pro a expiré le %1$s.</string>

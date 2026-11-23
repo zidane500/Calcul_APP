@@ -2145,7 +2145,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (client == null) {
             clientId = null;
-            btnEnregistrerClient.setVisibility(View.GONE);
+            btnEnregistrerClient.setVisibility(View.VISIBLE);
+            btnEnregistrerClient.setText(calculId != null
+                    ? getString(R.string.btn_enregistrer_modifs)
+                    : getString(R.string.dialog_titre_enregistrer));
+            btnEnregistrerClient.setOnClickListener(v -> afficherDialogueEnregistrement());
             return;
         }
         nomClient = client.getNom();
@@ -2175,6 +2179,10 @@ public class MainActivity extends AppCompatActivity {
         View vueDialogue = LayoutInflater.from(this).inflate(R.layout.dialog_nom_calcul, null);
         final TextInputLayout layoutNom = vueDialogue.findViewById(R.id.layoutNomCalcul);
         final TextInputEditText etNom = vueDialogue.findViewById(R.id.etNomCalcul);
+        final TextInputLayout layoutNomClientSave = vueDialogue.findViewById(R.id.layoutNomClientSave);
+        if (layoutNomClientSave != null) {
+            layoutNomClientSave.setVisibility(View.GONE);
+        }
 
         if (calculId != null && nomCalculCharge != null) {
             etNom.setText(nomCalculCharge);
@@ -2203,6 +2211,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     layoutNom.setError(null);
 
+                    String targetClientId = clientId != null ? clientId : CalculManager.CLIENT_ID_ACCUEIL;
+
                     try {
                         String json = construireJsonCalcul();
                         CalculManager gestionnaire = CalculManager.getInstance(MainActivity.this);
@@ -2212,10 +2222,9 @@ public class MainActivity extends AppCompatActivity {
                         if (etaitModification) {
                             succes = gestionnaire.modifier(calculId, nom, json);
                         } else {
-                            CalculEnregistre cree = gestionnaire.ajouter(clientId, nom, json);
+                            CalculEnregistre cree = gestionnaire.ajouter(targetClientId, nom, json);
                             succes = cree != null;
                             if (cree != null) {
-                                // Les enregistrements suivants mettront ce calcul à jour
                                 calculId = cree.getId();
                             }
                         }
@@ -2357,13 +2366,12 @@ public class MainActivity extends AppCompatActivity {
     // ------------------------------------------------------------------
 
     private void chargerCalculSiDemande() {
-        if (clientId == null || calculId == null) {
-            calculId = null;
+        if (calculId == null) {
             return;
         }
 
         CalculEnregistre calcul = CalculManager.getInstance(this).trouverParId(calculId);
-        if (calcul == null || !calcul.getClientId().equals(clientId)) {
+        if (calcul == null) {
             calculId = null;
             Toast.makeText(this, R.string.calcul_introuvable, Toast.LENGTH_SHORT).show();
             return;
@@ -2374,7 +2382,7 @@ public class MainActivity extends AppCompatActivity {
             if (racine.optBoolean("multi", false)) {
                 modeMulti = true;
                 btnAjouterPoteau.setText(R.string.multi_ajouter_autre);
-                if (getSupportActionBar() != null) {
+                if (nomClient != null && getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(titreCalculClient(nomClient));
                 }
             }
@@ -2383,6 +2391,7 @@ public class MainActivity extends AppCompatActivity {
             switchUtiliserStockClient.setChecked(racine.optBoolean("utiliserStockClient", false));
             restaurerResultats(racine);
             nomCalculCharge = calcul.getNom();
+            btnEnregistrerClient.setText(R.string.btn_enregistrer_modifs);
         } catch (JSONException e) {
             calculId = null;
             Toast.makeText(this, R.string.calcul_illisible,

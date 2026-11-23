@@ -20,6 +20,8 @@ import java.util.UUID;
  */
 public class CalculManager {
 
+    public static final String CLIENT_ID_ACCUEIL = "accueil_general";
+
     private static final String PREFS_NOM = NomsPrefs.CALCULS;
     private static final String CLE_CALCULS = NomsPrefs.CLE_CALCULS;
 

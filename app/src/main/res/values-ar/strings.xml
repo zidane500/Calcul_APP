@@ -119,14 +119,15 @@
     <string name="licence_erreur_stockage">تعذر حفظ الرخصة على هذا الهاتف. أعد المحاولة.</string>
     <string name="licence_succes_limitee">تم تفعيل الرخصة. صالحة حتى %1$s.</string>
     <string name="licence_succes_vie">تم تفعيل الرخصة (بدون تاريخ انتهاء).</string>
-    <string name="licence_contact">للحصول على رمز، تواصل معنا: %1$s</string>
+    <string name="licence_contact">للحصول على رمز، تواصل معنا: &#x202A;%1$s&#x202C;</string>
+    <string name="licence_contacter_whatsapp">التواصل عبر واتساب</string>
     <!--  الرخصة: انتهاء الصلاحية والتجديد  -->
     <string name="licence_titre_expiree">انتهت صلاحية الرخصة</string>
     <string name="licence_expiree_message">انتهت صلاحية رخصة Fer Pro الخاصة بك بتاريخ %1$s.</string>
     <string name="licence_donnees_conservees">بياناتك (الحرفاء، الحسابات، المخزون، السجل) محفوظة.</string>
     <string name="licence_nouveau_code">رمز تفعيل جديد</string>
     <string name="licence_renouveler">تجديد</string>
-    <string name="licence_contact_renouveler">لتجديد رخصتك، يرجى التواصل معنا: %1$s</string>
+    <string name="licence_contact_renouveler">لتجديد رخصتك، يرجى التواصل معنا: &#x202A;%1$s&#x202C;</string>
     <string name="licence_renouvelee_limitee">تم تجديد الرخصة. صالحة حتى %1$s.</string>
     <string name="licence_renouvelee_vie">تم تجديد الرخصة (بدون تاريخ انتهاء).</string>
     <string name="licence_titre_invalide">رخصة غير صالحة</string>
