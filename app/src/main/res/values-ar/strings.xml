@@ -26,12 +26,12 @@
     <string name="calcul_poteaux_desc">أدخل الأبعاد والتسليح للحصول على تفاصيل القضبان اللازمة.</string>
     <string name="demarrer_calcul">بدء حساب</string>
     <string name="autres_calculs">حسابات أخرى</string>
-    <string name="type_pre_poteau">عمود مسبق الصنع</string>
+    <string name="type_pre_poteau">بريبوتو</string>
     <string name="disponible">متاح</string>
-    <string name="type_dalle">بلاطة</string>
-    <string name="type_semelle">أساس</string>
-    <string name="type_poutre">رافدة</string>
-    <string name="type_chainage">سيناج</string>
+    <string name="type_dalle">لاماس</string>
+    <string name="type_semelle">سمال</string>
+    <string name="type_poutre">البودرا</string>
+    <string name="type_chainage">السيناج</string>
     <string name="votre_stock">مخزونك</string>
     <string name="valorisez_chutes">ثمّن فضلاتك.</string>
     <string name="stock_desc">اطّلع على قضبانك الكاملة وقطع الحديد وأضفها.</string>
@@ -87,7 +87,7 @@
     <string name="ajouter_poteau">إضافة عمود آخر</string>
     <string name="supprimer_poteau">حذف هذا العمود</string>
     <!--  Multi-Calcul  -->
-    <string name="type_poteau">عمود</string>
+    <string name="type_poteau">البوتو</string>
     <string name="multi_calcul_desc">أدخل الأبعاد والتسليح لحساب عدة أنواع من العناصر في حساب واحد.</string>
     <string name="multi_calcul">حساب متعدد</string>
     <string name="client_nouveau_calcul">حساب جديد</string>
