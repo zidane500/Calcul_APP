@@ -80,7 +80,7 @@
     <string name="barres_fer_poteau">قضبان الحديد لكل عمود</string>
     <string name="nombre">العدد</string>
     <string name="calculer">حساب</string>
-    <string name="selection_types_barres">اختيار أنواع القضبان</string>
+    <string name="selection_types_barres">اختيار نوع الحديد وكميته</string>
     <string name="choisir_type_barre">اختر نوع القضيب</string>
     <string name="aucune_barre_selectionnee">لم يتم اختيار أي قضيب !</string>
     <string name="resultats">النتائج</string>

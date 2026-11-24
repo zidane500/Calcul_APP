@@ -756,6 +756,14 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterTypesBarres = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, typesBarresDisponibles);
         groupe.autoCompleteBarreType.setAdapter(adapterTypesBarres);
+        groupe.autoCompleteBarreType.post(() -> {
+            int largeurInput = groupe.autoCompleteBarreType.getWidth();
+            if (largeurInput > 0) {
+                int dropDownWidth = (int) (largeurInput / 2.2);
+                groupe.autoCompleteBarreType.setDropDownWidth(dropDownWidth);
+                groupe.autoCompleteBarreType.setDropDownHorizontalOffset(largeurInput - dropDownWidth);
+            }
+        });
 
         groupe.autoCompleteBarreType.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

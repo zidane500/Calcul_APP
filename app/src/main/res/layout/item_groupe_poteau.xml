@@ -188,12 +188,10 @@
         <!-- ================================================= -->
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
-
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-
             app:boxCornerRadiusBottomEnd="11dp"
             app:boxCornerRadiusBottomStart="11dp"
             app:boxCornerRadiusTopEnd="11dp"
@@ -212,11 +210,6 @@
                 android:textSize="14sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
-
-
-        <!-- ================================================= -->
-        <!-- BARRES SÉLECTIONNÉES -->
-        <!-- ================================================= -->
 
         <LinearLayout
             android:id="@+id/layoutBarresSelectionnees"
