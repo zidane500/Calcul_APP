@@ -211,4 +211,23 @@
     <string name="restauration_err_trop">Trop de fichiers choisis (maximum %1$d).</string>
     <string name="restauration_err_fusion">Impossible de fusionner ces sauvegardes : l\'une d\'elles contient des données inutilisables. Essayez de les restaurer une par une.</string>
     <string name="restauration_info_ignores">%1$d fichier(s) ignoré(s) : illisible(s), abîmé(s) ou qui ne sont pas des sauvegardes Fer Pro.</string>
+
+    <!-- Historique du stock -->
+    <string name="histo_fermer">Fermer</string>
+    <string name="histo_badge_ajout">AJOUT</string>
+    <string name="histo_badge_retrait">RETRAIT</string>
+    <string name="histo_badge_operation">OPÉRATION</string>
+    <string name="histo_ajoute">Ajouté</string>
+    <string name="histo_retire">Retiré</string>
+    <string name="histo_valeur">%1$s m × %2$d</string>
+    <string name="motif_ajout_manuel">Ajout manuel</string>
+    <string name="motif_retrait_manuel">Retrait manuel</string>
+    <string name="motif_chutes_calcul">Chutes d\'un calcul</string>
+    <string name="motif_chutes_calcul_libre">Chutes d\'un calcul libre</string>
+    <string name="motif_chutes_calcul_retirees">Chutes d\'un calcul retirées</string>
+    <string name="motif_chutes_calcul_libre_retirees">Chutes d\'un calcul libre retirées</string>
+    <string name="motif_annulation">Annulation d\'une opération</string>
+    <string name="motif_annulation_libre">Annulation d\'une opération (calcul libre)</string>
+    <string name="motif_reste_remis">Reste remis en stock</string>
+    <string name="motif_coupe">Coupe de %1$s m</string>
 </resources>

@@ -683,15 +683,15 @@ public class StockActivity extends AppCompatActivity {
             int couleurTexte;
             int couleurFond;
             if (aAjout && aRetrait) {
-                texteBadge = "OPÉRATION";
-                couleurTexte = 0xFF1565C0;
+                texteBadge = getString(R.string.histo_badge_operation);
+                        couleurTexte = 0xFF1565C0;
                 couleurFond = 0xFFE3F2FD;
             } else if (aAjout) {
-                texteBadge = "AJOUT";
+                texteBadge = getString(R.string.histo_badge_ajout);
                 couleurTexte = 0xFF2E7D32;
                 couleurFond = 0xFFE8F5E9;
             } else {
-                texteBadge = "RETRAIT";
+                texteBadge = getString(R.string.histo_badge_retrait);
                 couleurTexte = 0xFFC62828;
                 couleurFond = 0xFFFDECEA;
             }
@@ -704,6 +704,7 @@ public class StockActivity extends AppCompatActivity {
             tvBadge.setTextColor(couleurTexte);
 
             tvDate.setText(format.format(new Date(premier.date)));
+            tvDate.setTextDirection(View.TEXT_DIRECTION_LTR);
 
             // Calcul fait dans l'espace d'un client : on affiche son nom entre le badge et la date.
             TextView tvClient = carte.findViewById(R.id.tvCarteClient);
@@ -716,9 +717,11 @@ public class StockActivity extends AppCompatActivity {
 
             String titre = premier.typeFer;
             if (!premier.motif.isEmpty()) {
-                titre += " · " + premier.motif;
+                titre += " · " + traduireMotif(premier.motif);
             }
             tvTitre.setText(titre);
+            tvTitre.setTextDirection(View.TEXT_DIRECTION_LOCALE);
+            tvTitre.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
 
             for (MouvementStock m : groupe) {
                 View ligne = LayoutInflater.from(this)
@@ -727,13 +730,16 @@ public class StockActivity extends AppCompatActivity {
                 TextView tvValeur = ligne.findViewById(R.id.tvLigneValeur);
 
                 boolean ajout = MouvementStock.AJOUT.equals(m.action);
-                String libelle = ajout ? "Ajouté" : "Retiré";
+                String libelle = getString(ajout ? R.string.histo_ajoute : R.string.histo_retire);
                 if (!m.motif.isEmpty() && !m.motif.equals(premier.motif)) {
-                    libelle = m.motif;   // ex : « Reste remis en stock »
+                    libelle = traduireMotif(m.motif);   // ex : « Reste remis en stock »
                 }
 
                 tvLibelle.setText((ajout ? "+ " : "- ") + libelle);
-                tvValeur.setText(String.format(Locale.FRANCE, "%.2f m × %d", m.longueur, m.quantite));
+                tvLibelle.setTextDirection(View.TEXT_DIRECTION_LOCALE);
+                tvLibelle.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                tvValeur.setText(getString(R.string.histo_valeur,
+                        String.format(Locale.FRANCE, "%.2f", m.longueur), m.quantite));
 
                 int couleur = ContextCompat.getColor(this, ajout ? R.color.success : R.color.error);
                 tvLibelle.setTextColor(couleur);
@@ -750,7 +756,7 @@ public class StockActivity extends AppCompatActivity {
         AlertDialog dialogue = new AlertDialog.Builder(this)
                 .setCustomTitle(titre)
                 .setView(vue)
-                .setPositiveButton("Fermer", null)
+                .setPositiveButton(R.string.histo_fermer, null)
                 .create();
 
         // Fond gris pour toute la boîte de dialogue (les cartes blanches ressortent dessus)
@@ -763,6 +769,41 @@ public class StockActivity extends AppCompatActivity {
         }
 
         dialogue.show();
+    }
+
+    /**
+     * Les motifs sont enregistrés en français dans l'historique (anciens mouvements compris) :
+     * on les traduit à l'affichage, dans la langue courante de l'application.
+     */
+    private String traduireMotif(String motif) {
+        switch (motif) {
+            case "Ajout manuel":
+                return getString(R.string.motif_ajout_manuel);
+            case "Retrait manuel":
+                return getString(R.string.motif_retrait_manuel);
+            case "Chutes d'un calcul":
+                return getString(R.string.motif_chutes_calcul);
+            case "Chutes d'un calcul libre":
+                return getString(R.string.motif_chutes_calcul_libre);
+            case "Chutes d'un calcul retirées":
+                return getString(R.string.motif_chutes_calcul_retirees);
+            case "Chutes d'un calcul libre retirées":
+                return getString(R.string.motif_chutes_calcul_libre_retirees);
+            case "Annulation d'une opération":
+                return getString(R.string.motif_annulation);
+            case "Annulation d'une opération (calcul libre)":
+                return getString(R.string.motif_annulation_libre);
+            case "Reste remis en stock":
+                return getString(R.string.motif_reste_remis);
+            default:
+                break;
+        }
+        // « Coupe de 1,60 m » : on garde le nombre tel qu'il est écrit.
+        if (motif.startsWith("Coupe de ") && motif.endsWith(" m")) {
+            String nombre = motif.substring("Coupe de ".length(), motif.length() - 2);
+            return getString(R.string.motif_coupe, nombre);
+        }
+        return motif;   // motif inconnu : affiché tel quel
     }
 
     // ------------------------------------------------------------------

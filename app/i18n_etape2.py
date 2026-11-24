@@ -31,12 +31,12 @@ from pathlib import Path
 # --------------------------------------------------------------------------------------
 TEXTES = {
     # ---- Page client : boutons de calcul
-    "Calculer Poteau": ("calculer_poteau", "حساب الأعمدة"),
-    "Calculer Dalle": ("calculer_dalle", "حساب البلاطات"),
-    "Calculer Semelle": ("calculer_semelle", "حساب الأسس"),
+    "Calculer Poteau": ("calculer_poteau", "حساب بوتو"),
+    "Calculer Dalle": ("calculer_dalle", "حساب لاماس"),
+    "Calculer Semelle": ("calculer_semelle", "حساب سمال"),
     "Calculer Escalier": ("calculer_escalier", "حساب الدرج"),
-    "Calculer Poutre": ("calculer_poutre", "حساب الروافد"),
-    "Calculer Pré-poteau": ("calculer_pre_poteau", "حساب الأعمدة المسبقة الصنع"),
+    "Calculer Poutre": ("calculer_poutre", "حساب بودرا"),
+    "Calculer Pré-poteau": ("calculer_pre_poteau", "حساب بريبوتو"),
     "Aucun calcul enregistré pour ce client.": ("aucun_calcul_client", "لا توجد حسابات محفوظة لهذا الحريف."),
 
     # ---- Espace client

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--  Textes des écrans (étape 2)  -->
-    <string name="calculer_poteau">حساب الأعمدة</string>
-    <string name="calculer_dalle">حساب البلاطات</string>
-    <string name="calculer_semelle">حساب الأسس</string>
-    <string name="calculer_pre_poteau">حساب الأعمدة المسبقة الصنع</string>
-    <string name="calculer_poutre">حساب الروافد</string>
+    <string name="calculer_poteau">حساب البوتو</string>
+    <string name="calculer_dalle">حساب لاماس</string>
+    <string name="calculer_semelle">حساب سمال</string>
+    <string name="calculer_pre_poteau">حساب بريبوتو</string>
+    <string name="calculer_poutre">حساب البودرا</string>
     <string name="calculer_chainage">حساب السيناج</string>
     <string name="aucun_calcul_client">لا توجد حسابات محفوظة لهذا الحريف.</string>
     <string name="ajouter_client">+ إضافة حريف</string>
@@ -186,4 +186,23 @@
     <string name="restauration_err_trop">عدد الملفات المختارة كبير جدًا (الحد الأقصى %1$d).</string>
     <string name="restauration_err_fusion">تعذّر دمج هذه النسخ: إحداها تحتوي على بيانات غير صالحة. جرّب استعادتها واحدة تلو الأخرى.</string>
     <string name="restauration_info_ignores">تم تجاهل %1$d ملف(ات): غير قابلة للقراءة أو تالفة أو ليست نسخًا احتياطية لـ Fer Pro.</string>
+
+    <!--  سجل المخزون  -->
+    <string name="histo_fermer">إغلاق</string>
+    <string name="histo_badge_ajout">إضافة</string>
+    <string name="histo_badge_retrait">سحب</string>
+    <string name="histo_badge_operation">عملية</string>
+    <string name="histo_ajoute">تمت الإضافة</string>
+    <string name="histo_retire">تم السحب</string>
+    <string name="histo_valeur">%1$s م × %2$d</string>
+    <string name="motif_ajout_manuel">إضافة يدوية</string>
+    <string name="motif_retrait_manuel">سحب يدوي</string>
+    <string name="motif_chutes_calcul">فضلات حساب</string>
+    <string name="motif_chutes_calcul_libre">فضلات حساب حرّ</string>
+    <string name="motif_chutes_calcul_retirees">سحب فضلات حساب</string>
+    <string name="motif_chutes_calcul_libre_retirees">سحب فضلات حساب حرّ</string>
+    <string name="motif_annulation">إلغاء عملية</string>
+    <string name="motif_annulation_libre">إلغاء عملية (حساب حرّ)</string>
+    <string name="motif_reste_remis">الباقي أُعيد إلى المخزون</string>
+    <string name="motif_coupe">قص بطول %1$s م</string>
 </resources>
