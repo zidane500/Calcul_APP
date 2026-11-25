@@ -70,6 +70,7 @@
     <string name="enregistrement_echoue">L\'enregistrement a échoué.</string>
     <string name="modifs_enregistrees">Modifications enregistrées.</string>
     <string name="calcul_enregistre">Calcul enregistré.</string>
+    <string name="calcul_enregistre_auto">Calcul enregistré automatiquement.</string>
     <string name="impossible_enregistrer">Impossible d\'enregistrer ce calcul.</string>
     <string name="calcul_introuvable">Calcul introuvable.</string>
     <string name="calcul_illisible">Ce calcul enregistré est illisible.</string>

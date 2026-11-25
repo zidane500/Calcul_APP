@@ -7,6 +7,8 @@
                 <TextView android:id="@+id/tvNomCalcul" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#17263C" android:textSize="16sp" android:textStyle="bold"/>
                 <TextView android:id="@+id/tvDateCalcul" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textColor="#526176" android:textSize="13sp"/>
             </LinearLayout>
+            <!--  Renommer ce calcul  -->
+            <ImageButton android:id="@+id/btnRenommerCalcul" android:layout_width="40dp" android:layout_height="40dp" android:layout_marginStart="8dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/renommer_calcul" android:padding="9dp" android:src="@drawable/ic_edit_outline"/>
             <!--  Supprimer ce calcul (demande une confirmation)  -->
             <ImageButton android:id="@+id/btnSupprimerCalcul" android:layout_width="40dp" android:layout_height="40dp" android:layout_marginStart="12dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/supprimer_calcul" android:padding="9dp" android:src="@drawable/ic_delete_outline" app:tint="@color/retirer_text"/>
         </LinearLayout>

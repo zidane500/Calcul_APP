@@ -793,6 +793,10 @@ public class StockActivity extends AppCompatActivity {
                 return getString(R.string.motif_annulation);
             case "Annulation d'une opération (calcul libre)":
                 return getString(R.string.motif_annulation_libre);
+            case "Utilisation du stock (calcul)":
+                return getString(R.string.motif_utilisation_stock);
+            case "Utilisation du stock (calcul libre)":
+                return getString(R.string.motif_utilisation_stock_libre);
             case "Reste remis en stock":
                 return getString(R.string.motif_reste_remis);
             default:

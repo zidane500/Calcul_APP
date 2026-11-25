@@ -228,6 +228,17 @@
     <string name="motif_chutes_calcul_libre_retirees">Chutes d\'un calcul libre retirées</string>
     <string name="motif_annulation">Annulation d\'une opération</string>
     <string name="motif_annulation_libre">Annulation d\'une opération (calcul libre)</string>
+    <string name="motif_utilisation_stock">Utilisation du stock (calcul)</string>
+    <string name="motif_utilisation_stock_libre">Utilisation du stock (calcul libre)</string>
     <string name="motif_reste_remis">Reste remis en stock</string>
     <string name="motif_coupe">Coupe de %1$s m</string>
+
+    <string name="renommer">Renommer</string>
+    <string name="renommer_calcul">Renommer le calcul</string>
+    <string name="renommer_client">Renommer le client</string>
+    <string name="renommer_nom_calcul_obligatoire">Le nom du calcul est obligatoire</string>
+    <string name="renommer_nom_client_obligatoire">Le nom du client est obligatoire</string>
+    <string name="calcul_renomme">Calcul renommé</string>
+    <string name="client_renomme">Client renommé</string>
+    <string name="renommer_echec">Impossible d\'enregistrer le changement</string>
 </resources>

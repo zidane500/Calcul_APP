@@ -87,6 +87,57 @@ public class StockManager {
                 .commit();
     }
 
+    /**
+     * Après le renommage d'un client : remplace son ancien nom par le nouveau dans l'historique
+     * du stock global et de chaque stock client, et dans les opérations confirmées
+     * (le nom y sert à l'annulation).
+     */
+    public static synchronized void renommerClientPartout(Context context, List<Client> clients,
+                                                          String ancienNom, String nouveauNom) {
+        getInstance(context).renommerClient(ancienNom, nouveauNom);
+        for (Client c : clients) {
+            getInstanceClient(context, c.getId()).renommerClient(ancienNom, nouveauNom);
+        }
+    }
+
+    private synchronized void renommerClient(String ancienNom, String nouveauNom) {
+        boolean historiqueModifie = false;
+        for (int i = 0; i < historique.size(); i++) {
+            MouvementStock m = historique.get(i);
+            if (m.client.equals(ancienNom)) {
+                historique.set(i, new MouvementStock(m.date, m.action, m.typeFer, m.longueur,
+                        m.quantite, m.motif, m.groupe, nouveauNom));
+                historiqueModifie = true;
+            }
+        }
+        if (historiqueModifie) {
+            sauvegarderHistorique();
+        }
+
+        SharedPreferences.Editor editeur = null;
+        for (Map.Entry<String, ?> entree : preferences.getAll().entrySet()) {
+            if (!entree.getKey().startsWith(PREFIXE_OPERATION)
+                    || !(entree.getValue() instanceof String)) {
+                continue;
+            }
+            try {
+                JSONObject operation = new JSONObject((String) entree.getValue());
+                if (ancienNom.equals(operation.optString("client", null))) {
+                    operation.put("client", nouveauNom);
+                    if (editeur == null) {
+                        editeur = preferences.edit();
+                    }
+                    editeur.putString(entree.getKey(), operation.toString());
+                }
+            } catch (JSONException e) {
+                // Opération illisible : on la laisse telle quelle
+            }
+        }
+        if (editeur != null) {
+            editeur.apply();
+        }
+    }
+
     /** Retourne le stock actuel : type de fer -> liste de morceaux (longueur + quantité). */
     public Map<String, List<MorceauFer>> getStock() {
         return stock;

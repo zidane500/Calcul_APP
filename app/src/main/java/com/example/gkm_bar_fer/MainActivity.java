@@ -1064,6 +1064,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         cardResultats.setVisibility(View.VISIBLE);
+        enregistrerAutomatiquement();
     }
 
     /**
@@ -1162,6 +1163,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 actualiserBoutonStockClient(bouton, resultat.stockClientConfirme);
+                enregistrerAutomatiquement();
             }
         });
     }
@@ -1360,6 +1362,7 @@ public class MainActivity extends AppCompatActivity {
                         btnConfirmerStock,
                         resultat.stockConfirme
                 );
+                enregistrerAutomatiquement();
             }
         });
 
@@ -1493,6 +1496,7 @@ public class MainActivity extends AppCompatActivity {
 
                 actualiserBoutonEnvoiStockClient(bouton, resultat.dechetsClientEnvoyes);
                 actualiserExclusionEnvois(boutonGlobal, bouton, resultat);
+                enregistrerAutomatiquement();
             }
         });
     }
@@ -2153,11 +2157,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (client == null) {
             clientId = null;
-            btnEnregistrerClient.setVisibility(View.VISIBLE);
-            btnEnregistrerClient.setText(calculId != null
-                    ? getString(R.string.btn_enregistrer_modifs)
-                    : getString(R.string.dialog_titre_enregistrer));
-            btnEnregistrerClient.setOnClickListener(v -> afficherDialogueEnregistrement());
+            btnEnregistrerClient.setVisibility(View.GONE);
             return;
         }
         nomClient = client.getNom();
@@ -2170,11 +2170,51 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(titreCalculClient(client.getNom()));
         }
 
-        btnEnregistrerClient.setVisibility(View.VISIBLE);
-        btnEnregistrerClient.setText(calculId != null
-                ? getString(R.string.btn_enregistrer_modifs)
-                : getString(R.string.btn_enregistrer_pour, client.getNom()));
-        btnEnregistrerClient.setOnClickListener(v -> afficherDialogueEnregistrement());
+        btnEnregistrerClient.setVisibility(View.GONE);
+    }
+
+    /**
+     * Enregistrement automatique : crée le calcul au premier passage, puis le met à jour.
+     * Appelée après « Calculer » et après chaque action sur le stock.
+     */
+    private void enregistrerAutomatiquement() {
+        if (derniersResultatsBarres.isEmpty() || dernieresEntrees == null) {
+            return;
+        }
+        try {
+            String json = construireJsonCalcul();
+            CalculManager gestionnaire = CalculManager.getInstance(this);
+
+            if (calculId != null && gestionnaire.trouverParId(calculId) != null) {
+                String nom = nomCalculCharge != null ? nomCalculCharge : "";
+                if (nom.isEmpty()) {
+                    nom = nomParDefautCalcul();
+                    nomCalculCharge = nom;
+                }
+                if (!gestionnaire.modifier(calculId, nom, json)) {
+                    Toast.makeText(this, R.string.enregistrement_echoue, Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            String cible = clientId != null ? clientId : CalculManager.CLIENT_ID_ACCUEIL;
+            String nom = nomParDefautCalcul();
+            CalculEnregistre cree = gestionnaire.ajouter(cible, nom, json);
+            if (cree == null) {
+                Toast.makeText(this, R.string.enregistrement_echoue, Toast.LENGTH_LONG).show();
+                return;
+            }
+            calculId = cree.getId();
+            nomCalculCharge = nom;
+            Toast.makeText(this, R.string.calcul_enregistre_auto, Toast.LENGTH_SHORT).show();
+        } catch (JSONException e) {
+            Toast.makeText(this, R.string.impossible_enregistrer, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String nomParDefautCalcul() {
+        String dateHeure = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRANCE).format(new Date());
+        return getString(R.string.nom_calcul_defaut, dateHeure);
     }
 
     private void afficherDialogueEnregistrement() {

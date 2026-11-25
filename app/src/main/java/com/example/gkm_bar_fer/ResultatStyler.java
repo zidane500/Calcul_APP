@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.LeadingMarginSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 
 import androidx.core.content.ContextCompat;
 
@@ -50,6 +51,7 @@ public final class ResultatStyler {
         }
 
         int couleurTitre = ContextCompat.getColor(ctx, R.color.primary_dark);
+        int couleurTypeFer = ContextCompat.getColor(ctx, R.color.titre_type_fer);
         int couleurTexte = ContextCompat.getColor(ctx, R.color.barre_type_text);
         int couleurLibelle = ContextCompat.getColor(ctx, R.color.secondary_text);
 
@@ -81,10 +83,11 @@ public final class ResultatStyler {
 
             } else if ((m = TITRE_TYPE.matcher(ligne.trim())).matches()
                     && !ligne.startsWith(" ")) {
-                // Type de barre (N12...) : grand et en gras
+                // Type de barre (N12...) : grand, en gras, en VIOLET et SOULIGNÉ
                 sb.append(m.group(1));
                 gras(sb, debut, sb.length());
-                couleur(sb, debut, sb.length(), couleurTitre);
+                souligne(sb, debut, sb.length());
+                couleur(sb, debut, sb.length(), couleurTypeFer);
                 taille(sb, debut, sb.length(), 1.2f);
 
             } else if ((m = BESOIN.matcher(ligne)).matches()) {
@@ -93,7 +96,7 @@ public final class ResultatStyler {
                 int debutType = sb.length();
                 sb.append(m.group(1));
                 gras(sb, debutType, sb.length());
-                couleur(sb, debutType, sb.length(), couleurTitre);
+                couleur(sb, debutType, sb.length(), couleurTypeFer);
 
                 // On garde le séparateur d'origine (en arabe : marque droite-à-gauche) pour que
                 // le diamètre reste avant le nombre de coupes.
@@ -161,6 +164,10 @@ public final class ResultatStyler {
 
     private static void gras(SpannableStringBuilder sb, int from, int to) {
         sb.setSpan(new StyleSpan(Typeface.BOLD), from, to, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
+    private static void souligne(SpannableStringBuilder sb, int from, int to) {
+        sb.setSpan(new UnderlineSpan(), from, to, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     private static void couleur(SpannableStringBuilder sb, int from, int to, int couleur) {

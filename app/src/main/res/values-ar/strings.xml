@@ -203,6 +203,17 @@
     <string name="motif_chutes_calcul_libre_retirees">سحب فضلات حساب حرّ</string>
     <string name="motif_annulation">إلغاء عملية</string>
     <string name="motif_annulation_libre">إلغاء عملية (حساب حرّ)</string>
+    <string name="motif_utilisation_stock">استعمال المخزون (حساب)</string>
+    <string name="motif_utilisation_stock_libre">استعمال المخزون (حساب حرّ)</string>
     <string name="motif_reste_remis">الباقي أُعيد إلى المخزون</string>
     <string name="motif_coupe">قص بطول %1$s م</string>
+
+    <string name="renommer">تغيير الاسم</string>
+    <string name="renommer_calcul">تغيير اسم الحساب</string>
+    <string name="renommer_client">تغيير اسم الحريف</string>
+    <string name="renommer_nom_calcul_obligatoire">اسم الحساب إجباري</string>
+    <string name="renommer_nom_client_obligatoire">اسم الحريف إجباري</string>
+    <string name="calcul_renomme">تم تغيير اسم الحساب</string>
+    <string name="client_renomme">تم تغيير اسم الحريف</string>
+    <string name="renommer_echec">تعذّر حفظ التغيير</string>
 </resources>

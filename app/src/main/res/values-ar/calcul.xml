@@ -69,6 +69,7 @@
     <string name="enregistrement_echoue">فشل الحفظ.</string>
     <string name="modifs_enregistrees">تم حفظ التعديلات.</string>
     <string name="calcul_enregistre">تم حفظ الحساب.</string>
+    <string name="calcul_enregistre_auto">تم حفظ الحساب تلقائيا.</string>
     <string name="impossible_enregistrer">تعذّر حفظ هذا الحساب.</string>
     <string name="calcul_introuvable">الحساب غير موجود.</string>
     <string name="calcul_illisible">هذا الحساب المحفوظ غير قابل للقراءة.</string>

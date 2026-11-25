@@ -159,6 +159,7 @@ public class CalculsClientActivity extends AppCompatActivity {
             TextView tvNom = itemView.findViewById(R.id.tvNomCalcul);
             TextView tvDate = itemView.findViewById(R.id.tvDateCalcul);
             ImageButton btnSupprimer = itemView.findViewById(R.id.btnSupprimerCalcul);
+            ImageButton btnRenommer = itemView.findViewById(R.id.btnRenommerCalcul);
 
             tvNom.setText(calcul.getNom());
             itemView.findViewById(R.id.viewAccentCalcul)
@@ -180,6 +181,8 @@ public class CalculsClientActivity extends AppCompatActivity {
                 startActivity(intent);
             });
             btnSupprimer.setOnClickListener(v -> afficherConfirmationSuppression(calcul));
+            btnRenommer.setOnClickListener(v -> DialoguesRenommage.renommerCalcul(
+                    CalculsClientActivity.this, calcul, this::rafraichirAffichage));
 
             layoutCalculs.addView(itemView);
         }

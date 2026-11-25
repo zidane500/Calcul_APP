@@ -91,6 +91,24 @@ public class ClientManager {
         return client;
     }
 
+    /** Modifie le nom et la ville d'un client (même identifiant, même date de création). */
+    public boolean renommer(String idClient, String nouveauNom, String nouvelleVille) {
+        for (int i = 0; i < clients.size(); i++) {
+            Client ancien = clients.get(i);
+            if (ancien.getId().equals(idClient)) {
+                clients.set(i, new Client(
+                        ancien.getId(),
+                        nouveauNom.trim(),
+                        nouvelleVille == null ? "" : nouvelleVille.trim(),
+                        ancien.getDateCreation()
+                ));
+                sauvegarder();
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Supprime un client à partir de son identifiant. */
     public boolean supprimer(String idClient) {
         for (int i = 0; i < clients.size(); i++) {

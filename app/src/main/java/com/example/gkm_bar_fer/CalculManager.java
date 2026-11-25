@@ -97,6 +97,30 @@ public class CalculManager {
         return false;
     }
 
+    /** Change uniquement le nom d'un calcul : données et dates restent identiques. */
+    public boolean renommer(String idCalcul, String nouveauNom) {
+        for (int i = 0; i < calculs.size(); i++) {
+            CalculEnregistre ancien = calculs.get(i);
+            if (ancien.getId().equals(idCalcul)) {
+                CalculEnregistre nouveau = new CalculEnregistre(
+                        ancien.getId(),
+                        ancien.getClientId(),
+                        nouveauNom.trim(),
+                        ancien.getDateCreation(),
+                        ancien.getDateModification(),
+                        ancien.getDonneesJson()
+                );
+                calculs.set(i, nouveau);
+                if (!sauvegarder()) {
+                    calculs.set(i, ancien);
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Ajoute un calcul pour un client et retourne l'élément créé (ou null si échec). */
     public CalculEnregistre ajouter(String clientId, String nom, String donneesJson) {
         long maintenant = System.currentTimeMillis();

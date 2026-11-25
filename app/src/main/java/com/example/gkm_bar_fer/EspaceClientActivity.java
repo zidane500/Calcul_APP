@@ -204,6 +204,7 @@ public class EspaceClientActivity extends AppCompatActivity {
             TextView tvVille = itemView.findViewById(R.id.tvVilleClient);
             Button btnConsulter = itemView.findViewById(R.id.btnConsulterClient);
             ImageButton btnSupprimer = itemView.findViewById(R.id.btnSupprimerClient);
+            ImageButton btnRenommer = itemView.findViewById(R.id.btnRenommerClient);
 
             tvNom.setText(client.getNom());
 
@@ -240,6 +241,8 @@ public class EspaceClientActivity extends AppCompatActivity {
             itemView.setOnClickListener(v -> btnConsulter.performClick());
 
             btnSupprimer.setOnClickListener(v -> afficherConfirmationSuppression(client));
+            btnRenommer.setOnClickListener(v -> DialoguesRenommage.renommerClient(
+                    EspaceClientActivity.this, client, this::rafraichirAffichage));
 
             layoutClients.addView(itemView);
         }

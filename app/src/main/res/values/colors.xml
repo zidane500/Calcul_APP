@@ -12,6 +12,7 @@
     <!--  Fond de l'écran de démarrage : même bleu marine que le logo  -->
     <color name="splash_fond">#011E3C</color>
     <color name="primary_dark">#1976D2</color>
+    <color name="titre_type_fer">#8E24AA</color>
     <color name="accent">#FF4081</color>
     <color name="background">#F5F5F5</color>
     <color name="surface">#FFFFFF</color>
