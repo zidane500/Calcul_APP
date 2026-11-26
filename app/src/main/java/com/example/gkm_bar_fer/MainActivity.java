@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_TYPE_ELEMENT = "type_element";
     public static final String TYPE_MULTI = "multi";
+    /** Saisies (JSON) venant du scan d'un plan : groupes à pré-remplir, déjà relus par l'utilisateur. */
+    public static final String EXTRA_ENTREES_SCAN = "entrees_scan";
     private boolean modeMulti = false;
     private TypeElement typeElement = TypeElement.POTEAU;
     private String clientId = null;
@@ -466,7 +468,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Premier groupe affiché par défaut, sans bouton "Supprimer".
         // En mode Multi-Calcul, le type est d'abord choisi dans un modal.
-        if (modeMulti) {
+        String entreesScan = getIntent().getStringExtra(EXTRA_ENTREES_SCAN);
+        if (entreesScan != null) {
+            chargerEntreesScan(entreesScan);
+        } else if (modeMulti) {
             afficherChoixTypeMulti();
         } else {
             ajouterGroupePoteau(false);
@@ -474,6 +479,23 @@ public class MainActivity extends AppCompatActivity {
 
         // Si on ouvre un calcul enregistré, on restaure ses saisies et ses résultats
         chargerCalculSiDemande();
+    }
+
+    /**
+     * Pré-remplit les groupes avec ceux relus à l'écran de scan d'un plan. Aucun calcul n'est lancé :
+     * l'utilisateur vérifie puis appuie lui-même sur « Calculer ».
+     */
+    private void chargerEntreesScan(String json) {
+        try {
+            restaurerEntrees(new JSONArray(json));
+        } catch (JSONException e) {
+            Toast.makeText(this, R.string.calcul_illisible, Toast.LENGTH_LONG).show();
+        }
+        if (listeGroupesPoteaux.isEmpty()) {
+            ajouterGroupePoteau(false);
+            return;
+        }
+        Toast.makeText(this, R.string.scan_importe_verifier, Toast.LENGTH_LONG).show();
     }
 
     @Override

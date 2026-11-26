@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Accueil -->
+    <string name="scan_menu_titre">Scanner un plan</string>
+    <string name="scan_menu_desc">Lisez un plan de ferraillage (PDF ou photo) pour pré-remplir un calcul. Vous vérifiez chaque valeur avant l\'import.</string>
+    <string name="scan_menu_bouton">Scanner un plan</string>
+
+    <!-- Écran de scan -->
+    <string name="scan_titre">Scanner un plan</string>
+    <string name="scan_intro">Choisissez un plan de béton armé (PDF ou photo). La lecture se fait sur votre téléphone : le plan n\'est envoyé nulle part.\n\nL\'application reconnaît les fiches de poutres (avec contrôle par les totaux du plan) et les tableaux ou annotations de ferraillage (poteaux, semelles, chaînages...).\n\nRien n\'est importé sans votre vérification : vous relisez, complétez et cochez chaque groupe.</string>
+    <string name="scan_choisir">Choisir un plan (PDF ou photo)</string>
+    <string name="scan_erreur_lecture">Impossible de lire ce fichier.</string>
+    <string name="scan_annuler">Annuler</string>
+    <string name="scan_pages_titre">Pages à analyser</string>
+    <string name="scan_pages_hint">Ex. : 4-21 ou 1,3,5-7</string>
+    <string name="scan_pages_info">Ce PDF contient %1$d pages. Indiquez seulement les pages de plans de ferraillage (%2$d pages maximum à la fois).</string>
+    <string name="scan_pages_invalides">Pages invalides (de 1 à %1$d, %2$d pages maximum).</string>
+    <string name="scan_analyse">Analyse de la page %1$d (%2$d sur %3$d)…</string>
+    <string name="scan_rien">Aucune armature reconnue. Essayez une photo plus nette et bien cadrée, ou le PDF du plan.</string>
+    <string name="scan_resume">%1$d groupe(s) reconnu(s) sur %2$d page(s). Comparez chaque ligne avec le plan : rien n\'est importé sans votre validation.</string>
+    <string name="scan_pages_vides">Pages sans armature reconnue : %1$s</string>
+
+    <!-- Vérification -->
+    <string name="scan_confiance_haute">Contrôle réussi</string>
+    <string name="scan_confiance_moyenne">À vérifier</string>
+    <string name="scan_confiance_basse">Contrôle échoué</string>
+    <string name="scan_page_n">page %1$d</string>
+    <string name="scan_lu_sur_plan">Lu sur le plan :\n%1$s</string>
+    <string name="scan_type_choisir">— Choisir le type d\'élément —</string>
+    <string name="scan_champ_nombre">Nombre</string>
+    <string name="scan_champ_longueur">Longueur (m)</string>
+    <string name="scan_champ_quantite">Quantité</string>
+    <string name="scan_ajouter_barre">+ Ajouter une barre</string>
+    <string name="scan_retirer_barre">Retirer cette barre</string>
+    <string name="scan_ajouter_groupe">+ Ajouter un groupe</string>
+    <string name="scan_groupe_ajoute">Groupe ajouté</string>
+    <string name="scan_bouton_importer">Importer les groupes cochés</string>
+    <string name="scan_confirmer_titre">Contrôle non réussi</string>
+    <string name="scan_confirmer_msg">La lecture de « %1$s » ne correspond pas aux totaux du plan ou reste incertaine. Ne la cochez qu\'après avoir comparé chaque valeur avec le plan.</string>
+    <string name="scan_confirmer_oui">J\'ai vérifié</string>
+    <string name="scan_corriger">%1$d groupe(s) à corriger avant l\'import.</string>
+    <string name="scan_aucun_groupe">Cochez au moins un groupe à importer.</string>
+    <string name="scan_pb_type">Choisissez le type d\'élément.</string>
+    <string name="scan_pb_nombre">Nombre d\'éléments manquant ou invalide.</string>
+    <string name="scan_pb_longueur">Longueur manquante ou invalide.</string>
+    <string name="scan_pb_aucune_barre">Ajoutez au moins une barre.</string>
+    <string name="scan_pb_barre_inconnue">Diamètre non disponible dans l\'application.</string>
+    <string name="scan_pb_quantite">Quantité de barres manquante ou invalide.</string>
+    <string name="scan_pb_longueur_12">Longueur supérieure à une barre de 12 m : vérifiez-la.</string>
+
+    <!-- Écran de calcul -->
+    <string name="scan_importe_verifier">Données importées d\'un plan : vérifiez chaque groupe avant de calculer.</string>
+</resources>

@@ -1,5 +1,7 @@
 package com.example.gkm_bar_fer;
 
+import com.example.gkm_bar_fer.scan.ScanPlanActivity;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -78,6 +80,7 @@ public class MenuActivity extends AppCompatActivity {
         Button btnPrePoteau = findViewById(R.id.btnMenuPrePoteau);
         Button btnChainage = findViewById(R.id.btnMenuChainage);
         Button btnMulti = findViewById(R.id.btnMenuMulti);
+        Button btnScan = findViewById(R.id.btnMenuScan);
         Button btnStock = findViewById(R.id.btnMenuStock);
 
         btnPoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.POTEAU));
@@ -87,6 +90,8 @@ public class MenuActivity extends AppCompatActivity {
         btnPrePoteau.setOnClickListener(v -> ouvrirCalcul(TypeElement.PRE_POTEAU));
         btnChainage.setOnClickListener(v -> ouvrirCalcul(TypeElement.CHAINAGE));
         btnMulti.setOnClickListener(v -> ouvrirCalculMulti());
+        btnScan.setOnClickListener(v -> startActivity(
+                new Intent(MenuActivity.this, ScanPlanActivity.class)));
 
         btnStock.setOnClickListener(v -> {
             Intent intent = new Intent(
